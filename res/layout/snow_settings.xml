@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2010 Dan Walkes - All Rights Reserved
+-->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:gravity="center">
+<TextView android:text="@string/wake_me_up_when" 
+	android:id="@+id/snow_settings_wake_me_up_text" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:gravity="center"></TextView>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  android:gravity="center">
+<Spinner android:id="@+id/snow_settings_amount" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:entries="@array/one_to_24">
+</Spinner>
+<Spinner android:id="@+id/snow_settings_units" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:entries="@array/inches_cm">
+</Spinner>
+</LinearLayout>
+<TextView android:text="@string/past_24_hours" 
+	android:id="@+id/snow_settings_past_24_text" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:gravity="center">
+</TextView>
+</LinearLayout>
