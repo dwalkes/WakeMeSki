@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.dwalkes.android.wakemeski.R;
+import com.dwalkes.android.wakemeski.SnowUnits;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -65,6 +66,8 @@ public class Report implements Parcelable
 	private ArrayList<String> _snowTotals = new ArrayList<String>();
 	private ArrayList<String> _dailySnow = new ArrayList<String>();
 	private ArrayList<String> _tempReadings = new ArrayList<String>();
+	private String _freshSnow ="";
+	private String _snowUnits ="inches";
 	
 	private String _label;
 	
@@ -73,8 +76,6 @@ public class Report implements Parcelable
 	
 	private static final String TAG = "android.skireport.Report";
 	
-	private String _24hrSnowParsedString = null;
-
 	public static final Parcelable.Creator<Report> CREATOR
 		= new Parcelable.Creator<Report>()
 		{
@@ -104,6 +105,10 @@ public class Report implements Parcelable
 				r._longitude = source.readString();
 				
 				r._snowConditions = source.readString();
+				
+				r._freshSnow = source.readString();
+				
+				r._snowUnits = source.readString();
 				
 				source.readList(r._snowTotals, getClass().getClassLoader());
 				source.readList(r._dailySnow, getClass().getClassLoader());
@@ -187,49 +192,37 @@ public class Report implements Parcelable
 	}
 	
 	/**
-	 * @return true if a 24hour snow total was found for this resort
+	 * @return true if a fresh snow total was obtained for this resort
 	 */
-	public boolean has24HrSnowTotal() 
+	public boolean hasFreshSnowTotal() 
 	{
-		return get24HrSnowString() != null;
+		return getFreshSnowTotal() >= 0;
 	}
 	
 	/**
-	 * @return A String object representing the amount of snow in the last 24 hours
-	 * or null if the value was not found
+	 * @return The units for all snow totals
 	 */
-	private String get24HrSnowString()
+	public SnowUnits getSnowUnits()
 	{
-		if( _24hrSnowParsedString == null ) {
-			StringBuilder builder = new StringBuilder();
-			for( String snow: _dailySnow ) {
-				builder.append(snow);
-				builder.append(' ');	 // make sure at least one space exists between snow values
-			}
-			// different formats are used for 24 hour totals, look for 24hr followed by 
-			// a series of non-digits (at least one space, as inserted above), followed by a series of digits
-			Pattern hr24Regex = Pattern.compile("24hr\\D*(\\d+)");
-	
-			Matcher m = hr24Regex.matcher(builder.toString());
-			if( m.find() ) {
-				if( m.groupCount() >= 1 ) {
-					_24hrSnowParsedString = m.group(1);
-				}
-			}
+		if( _snowUnits.equalsIgnoreCase("inches") ) {
+			return SnowUnits.INCHES;
 		}
-		return _24hrSnowParsedString;
+		return SnowUnits.CENTIMETERS;
 	}
-	
 	/**
-	 * @return The total snowfall in 24 hours as an integer value, or 0 if ! has24HrSnowTotal()
+	 * @return The total fresh snowfall (rounded to nearest int) or -1 if ! hasFreshSnowTotal()
 	 */
-	public int get24HrSnowTotal() 
+	public int getFreshSnowTotal() 
 	{
-		String snowString = get24HrSnowString();
-		if( snowString == null ) {
-			return 0;
+		int snowTotal;
+		try 
+		{
+			snowTotal = Math.round(Float.parseFloat(_freshSnow));
+		} catch (NumberFormatException nfe)
+		{
+			snowTotal = -1;
 		}
-		return Integer.parseInt(snowString);
+		return snowTotal;
 	}
 	
 	public String getSnowConditions()
@@ -330,6 +323,9 @@ public class Report implements Parcelable
 		dest.writeString(_longitude);
 		
 		dest.writeString(_snowConditions);
+		
+		dest.writeString(_freshSnow);
+		dest.writeString(_snowUnits);
 
 		dest.writeList(_snowTotals);
 		dest.writeList(_dailySnow);
@@ -378,7 +374,9 @@ public class Report implements Parcelable
 		// trails.open = 0
 		// trails.total = 10
 		// snow.total = 6 
-		// snow.daily = 0 
+		// snow.daily = Fresh(4.3) [48 hr(<amount>)]
+		// snow.fresh = 4.3
+		// snow.units = inches
 		// temp.readings = 41/33 44/38 43/34 
 		// wind.avg = 20
 		
@@ -468,6 +466,14 @@ public class Report implements Parcelable
 				{
 					r._errMsg = parts[1];
 				}
+				else if( parts[0].equals("snow.fresh"))
+				{
+					r._freshSnow = parts[1];
+				}
+				else if( parts[0].equals("snow.units"))
+				{
+					r._snowUnits = parts[1];
+				}
 				else
 				{
 					String values[] = parts[1].split("\\s+");
@@ -481,6 +487,7 @@ public class Report implements Parcelable
 					{
 						r._dailySnow = vals;
 					}
+
 					else if( parts[0].equals("temp.readings"))
 					{
 						r._tempReadings = vals;

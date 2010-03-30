@@ -44,9 +44,10 @@ public class SkiReportManager {
 		Set<ResortSnowInfo> snowInfoSet = new HashSet<ResortSnowInfo>(); 
 		for( Resort resort : resortList ) {
 			Report report = Report.loadReport(mContext, mConnectivityMgr, resort.getLocation());
-			if( report.has24HrSnowTotal() ) {
+			if( report.hasFreshSnowTotal() ) {
 				ResortSnowInfo snowInfo = new ResortSnowInfo(resort);
-				snowInfo.setResortSnowDepth24Hours(report.get24HrSnowTotal());
+				snowInfo.setResortSnowDepth24Hours(report.getFreshSnowTotal());
+				snowInfo.setResortReportUnits(report.getSnowUnits());
 				snowInfoSet.add(snowInfo);
 			}
 		}

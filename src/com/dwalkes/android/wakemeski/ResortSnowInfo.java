@@ -25,6 +25,11 @@ package com.dwalkes.android.wakemeski;
  */
 public class ResortSnowInfo implements Comparable<ResortSnowInfo> {
 	private SnowUnits resortReportUnits = SnowUnits.INCHES;
+	
+	public void setResortReportUnits(SnowUnits resortReportUnits) {
+		this.resortReportUnits = resortReportUnits;
+	}
+
 	private int	resortSnowDepth24Hours = 0;
 	Resort resort;
 	
