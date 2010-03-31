@@ -19,8 +19,6 @@
 package com.dwalkes.android.wakemeski.alarmclock;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
