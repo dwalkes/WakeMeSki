@@ -27,19 +27,20 @@ import android.util.Config;
 import com.android.wakemeski.ui.WakeMeSkiPreferences;
 
 class Log {
-    public final static String LOGTAG = "WakeMeSki";
+	public final static String LOGTAG = "WakeMeSki";
 
-    static final boolean LOGV = WakeMeSkiPreferences.DEBUG ? Config.LOGD : Config.LOGV;
+	static final boolean LOGV = WakeMeSkiPreferences.DEBUG ? Config.LOGD
+			: Config.LOGV;
 
-    static void v(String logMe) {
-        android.util.Log.v(LOGTAG, logMe);
-    }
+	static void v(String logMe) {
+		android.util.Log.v(LOGTAG, logMe);
+	}
 
-    static void e(String logMe) {
-        android.util.Log.e(LOGTAG, logMe);
-    }
+	static void e(String logMe) {
+		android.util.Log.e(LOGTAG, logMe);
+	}
 
-    static void e(String logMe, Exception ex) {
-        android.util.Log.e(LOGTAG, logMe, ex);
-    }
+	static void e(String logMe, Exception ex) {
+		android.util.Log.e(LOGTAG, logMe, ex);
+	}
 }

@@ -23,80 +23,83 @@ import android.content.Context;
 import android.os.PowerManager;
 
 /**
- * Hold a wakelock that can be acquired in the AlarmReceiver and
- * released in the AlarmAlert activity
+ * Hold a wakelock that can be acquired in the AlarmReceiver and released in the
+ * AlarmAlert activity
  */
 public class AlarmAlertWakeLock {
 
-    private static PowerManager.WakeLock sScreenWakeLock = null;
-    private static PowerManager.WakeLock sCpuWakeLock = null;
-    private static KeyguardManager.KeyguardLock mKeyguardLock = null;
-    
-    public static void acquireCpuWakeLock(Context context) {
-        Log.v("Acquiring cpu wake lock");
-        if (sCpuWakeLock != null) {
-            return;
-        }
+	private static PowerManager.WakeLock sScreenWakeLock = null;
+	private static PowerManager.WakeLock sCpuWakeLock = null;
+	private static KeyguardManager.KeyguardLock mKeyguardLock = null;
 
-        PowerManager pm =
-                (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+	public static void acquireCpuWakeLock(Context context) {
+		Log.v("Acquiring cpu wake lock");
+		if (sCpuWakeLock != null) {
+			return;
+		}
 
-        sCpuWakeLock = pm.newWakeLock(
-                PowerManager.PARTIAL_WAKE_LOCK |
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
-        sCpuWakeLock.acquire();
-    }
+		PowerManager pm = (PowerManager) context
+				.getSystemService(Context.POWER_SERVICE);
 
-    public static void acquireScreenWakeLock(Context context) {
-        Log.v("Acquiring screen wake lock");
-        if (sScreenWakeLock != null) {
-            return;
-        }
-        
-        PowerManager pm =
-                (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		sCpuWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+				| PowerManager.ACQUIRE_CAUSES_WAKEUP
+				| PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
+		sCpuWakeLock.acquire();
+	}
 
-        sScreenWakeLock = pm.newWakeLock(
-                PowerManager.FULL_WAKE_LOCK |
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
-        sScreenWakeLock.acquire();
-        
-        /*
-         *Disable the keyguard if active
-         *For 2.0 or later this is easier, just use addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED) 
-         *See http://gitorious.com/rowboat/packages-apps-alarmclock/commit/01dee6eedd37dd50961584a7c717c85f00131401
-         */
-        KeyguardManager keyMgr = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-        if( keyMgr == null ) {
-        	Log.e("Cannot access keyguard");
-        } else {
-       	 	mKeyguardLock = keyMgr.newKeyguardLock("com.dwalkes.wakemeski");
-       	 	if( mKeyguardLock != null ) {
-       	 		if (Log.LOGV) Log.v("keyguardLock Created");
-       	 	}
-        }
-    	if( mKeyguardLock != null ) {
-            if (Log.LOGV) Log.v("disabling keyguard");
-    		mKeyguardLock.disableKeyguard();
-    	}
-    }
+	public static void acquireScreenWakeLock(Context context) {
+		Log.v("Acquiring screen wake lock");
+		if (sScreenWakeLock != null) {
+			return;
+		}
 
-    public static void release() {
-        Log.v("Releasing wake lock");
-        if (sCpuWakeLock != null) {
-            sCpuWakeLock.release();
-            sCpuWakeLock = null;
-        }
-        if (sScreenWakeLock != null) {
-            sScreenWakeLock.release();
-            sScreenWakeLock = null;
-        }
-        if( mKeyguardLock != null ) {
-            if (Log.LOGV) Log.v("re-enabling keyguard");
-    		mKeyguardLock.reenableKeyguard();
-    		mKeyguardLock = null;
-    	}
-    }
+		PowerManager pm = (PowerManager) context
+				.getSystemService(Context.POWER_SERVICE);
+
+		sScreenWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
+				| PowerManager.ACQUIRE_CAUSES_WAKEUP
+				| PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
+		sScreenWakeLock.acquire();
+
+		/*
+		 * Disable the keyguard if activeFor 2.0 or later this is easier, just
+		 * use addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)See
+		 * http://gitorious.com/rowboat/packages-apps-alarmclock/commit/01d
+		 * ee6eedd37dd50961584a7c717c85f00131401
+		 */
+		KeyguardManager keyMgr = (KeyguardManager) context
+				.getSystemService(Context.KEYGUARD_SERVICE);
+		if (keyMgr == null) {
+			Log.e("Cannot access keyguard");
+		} else {
+			mKeyguardLock = keyMgr.newKeyguardLock("com.dwalkes.wakemeski");
+			if (mKeyguardLock != null) {
+				if (Log.LOGV)
+					Log.v("keyguardLock Created");
+			}
+		}
+		if (mKeyguardLock != null) {
+			if (Log.LOGV)
+				Log.v("disabling keyguard");
+			mKeyguardLock.disableKeyguard();
+		}
+	}
+
+	public static void release() {
+		Log.v("Releasing wake lock");
+		if (sCpuWakeLock != null) {
+			sCpuWakeLock.release();
+			sCpuWakeLock = null;
+		}
+		if (sScreenWakeLock != null) {
+			sScreenWakeLock.release();
+			sScreenWakeLock = null;
+		}
+		if (mKeyguardLock != null) {
+			if (Log.LOGV)
+				Log.v("re-enabling keyguard");
+			mKeyguardLock.reenableKeyguard();
+			mKeyguardLock = null;
+		}
+	}
 }

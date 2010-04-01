@@ -27,51 +27,53 @@ import android.util.AttributeSet;
 import com.android.wakemeski.ui.AlarmToneSharedPreference;
 
 public class AlarmPreference extends RingtonePreference {
-    AlarmToneSharedPreference 	mPreference;
-    private IRingtoneChangedListener mRingtoneChangedListener;
-    
-    public interface IRingtoneChangedListener {
-        public void onRingtoneChanged(Uri ringtoneUri);
-    };
-    
-    public AlarmPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mPreference = new AlarmToneSharedPreference();
-        mRingtoneChangedListener = null;
-    }
+	AlarmToneSharedPreference mPreference;
+	private IRingtoneChangedListener mRingtoneChangedListener;
 
-    public void setRingtoneChangedListener(IRingtoneChangedListener listener) {
-        mRingtoneChangedListener = listener;
-    }
-    
-    public void updateSummary() {
-//    	String summaryString = mPreference.getSummaryString(mRingtoneUriToTitle);
-//    	this.setSummary(summaryString); 
-    }
-    
-    protected void onSaveRingtone(Uri ringtoneUri ) {
-    	mPreference.setFromUri(ringtoneUri);
-    	updateSummary();
-        if (mRingtoneChangedListener != null) {
-            mRingtoneChangedListener.onRingtoneChanged(ringtoneUri);
-        }
-    	super.onSaveRingtone(ringtoneUri);
-    }
-    
+	public interface IRingtoneChangedListener {
+		public void onRingtoneChanged(Uri ringtoneUri);
+	};
+
+	public AlarmPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		mPreference = new AlarmToneSharedPreference();
+		mRingtoneChangedListener = null;
+	}
+
+	public void setRingtoneChangedListener(IRingtoneChangedListener listener) {
+		mRingtoneChangedListener = listener;
+	}
+
+	public void updateSummary() {
+		// String summaryString =
+		// mPreference.getSummaryString(mRingtoneUriToTitle);
+		// this.setSummary(summaryString);
+	}
+
+	protected void onSaveRingtone(Uri ringtoneUri) {
+		mPreference.setFromUri(ringtoneUri);
+		updateSummary();
+		if (mRingtoneChangedListener != null) {
+			mRingtoneChangedListener.onRingtoneChanged(ringtoneUri);
+		}
+		super.onSaveRingtone(ringtoneUri);
+	}
+
 	/**
 	 * This is the first time the persistent value can be read
-	 * @param preferenceManager - the manager attached to this hierarchy
+	 * 
+	 * @param preferenceManager
+	 *            - the manager attached to this hierarchy
 	 */
-    @Override
-	protected void onAttachedToHierarchy( PreferenceManager preferenceManager ) {
+	@Override
+	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
 		mPreference.setFromPersistString(this.getPersistedString(null));
 		updateSummary();
 	}
-	
+
 	public Uri getTone() {
 		return mPreference.getUri();
 	}
-	
-	
+
 }

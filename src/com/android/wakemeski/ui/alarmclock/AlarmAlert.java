@@ -36,299 +36,301 @@ import com.android.wakemeski.ui.WakeMeSkiDashboard;
 import com.android.wakemeski.ui.WakeMeSkiPreferences;
 
 /**
- * Alarm Clock alarm alert: pops visible indicator and plays alarm
- * tone
+ * Alarm Clock alarm alert: pops visible indicator and plays alarm tone
  */
 public class AlarmAlert extends Activity {
 
-    private static final int SNOOZE_MINUTES = 10;
-    private static final int SNOOZE_MS = WakeMeSkiPreferences.DEBUG ? 
-    			10000 : (1000 * 60 * SNOOZE_MINUTES);
-    
-    private static final int UNKNOWN = 0;
-    private static final int SNOOZE = 1;
-    private static final int DISMISS = 2;
-    private static final int KILLED = 3;
-    private Button mSnoozeButton;
-    private int mState = UNKNOWN;
+	private static final int SNOOZE_MINUTES = 10;
+	private static final int SNOOZE_MS = WakeMeSkiPreferences.DEBUG ? 10000
+			: (1000 * 60 * SNOOZE_MINUTES);
 
-    private AlarmKlaxon mKlaxon;
-    private int mAlarmId = 0;
-    private String mLabel;
+	private static final int UNKNOWN = 0;
+	private static final int SNOOZE = 1;
+	private static final int DISMISS = 2;
+	private static final int KILLED = 3;
+	private Button mSnoozeButton;
+	private int mState = UNKNOWN;
 
-    
-    public static final String MEDIA_ALERT_SOURCE_STRING_EXTRA = "com.dwalkes.android.alarmclock.media_alert_source";
-    public static final String VIBRATE_BOOLEAN_EXTRA = "com.dwalkes.android.alarmclock.vibrate";
+	private AlarmKlaxon mKlaxon;
+	private int mAlarmId = 0;
+	private String mLabel;
 
-    /*
-     * FIXME: it would be nice for this to live in an xml config file.
-     */
-    final static int[] CLOCKS = {
-        R.layout.clock_basic_bw,
-    };
+	public static final String MEDIA_ALERT_SOURCE_STRING_EXTRA = "com.dwalkes.android.alarmclock.media_alert_source";
+	public static final String VIBRATE_BOOLEAN_EXTRA = "com.dwalkes.android.alarmclock.vibrate";
 
-    
-    @Override
-    protected void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+	/*
+	 * FIXME: it would be nice for this to live in an xml config file.
+	 */
+	final static int[] CLOCKS = { R.layout.clock_basic_bw, };
 
-        // Maintain a lock during the playback of the alarm. This lock may have
-        // already been acquired in AlarmReceiver. If the process was killed,
-        // the global wake lock is gone. Acquire again just to be sure.
-        AlarmAlertWakeLock.acquireCpuWakeLock(this);
+	@Override
+	protected void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
 
-        /* FIXME Intentionally verbose: always log this until we've
-           fully debugged the app failing to start up */
-        Log.v("AlarmAlert.onCreate()");
+		// Maintain a lock during the playback of the alarm. This lock may have
+		// already been acquired in AlarmReceiver. If the process was killed,
+		// the global wake lock is gone. Acquire again just to be sure.
+		AlarmAlertWakeLock.acquireCpuWakeLock(this);
 
-        Intent i = getIntent();
-//        mAlarmId = i.getIntExtra(Alarms.ID, -1);
+		/*
+		 * FIXME Intentionally verbose: always log this until we've fully
+		 * debugged the app failing to start up
+		 */
+		Log.v("AlarmAlert.onCreate()");
 
-        mKlaxon = new AlarmKlaxon(this.getApplicationContext(),
-        							i.getStringExtra(MEDIA_ALERT_SOURCE_STRING_EXTRA),
-        							i.getBooleanExtra(VIBRATE_BOOLEAN_EXTRA, false));
-        
-        mKlaxon.postPlay(this, mAlarmId);
+		Intent i = getIntent();
+		// mAlarmId = i.getIntExtra(Alarms.ID, -1);
 
-        /* allow next alarm to trigger while this activity is
-           active */
-//        Alarms.disableSnoozeAlert(AlarmAlert.this);
-//        Alarms.disableAlert(AlarmAlert.this, mAlarmId);
-//        Alarms.setNextAlert(this);
+		mKlaxon = new AlarmKlaxon(this.getApplicationContext(), i
+				.getStringExtra(MEDIA_ALERT_SOURCE_STRING_EXTRA), i
+				.getBooleanExtra(VIBRATE_BOOLEAN_EXTRA, false));
 
-        mKlaxon.setKillerCallback(new AlarmKlaxon.KillerCallback() {
-            public void onKilled() {
-                if (Log.LOGV) Log.v("onKilled()");
-                updateSilencedText();
+		mKlaxon.postPlay(this, mAlarmId);
 
-                /* don't allow snooze */
-                mSnoozeButton.setEnabled(false);
+		/*
+		 * allow next alarm to trigger while this activity is active
+		 */
+		// Alarms.disableSnoozeAlert(AlarmAlert.this);
+		// Alarms.disableAlert(AlarmAlert.this, mAlarmId);
+		// Alarms.setNextAlert(this);
 
-                // Dismiss the alarm but mark the state as killed so if the
-                // config changes, we show the silenced message and disable
-                // snooze.
-                dismiss();
-                mState = KILLED;
-            }
-        });
+		mKlaxon.setKillerCallback(new AlarmKlaxon.KillerCallback() {
+			public void onKilled() {
+				if (Log.LOGV)
+					Log.v("onKilled()");
+				updateSilencedText();
 
-        requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+				/* don't allow snooze */
+				mSnoozeButton.setEnabled(false);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        updateLayout();
-    }
+				// Dismiss the alarm but mark the state as killed so if the
+				// config changes, we show the silenced message and disable
+				// snooze.
+				dismiss();
+				mState = KILLED;
+			}
+		});
 
+		requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
 
-    private void setTitleFromIntent(Intent i) {
-//      mLabel = i.getStringExtra(Alarms.LABEL);
-    	mLabel = "Ski Wake Up!!";
-//        if (mLabel == null || mLabel.length() == 0) {
-//            mLabel = getString(R.string.default_label);
-//        }
-        TextView title = (TextView) findViewById(R.id.alertTitle);
-        title.setText(mLabel);
-    }
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+		updateLayout();
+	}
 
-    private void updateSilencedText() {
-        TextView silenced = (TextView) findViewById(R.id.silencedText);
-        silenced.setText(getString(R.string.alarm_alert_alert_silenced,
-                    AlarmKlaxon.ALARM_TIMEOUT_SECONDS / 60));
-        silenced.setVisibility(View.VISIBLE);
-    }
+	private void setTitleFromIntent(Intent i) {
+		// mLabel = i.getStringExtra(Alarms.LABEL);
+		mLabel = "Ski Wake Up!!";
+		// if (mLabel == null || mLabel.length() == 0) {
+		// mLabel = getString(R.string.default_label);
+		// }
+		TextView title = (TextView) findViewById(R.id.alertTitle);
+		title.setText(mLabel);
+	}
 
-    // This method is overwritten in AlarmAlertFullScreen in order to show a
-    // full activity with the wallpaper as the background.
-    protected View inflateView(LayoutInflater inflater) {
-        return inflater.inflate(R.layout.alarm_alert, null);
-    }
+	private void updateSilencedText() {
+		TextView silenced = (TextView) findViewById(R.id.silencedText);
+		silenced.setText(getString(R.string.alarm_alert_alert_silenced,
+				AlarmKlaxon.ALARM_TIMEOUT_SECONDS / 60));
+		silenced.setVisibility(View.VISIBLE);
+	}
 
-    private void updateLayout() {
-        LayoutInflater inflater = LayoutInflater.from(this);
+	// This method is overwritten in AlarmAlertFullScreen in order to show a
+	// full activity with the wallpaper as the background.
+	protected View inflateView(LayoutInflater inflater) {
+		return inflater.inflate(R.layout.alarm_alert, null);
+	}
 
-        setContentView(inflateView(inflater));
+	private void updateLayout() {
+		LayoutInflater inflater = LayoutInflater.from(this);
 
-        /* set clock face */
-//        SharedPreferences settings =
-//                getSharedPreferences(AlarmClock.PREFERENCES, 0);
-        int face = 0;
-//        if (face < 0 || face >= AlarmClock.CLOCKS.length) {
-//            face = 0;
-//        }
-        ViewGroup clockView = (ViewGroup) findViewById(R.id.clockView);
-        inflater.inflate(CLOCKS[face], clockView);
-//      View clockLayout = findViewById(R.id.clock);
-//        if (clockLayout instanceof DigitalClock) {
-//            ((DigitalClock) clockLayout).setAnimate();
-//        }
+		setContentView(inflateView(inflater));
 
-        /* snooze behavior: pop a snooze confirmation view, kick alarm
-           manager. */
-        mSnoozeButton = (Button) findViewById(R.id.snooze);
-        mSnoozeButton.requestFocus();
-        // If this was a configuration change, keep the silenced text if the
-        // alarm was killed.
-        if (mState == KILLED) {
-            updateSilencedText();
-            mSnoozeButton.setEnabled(false);
-        } else {
-            mSnoozeButton.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    snooze();
-                    finish();
-                }
-            });
-        }
+		/* set clock face */
+		// SharedPreferences settings =
+		// getSharedPreferences(AlarmClock.PREFERENCES, 0);
+		int face = 0;
+		// if (face < 0 || face >= AlarmClock.CLOCKS.length) {
+		// face = 0;
+		// }
+		ViewGroup clockView = (ViewGroup) findViewById(R.id.clockView);
+		inflater.inflate(CLOCKS[face], clockView);
+		// View clockLayout = findViewById(R.id.clock);
+		// if (clockLayout instanceof DigitalClock) {
+		// ((DigitalClock) clockLayout).setAnimate();
+		// }
 
-        /* dismiss button: close notification */
-        findViewById(R.id.dismiss).setOnClickListener(
-                new Button.OnClickListener() {
-                    public void onClick(View v) {
-                        dismiss();
-                        finish();
-                    }
-                });
+		/*
+		 * snooze behavior: pop a snooze confirmation view, kick alarm manager.
+		 */
+		mSnoozeButton = (Button) findViewById(R.id.snooze);
+		mSnoozeButton.requestFocus();
+		// If this was a configuration change, keep the silenced text if the
+		// alarm was killed.
+		if (mState == KILLED) {
+			updateSilencedText();
+			mSnoozeButton.setEnabled(false);
+		} else {
+			mSnoozeButton.setOnClickListener(new Button.OnClickListener() {
+				public void onClick(View v) {
+					snooze();
+					finish();
+				}
+			});
+		}
 
-        /* Set the title from the passed in label */
-        setTitleFromIntent(getIntent());
-    }
+		/* dismiss button: close notification */
+		findViewById(R.id.dismiss).setOnClickListener(
+				new Button.OnClickListener() {
+					public void onClick(View v) {
+						dismiss();
+						finish();
+					}
+				});
 
-    // Attempt to snooze this alert.
-    private void snooze() {
-        if (mState != UNKNOWN) {
-            return;
-        }
-        // If the next alarm is set for sooner than the snooze interval, don't
-        // snooze. Instead, toast the user that the snooze will not be set.
-        final long snoozeTime = System.currentTimeMillis()
-                + SNOOZE_MS;
-//        final long nextAlarm =
-//                Alarms.calculateNextAlert(AlarmAlert.this).getAlert();
-        String displayTime = null;
-//        if (nextAlarm < snoozeTime) {
-//            final Calendar c = Calendar.getInstance();
-//            c.setTimeInMillis(nextAlarm);
-//            displayTime = getString(R.string.alarm_alert_snooze_not_set,
-//                    Alarms.formatTime(AlarmAlert.this, c));
-//            mState = DISMISS;
-//        } else {
-            new AlarmSnoozeController(this.getApplicationContext()).setAlarm(snoozeTime);
-            displayTime = getString(R.string.alarm_alert_snooze_set,
-                    SNOOZE_MINUTES);
-            mState = SNOOZE;
-//        }
-        // Intentionally log the snooze time for debugging.
-        Log.v(displayTime);
-        // Display the snooze minutes in a toast.
-        Toast.makeText(AlarmAlert.this, displayTime, Toast.LENGTH_LONG).show();
-        mKlaxon.stop(this, mState == SNOOZE);
-        releaseLocks();
-    }
+		/* Set the title from the passed in label */
+		setTitleFromIntent(getIntent());
+	}
 
-    // Dismiss the alarm.
-    private void dismiss() {
-        if (mState != UNKNOWN) {
-            return;
-        }
-        mState = DISMISS;
-        mKlaxon.stop(this, false);
-		startActivity( new Intent(Intent.ACTION_MAIN,null,this,WakeMeSkiDashboard.class));
-        releaseLocks();
-    }
+	// Attempt to snooze this alert.
+	private void snooze() {
+		if (mState != UNKNOWN) {
+			return;
+		}
+		// If the next alarm is set for sooner than the snooze interval, don't
+		// snooze. Instead, toast the user that the snooze will not be set.
+		final long snoozeTime = System.currentTimeMillis() + SNOOZE_MS;
+		// final long nextAlarm =
+		// Alarms.calculateNextAlert(AlarmAlert.this).getAlert();
+		String displayTime = null;
+		// if (nextAlarm < snoozeTime) {
+		// final Calendar c = Calendar.getInstance();
+		// c.setTimeInMillis(nextAlarm);
+		// displayTime = getString(R.string.alarm_alert_snooze_not_set,
+		// Alarms.formatTime(AlarmAlert.this, c));
+		// mState = DISMISS;
+		// } else {
+		new AlarmSnoozeController(this.getApplicationContext())
+				.setAlarm(snoozeTime);
+		displayTime = getString(R.string.alarm_alert_snooze_set, SNOOZE_MINUTES);
+		mState = SNOOZE;
+		// }
+		// Intentionally log the snooze time for debugging.
+		Log.v(displayTime);
+		// Display the snooze minutes in a toast.
+		Toast.makeText(AlarmAlert.this, displayTime, Toast.LENGTH_LONG).show();
+		mKlaxon.stop(this, mState == SNOOZE);
+		releaseLocks();
+	}
 
-    /**
-     * this is called when a second alarm is triggered while a
-     * previous alert window is still active.
-     */
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        if (Log.LOGV) Log.v("AlarmAlert.OnNewIntent()");
-//        mState = UNKNOWN;
-//        mSnoozeButton.setEnabled(true);
-//
-//        mAlarmId = intent.getIntExtra(Alarms.ID, -1);
-//        // Play the new alarm sound.
-//        mKlaxon.postPlay(this, mAlarmId);
-//
-//        setTitleFromIntent(intent);
-//
-//        /* unset silenced message */
-//        TextView silenced = (TextView)findViewById(R.id.silencedText);
-//        silenced.setVisibility(View.GONE);
-//
-//        Alarms.setNextAlert(this);
-//        setIntent(intent);
-//    }
+	// Dismiss the alarm.
+	private void dismiss() {
+		if (mState != UNKNOWN) {
+			return;
+		}
+		mState = DISMISS;
+		mKlaxon.stop(this, false);
+		startActivity(new Intent(Intent.ACTION_MAIN, null, this,
+				WakeMeSkiDashboard.class));
+		releaseLocks();
+	}
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (Log.LOGV) Log.v("AlarmAlert.onResume()");
-        // Acquire a separate lock for the screen to stay on. This is necessary
-        // to avoid flashing the keyguard when the screen is locked.
-        AlarmAlertWakeLock.acquireScreenWakeLock(this);
+	/**
+	 * this is called when a second alarm is triggered while a previous alert
+	 * window is still active.
+	 */
+	// @Override
+	// protected void onNewIntent(Intent intent) {
+	// super.onNewIntent(intent);
+	// if (Log.LOGV) Log.v("AlarmAlert.OnNewIntent()");
+	// mState = UNKNOWN;
+	// mSnoozeButton.setEnabled(true);
+	//
+	// mAlarmId = intent.getIntExtra(Alarms.ID, -1);
+	// // Play the new alarm sound.
+	// mKlaxon.postPlay(this, mAlarmId);
+	//
+	// setTitleFromIntent(intent);
+	//
+	// /* unset silenced message */
+	// TextView silenced = (TextView)findViewById(R.id.silencedText);
+	// silenced.setVisibility(View.GONE);
+	//
+	// Alarms.setNextAlert(this);
+	// setIntent(intent);
+	// }
 
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (Log.LOGV)
+			Log.v("AlarmAlert.onResume()");
+		// Acquire a separate lock for the screen to stay on. This is necessary
+		// to avoid flashing the keyguard when the screen is locked.
+		AlarmAlertWakeLock.acquireScreenWakeLock(this);
 
-    protected void onPause() {
-    	super.onPause();
-    	if (Log.LOGV) Log.v("AlarmAlert.onPause()");
-    }
-    
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (Log.LOGV) Log.v("AlarmAlert.onStop()");
-        // As a last resort, try to snooze if this activity is stopped.
-        snooze();
-        // We might have been killed by the KillerCallback so always release
-        // the lock and keyguard.
-        releaseLocks();
-    }
+	}
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        // Do this on key down to handle a few of the system keys. Only handle
-        // the snooze and dismiss this alert if the state is unknown.
-        boolean up = event.getAction() == KeyEvent.ACTION_UP;
-        boolean dismiss = false;
-        switch (event.getKeyCode()) {
-            case KeyEvent.KEYCODE_DPAD_UP:
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            // Ignore ENDCALL because we do not receive the event if the screen
-            // is on. However, we do receive the key up for ENDCALL if the
-            // screen was off.
-            case KeyEvent.KEYCODE_ENDCALL:
-                break;
-            // Volume keys dismiss the alarm
-            case KeyEvent.KEYCODE_VOLUME_UP:
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                dismiss = true;
-            // All other keys will snooze the alarm
-            default:
-                // Check for UNKNOWN here so that we intercept both key events
-                // and prevent the volume keys from triggering their default
-                // behavior.
-                if (mState == UNKNOWN && up) {
-                    if (dismiss) {
-                        dismiss();
-                    } else {
-                        snooze();
-                    }
-                    finish();
-                }
-                return true;
-        }
-        return super.dispatchKeyEvent(event);
-    }
+	protected void onPause() {
+		super.onPause();
+		if (Log.LOGV)
+			Log.v("AlarmAlert.onPause()");
+	}
 
-    /**
-     * release wake and keyguard locks
-     */
-    private synchronized void releaseLocks() {
-        AlarmAlertWakeLock.release();
-    }
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if (Log.LOGV)
+			Log.v("AlarmAlert.onStop()");
+		// As a last resort, try to snooze if this activity is stopped.
+		snooze();
+		// We might have been killed by the KillerCallback so always release
+		// the lock and keyguard.
+		releaseLocks();
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		// Do this on key down to handle a few of the system keys. Only handle
+		// the snooze and dismiss this alert if the state is unknown.
+		boolean up = event.getAction() == KeyEvent.ACTION_UP;
+		boolean dismiss = false;
+		switch (event.getKeyCode()) {
+		case KeyEvent.KEYCODE_DPAD_UP:
+		case KeyEvent.KEYCODE_DPAD_DOWN:
+		case KeyEvent.KEYCODE_DPAD_LEFT:
+		case KeyEvent.KEYCODE_DPAD_RIGHT:
+		case KeyEvent.KEYCODE_DPAD_CENTER:
+			// Ignore ENDCALL because we do not receive the event if the screen
+			// is on. However, we do receive the key up for ENDCALL if the
+			// screen was off.
+		case KeyEvent.KEYCODE_ENDCALL:
+			break;
+		// Volume keys dismiss the alarm
+		case KeyEvent.KEYCODE_VOLUME_UP:
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			dismiss = true;
+			// All other keys will snooze the alarm
+		default:
+			// Check for UNKNOWN here so that we intercept both key events
+			// and prevent the volume keys from triggering their default
+			// behavior.
+			if (mState == UNKNOWN && up) {
+				if (dismiss) {
+					dismiss();
+				} else {
+					snooze();
+				}
+				finish();
+			}
+			return true;
+		}
+		return super.dispatchKeyEvent(event);
+	}
+
+	/**
+	 * release wake and keyguard locks
+	 */
+	private synchronized void releaseLocks() {
+		AlarmAlertWakeLock.release();
+	}
 }

@@ -32,16 +32,16 @@ import android.view.LayoutInflater;
  */
 public class AlarmAlertFullScreen extends AlarmAlert {
 
-    @Override
-    final protected View inflateView(LayoutInflater inflater) {
-        View v = inflater.inflate(R.layout.alarm_alert, null);
+	@Override
+	final protected View inflateView(LayoutInflater inflater) {
+		View v = inflater.inflate(R.layout.alarm_alert, null);
 
-        // Display the wallpaper as the background.
-        BitmapDrawable wallpaper = (BitmapDrawable) getWallpaper();
-        wallpaper.setGravity(Gravity.CENTER);
-        v.setBackgroundDrawable(wallpaper);
+		// Display the wallpaper as the background.
+		BitmapDrawable wallpaper = (BitmapDrawable) getWallpaper();
+		wallpaper.setGravity(Gravity.CENTER);
+		v.setBackgroundDrawable(wallpaper);
 
-        return v;
-    }
+		return v;
+	}
 
 }
