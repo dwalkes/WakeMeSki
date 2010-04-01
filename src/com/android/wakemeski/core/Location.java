@@ -32,37 +32,31 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Defines a simple interface that provides the data
- * from which a Report will built from.
+ * Defines a simple interface that provides the data from which a Report will
+ * built from.
  */
-public class Location implements Parcelable, Serializable
-{
+public class Location implements Parcelable, Serializable {
 	private String _label;
 	private String _url;
-	
+
 	private static final long serialVersionUID = 0;
-	
-	public static final Parcelable.Creator<Location> CREATOR
-		= new Parcelable.Creator<Location>()
-	{
+
+	public static final Parcelable.Creator<Location> CREATOR = new Parcelable.Creator<Location>() {
 		@Override
-		public Location createFromParcel(Parcel source)
-		{
+		public Location createFromParcel(Parcel source) {
 			String label = source.readString();
 			String url = source.readString();
-			
+
 			return new Location(label, url);
 		}
 
 		@Override
-		public Location[] newArray(int size)
-		{
+		public Location[] newArray(int size) {
 			return new Location[size];
 		}
 	};
-	
-	public Location(String label, String url)
-	{
+
+	public Location(String label, String url) {
 		_label = label;
 		_url = url;
 	}
@@ -70,52 +64,47 @@ public class Location implements Parcelable, Serializable
 	/**
 	 * The human-readable label for this location.
 	 */
-	public String getLabel()
-	{
+	public String getLabel() {
 		return _label;
 	}
-	
+
 	/**
 	 * The URL where the report from the location can be found
 	 */
-	public String getReportUrl()
-	{
+	public String getReportUrl() {
 		return _url;
 	}
-	
+
 	@Override
-	public int describeContents()
-	{
+	public int describeContents() {
 		return 0;
 	}
 
 	@Override
-	public void writeToParcel(Parcel dest, int flags)
-	{
+	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(_label);
 		dest.writeString(_url);
 	}
-	
+
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return _label;
 	}
-	
+
 	/**
 	 * Determine whether the location objects refer to the same location.
-	 * @param loc The location object
+	 * 
+	 * @param loc
+	 *            The location object
 	 * @return True if location refers to the same location
 	 */
-	public boolean equals( Location loc ) 
-	{
+	public boolean equals(Location loc) {
 		return loc.getLabel() == this.getLabel();
 	}
 
-	public boolean equals (Object obj ) 
-	{
-		if( obj instanceof Location ) {
-			return equals((Location)obj);
+	public boolean equals(Object obj) {
+		if (obj instanceof Location) {
+			return equals((Location) obj);
 		}
 		return false;
 	}

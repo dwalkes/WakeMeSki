@@ -33,8 +33,9 @@ import android.util.Log;
 
 /**
  * Manages a list of resorts to/from persistent storage
+ * 
  * @author dan
- *
+ * 
  */
 public class ResortManager {
 
@@ -42,26 +43,27 @@ public class ResortManager {
 	private static final String resortFile = "resorts.txt";
 	private Context context;
 	private static ResortManager instance = null;
-	
+
 	Set<Resort> resorts = new HashSet<Resort>();
-	
-	public static synchronized ResortManager getInstance( Context c ) {
-		if( instance == null ) {
+
+	public static synchronized ResortManager getInstance(Context c) {
+		if (instance == null) {
 			instance = new ResortManager(c);
 		}
 		return instance;
 	}
-	
-	private ResortManager( Context c ) {
+
+	private ResortManager(Context c) {
 		context = c;
 		read();
 	}
-	
+
 	/**
 	 * Updates the resort list with the passed list, updates persistent storage
+	 * 
 	 * @param resort
 	 */
-	public void update( Resort[] resortList ) {
+	public void update(Resort[] resortList) {
 		resorts = new HashSet<Resort>(Arrays.asList(resortList));
 		update();
 	}
@@ -71,71 +73,68 @@ public class ResortManager {
 		ObjectOutputStream oos = null;
 		context.deleteFile(resortFile);
 		try {
-			fos = context.openFileOutput(resortFile,0);
+			fos = context.openFileOutput(resortFile, 0);
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(resorts.toArray(new Resort[resorts.size()]));
-		}
-		catch (Exception e ) {
-			Log.e(TAG,"Exception " + e + " writing " + resortFile );
-		}
-		finally {
-			if (oos != null ) {
+		} catch (Exception e) {
+			Log.e(TAG, "Exception " + e + " writing " + resortFile);
+		} finally {
+			if (oos != null) {
 				try {
 					oos.close();
-				} 
-				catch (IOException ioe ) {
-					Log.w(TAG,"IO exception " + ioe +" closing output file " + resortFile );
+				} catch (IOException ioe) {
+					Log.w(TAG, "IO exception " + ioe + " closing output file "
+							+ resortFile);
 				}
 			}
 		}
 	}
-	
+
 	private void read() {
-		
+
 		FileInputStream fis;
 		ObjectInputStream ois = null;
 		try {
 			fis = context.openFileInput(resortFile);
 			ois = new ObjectInputStream(fis);
-			Resort []resortArray = (Resort[])ois.readObject();
+			Resort[] resortArray = (Resort[]) ois.readObject();
 			resorts = new HashSet<Resort>(Arrays.asList(resortArray));
-		}
-		catch (FileNotFoundException fnf) {
-			Log.w(TAG,"File " + resortFile + " not found setting selected resorts");
+		} catch (FileNotFoundException fnf) {
+			Log.w(TAG, "File " + resortFile
+					+ " not found setting selected resorts");
 			// leave selected resorts list empty
-		}
-		catch (Exception e ) {
-			Log.e(TAG,"Exception " + e + " reading " + resortFile );
-		}
-		finally {
-			if (ois != null ) {
+		} catch (Exception e) {
+			Log.e(TAG, "Exception " + e + " reading " + resortFile);
+		} finally {
+			if (ois != null) {
 				try {
 					ois.close();
-				} 
-				catch (IOException ioe ) {
-					Log.w(TAG,"IO exception closing input file " + resortFile );
+				} catch (IOException ioe) {
+					Log.w(TAG, "IO exception closing input file " + resortFile);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * @return The current resort list from persistent storage
 	 */
-	public Resort [] getResorts() {
+	public Resort[] getResorts() {
 		return resorts.toArray(new Resort[resorts.size()]);
 	}
-	
+
 	/**
-	 * @return The list of resorts from persistent storage with wakeup enable configured 
+	 * @return The list of resorts from persistent storage with wakeup enable
+	 *         configured
 	 */
-	public Resort [] getWakeupEnabledResorts() {
-    	Set<Resort> wakeupEnabledResortSet = new HashSet<Resort>();
-    	for (Resort resort : resorts ) {
-    		if( resort.isWakeupEnabled() ) {
-    			wakeupEnabledResortSet.add(resort);
-    		}
-    	}
-    	return wakeupEnabledResortSet.toArray(new Resort[wakeupEnabledResortSet.size()]);
+	public Resort[] getWakeupEnabledResorts() {
+		Set<Resort> wakeupEnabledResortSet = new HashSet<Resort>();
+		for (Resort resort : resorts) {
+			if (resort.isWakeupEnabled()) {
+				wakeupEnabledResortSet.add(resort);
+			}
+		}
+		return wakeupEnabledResortSet.toArray(new Resort[wakeupEnabledResortSet
+				.size()]);
 	}
 }

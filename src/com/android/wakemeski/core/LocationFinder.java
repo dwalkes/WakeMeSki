@@ -35,43 +35,39 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 /**
- * This class helps find a location and its corresponding URL from which it
- * can get the ski report.
+ * This class helps find a location and its corresponding URL from which it can
+ * get the ski report.
  */
-public class LocationFinder
-{
+public class LocationFinder {
 	private static final String TAG = "LocationFinder";
+
 	/**
 	 * Gets the top-level regions to start the search for a location from.
 	 */
 	public static String[] getRegions(SharedPreferences pref)
-		throws ClientProtocolException, IOException
-	{
-		String url = HttpUtils.getLocationServer(pref) +"/location_finder.php";
+			throws ClientProtocolException, IOException {
+		String url = HttpUtils.getLocationServer(pref) + "/location_finder.php";
 		return HttpUtils.fetchUrl(url);
 	}
-	
+
 	/**
 	 * Returns the location objects associated with a given region.
 	 */
 	public static Location[] getLocations(SharedPreferences pref, String region)
-		throws ClientProtocolException, IOException
-	{
+			throws ClientProtocolException, IOException {
 		ArrayList<Location> locations = new ArrayList<Location>();
-	
-		String url = HttpUtils.getLocationServer(pref) +"/location_finder.php?region="+region;
+
+		String url = HttpUtils.getLocationServer(pref)
+				+ "/location_finder.php?region=" + region;
 		String rows[] = HttpUtils.fetchUrl(url);
-		for(String row: rows)
-		{
+		for (String row : rows) {
 			String vals[] = row.split("=", 2);
-			if( vals.length == 2)
-			{
+			if (vals.length == 2) {
 				Location l = new Location(vals[0].trim(), vals[1].trim());
 				locations.add(l);
-			}
-			else
-			{
-				Log.e(TAG, "Bad location line for region [" + region + "]: ["+row+"]");
+			} else {
+				Log.e(TAG, "Bad location line for region [" + region + "]: ["
+						+ row + "]");
 			}
 		}
 		return locations.toArray(new Location[locations.size()]);

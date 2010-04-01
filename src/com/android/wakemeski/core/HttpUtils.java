@@ -39,50 +39,43 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.SharedPreferences;
 
-public class HttpUtils
-{
+public class HttpUtils {
 	public final static String LOC_SERVER = "http://bettykrocks.com/skireport";
 
-	static HttpClient getHttpClient()
-	{
+	static HttpClient getHttpClient() {
 		return new DefaultHttpClient();
 	}
-	
+
 	/**
 	 * Returns the contents of the given URL as an array of strings
 	 */
 	public static String[] fetchUrl(String url) 
-		throws ClientProtocolException, IOException
-	{
+		throws ClientProtocolException, IOException {
 		ArrayList<String> lines = new ArrayList<String>();
-		
+
 		url = url.replace(" ", "%20");
-		
+
 		HttpResponse resp = getHttpClient().execute(new HttpGet(url));
-		if( resp.getStatusLine().getStatusCode() == 200 )
-		{
-			InputStreamReader ir = 
-				new InputStreamReader(resp.getEntity().getContent());
+		if (resp.getStatusLine().getStatusCode() == 200) {
+			InputStreamReader ir = new InputStreamReader(resp.getEntity()
+					.getContent());
 			BufferedReader r = new BufferedReader(ir);
-			
+
 			String line;
-			while( (line = r.readLine()) != null )
+			while ((line = r.readLine()) != null)
 				lines.add(line);
+		} else {
+			throw new IOException("LocationFinder: unable to get URL[" + url
+					+ "]");
 		}
-		else
-		{
-			throw new IOException("LocationFinder: unable to get URL[" + url +"]");
-		}
-		
+
 		return lines.toArray(new String[lines.size()]);
 	}
-	
+
 	/**
 	 * Returns the server to retrieve location data from.
-	 * @return
 	 */
-	public static String getLocationServer(SharedPreferences pref)
-	{
+	public static String getLocationServer(SharedPreferences pref) {
 		return pref.getString("location_server", LOC_SERVER);
 	}
 }

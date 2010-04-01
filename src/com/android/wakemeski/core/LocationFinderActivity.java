@@ -45,210 +45,175 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class LocationFinderActivity extends ListActivity
-{
+public class LocationFinderActivity extends ListActivity {
 	// Spawned activity id's
 	private final static int SELECT_LOC = 2;
-	
-	//Dialog ID's
+
+	// Dialog ID's
 	private static final int ERROR_DLG = 1;
-	
-	//This is tied to the ERROR_DLG
+
+	// This is tied to the ERROR_DLG
 	private String _errMsg;
 
 	private String _region = null;
-	
-	private Handler _handler = new Handler()
-	{
+
+	private Handler _handler = new Handler() {
 		@Override
-		public void handleMessage(Message msg)
-		{
+		public void handleMessage(Message msg) {
 			Bundle b = msg.getData();
-			
+
 			String regions[] = b.getStringArray("regions");
-			if( regions != null )
-			{
-				setListAdapter(
-						new ArrayAdapter<String>(LocationFinderActivity.this, 
-								android.R.layout.simple_list_item_1, regions));
+			if (regions != null) {
+				setListAdapter(new ArrayAdapter<String>(
+						LocationFinderActivity.this,
+						android.R.layout.simple_list_item_1, regions));
 			}
-			
-			Location l[] = (Location[])b.getParcelableArray("locations");
-			if( l != null )
-			{
-				setListAdapter(
-						new ArrayAdapter<Location>(LocationFinderActivity.this,
-								android.R.layout.simple_list_item_1, l));
-				
+
+			Location l[] = (Location[]) b.getParcelableArray("locations");
+			if (l != null) {
+				setListAdapter(new ArrayAdapter<Location>(
+						LocationFinderActivity.this,
+						android.R.layout.simple_list_item_1, l));
+
 			}
-			
+
 			setLoading(false);
-			
+
 			String err = b.getString("error");
-			if(err != null)
-			{
+			if (err != null) {
 				_errMsg = err;
 				showDialog(ERROR_DLG);
 			}
 		}
 	};
-	
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
-		
-		if( !isConnected() )
-		{
-			_errMsg = getApplicationContext().getString(R.string.error_no_connection);
+
+		if (!isConnected()) {
+			_errMsg = getApplicationContext().getString(
+					R.string.error_no_connection);
 			showDialog(ERROR_DLG);
 			return;
 		}
 		setLoading(true);
-		
+
 		Intent i = getIntent();
 		_region = i.getStringExtra("region");
-		if( _region != null )
-		{
+		if (_region != null) {
 			showLocations(_region);
-		}
-		else
-		{
+		} else {
 			showRegions();
 		}
 	}
 
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id)
-	{	
-		if( _region == null )
-		{
-			String selection = (String)getListView().getItemAtPosition(position);
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		if (_region == null) {
+			String selection = (String) getListView().getItemAtPosition(
+					position);
 			Intent i = new Intent(this, LocationFinderActivity.class);
 
-			i.putExtra("region",  selection);
+			i.putExtra("region", selection);
 			startActivityForResult(i, SELECT_LOC);
-		}
-		else
-		{
-			Location loc = (Location)getListView().getItemAtPosition(position);
+		} else {
+			Location loc = (Location) getListView().getItemAtPosition(position);
 			Intent i = new Intent();
 
-			i.putExtra("region",  _region);
-			i.putExtra("location",  loc.getLabel());
-			i.putExtra("url",  loc.getReportUrl());
-            setResult(RESULT_OK, i);
-            finish();
+			i.putExtra("region", _region);
+			i.putExtra("location", loc.getLabel());
+			i.putExtra("url", loc.getReportUrl());
+			setResult(RESULT_OK, i);
+			finish();
 		}
 	}
-	
+
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		
-		if( requestCode == SELECT_LOC && resultCode == RESULT_OK )
-		{
+
+		if (requestCode == SELECT_LOC && resultCode == RESULT_OK) {
 			setResult(resultCode, data);
-            finish();
+			finish();
 		}
 	}
-	
+
 	@Override
-	protected Dialog onCreateDialog(int id)
-	{
-		if( id == ERROR_DLG )
-		{
-			return new AlertDialog.Builder(this)
-				.setTitle(R.string.error_title)
-				.setMessage(_errMsg)
-				.create();
+	protected Dialog onCreateDialog(int id) {
+		if (id == ERROR_DLG) {
+			return new AlertDialog.Builder(this).setTitle(R.string.error_title)
+					.setMessage(_errMsg).create();
 		}
 		return null;
 	}
-	
-	private void setLoading(boolean loading)
-	{
-		if( loading )
+
+	private void setLoading(boolean loading) {
+		if (loading)
 			setTitle(R.string.selection_activity_loading);
 		else
 			setTitle(R.string.selection_activity);
 
 		setProgressBarIndeterminateVisibility(loading);
 	}
-	
-	private void showRegions()
-	{	
+
+	private void showRegions() {
 		Thread t = new Thread(new Runner());
 		t.start();
 	}
-	
-	private void showLocations(String region)
-	{	
+
+	private void showLocations(String region) {
 		Thread t = new Thread(new Runner(region));
 		t.start();
 	}
-	
-	private boolean isConnected()
-	{
-		ConnectivityManager cm =
-			(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-		
+
+	private boolean isConnected() {
+		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
 		NetworkInfo info = cm.getActiveNetworkInfo();
-		if( info != null )
+		if (info != null)
 			return cm.getActiveNetworkInfo().isConnected();
-		
+
 		return false;
 	}
-	
-	class Runner implements Runnable
-	{
+
+	class Runner implements Runnable {
 		private String _region = null;
-		
-		Runner()
-		{
+
+		Runner() {
 		}
-		
-		Runner(String region)
-		{
+
+		Runner(String region) {
 			_region = region;
 		}
-		
+
 		@Override
-		public void run()
-		{	
+		public void run() {
 			Bundle b = new Bundle();
-			try
-			{	
-				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-				
-				if( _region == null )
-				{
+			try {
+				SharedPreferences pref = PreferenceManager
+						.getDefaultSharedPreferences(getApplicationContext());
+
+				if (_region == null) {
 					String regions[] = LocationFinder.getRegions(pref);
 					b.putStringArray("regions", regions);
-				}
-				else
-				{
-					Location locations[] = 
-						LocationFinder.getLocations(pref, _region);
+				} else {
+					Location locations[] = LocationFinder.getLocations(pref,
+							_region);
 
 					b.putParcelableArray("locations", locations);
 				}
-			}
-			catch(Exception e)
-			{	
-				if( !isConnected() )
-				{
-					_errMsg = getApplicationContext().getString(R.string.error_no_connection);
+			} catch (Exception e) {
+				if (!isConnected()) {
+					_errMsg = getApplicationContext().getString(
+							R.string.error_no_connection);
 					showDialog(ERROR_DLG);
-				}
-				else
-				{
+				} else {
 					b.putString("error", e.getLocalizedMessage());
 				}
-			} 
-			
+			}
+
 			Message msg = Message.obtain(_handler);
 			msg.setData(b);
 			msg.sendToTarget();
