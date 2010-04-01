@@ -16,6 +16,8 @@
  */
 package com.android.wakemeski.ui;
 
+import com.android.wakemeski.core.SnowUnits;
+
 import android.content.SharedPreferences;
 
 /**

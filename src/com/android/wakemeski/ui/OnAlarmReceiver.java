@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.android.wakemeski.core.WakeMeSkiService;
 import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**

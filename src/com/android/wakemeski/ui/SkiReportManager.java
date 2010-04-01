@@ -37,12 +37,12 @@ public class SkiReportManager {
 	Context mContext;
 	ConnectivityManager mConnectivityMgr;
 
-	SkiReportManager(Context c, ConnectivityManager cm) {
+	public SkiReportManager(Context c, ConnectivityManager cm) {
 		mContext = c;
 		mConnectivityMgr = cm;
 	}
 
-	ResortSnowInfo[] getSnowInfo(Resort[] resortList) {
+	public ResortSnowInfo[] getSnowInfo(Resort[] resortList) {
 		Set<ResortSnowInfo> snowInfoSet = new HashSet<ResortSnowInfo>();
 		for (Resort resort : resortList) {
 			Report report = Report.loadReport(mContext, mConnectivityMgr,

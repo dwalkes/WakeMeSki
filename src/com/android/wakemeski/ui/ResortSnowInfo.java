@@ -16,6 +16,8 @@
  */
 package com.android.wakemeski.ui;
 
+import com.android.wakemeski.core.SnowUnits;
+
 /**
  * A class to hold information about snow totals for a specific resort. Used to
  * compare 24hr snow totals to a configured setting.
@@ -45,7 +47,7 @@ public class ResortSnowInfo implements Comparable<ResortSnowInfo> {
 				- this.resortSnowDepth24Hours;
 	}
 
-	boolean exceedsOrMatchesPreference(SnowSettingsSharedPreference snowSettings) {
+	public boolean exceedsOrMatchesPreference(SnowSettingsSharedPreference snowSettings) {
 		if (resortReportUnits == snowSettings.getMeasurementUnits()) {
 			if (resortSnowDepth24Hours >= snowSettings.getSnowDepth()) {
 				return true;

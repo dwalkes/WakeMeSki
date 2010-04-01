@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.core;
 
 import java.util.Calendar;
 
@@ -28,7 +28,16 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.android.wakemeski.core.ResortManager;
+import com.android.wakemeski.ui.AlarmCalculator;
+import com.android.wakemeski.ui.AlarmController;
+import com.android.wakemeski.ui.OnAlarmReceiver;
+import com.android.wakemeski.ui.RepeatDaySharedPreference;
+import com.android.wakemeski.ui.Resort;
+import com.android.wakemeski.ui.ResortSnowInfo;
+import com.android.wakemeski.ui.SkiReportManager;
+import com.android.wakemeski.ui.SnowSettingsSharedPreference;
+import com.android.wakemeski.ui.TimeSettingsSharedPreference;
+import com.android.wakemeski.ui.WakeMeSkiPreferences;
 import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
@@ -63,7 +72,7 @@ public class WakeMeSkiService extends IntentService {
 	 * the same process as its clients, we don't need to deal with IPC.
 	 */
 	public class LocalBinder extends Binder {
-		WakeMeSkiService getService() {
+		public WakeMeSkiService getService() {
 			return WakeMeSkiService.this;
 		}
 	}

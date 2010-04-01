@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.android.wakemeski.ui.SnowUnits;
 import com.android.wakemeski.R;
 
 import android.content.Context;

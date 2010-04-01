@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.core;
 
 /**
  * An enumeration describing the units of measure for snow totals. Different

@@ -16,6 +16,7 @@
  */
 package com.android.wakemeski.ui;
 
+import com.android.wakemeski.core.WakeMeSkiService;
 import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 import android.content.BroadcastReceiver;

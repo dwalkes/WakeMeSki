@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.ResortManager;
+import com.android.wakemeski.core.WakeMeSkiService;
 
 import android.app.Activity;
 import android.content.ComponentName;
