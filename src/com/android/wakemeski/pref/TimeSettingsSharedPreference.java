@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.pref;
 
 /**
  * A POJO used to read/write the time value from persistent storage. Used by

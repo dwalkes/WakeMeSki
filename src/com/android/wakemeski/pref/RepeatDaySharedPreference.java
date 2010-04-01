@@ -14,9 +14,11 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.pref;
 
 import java.util.Calendar;
+
+import com.android.wakemeski.ui.ListPreferenceMultiSelect;
 
 import android.util.Log;
 

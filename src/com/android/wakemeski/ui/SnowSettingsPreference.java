@@ -18,6 +18,7 @@ package com.android.wakemeski.ui;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.SnowUnits;
+import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 import android.content.Context;
 import android.preference.DialogPreference;

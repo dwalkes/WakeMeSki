@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.pref;
 
 import android.net.Uri;
 

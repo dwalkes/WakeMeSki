@@ -19,6 +19,9 @@ package com.android.wakemeski.ui;
 
 import java.util.Calendar;
 
+import com.android.wakemeski.pref.RepeatDaySharedPreference;
+import com.android.wakemeski.pref.TimeSettingsSharedPreference;
+
 public class AlarmCalculator {
 	RepeatDaySharedPreference mDaySelect;
 	TimeSettingsSharedPreference mTimeSelect;

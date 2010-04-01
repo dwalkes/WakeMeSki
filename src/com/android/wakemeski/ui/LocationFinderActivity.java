@@ -24,9 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.android.wakemeski.core;
+package com.android.wakemeski.ui;
 
 import com.android.wakemeski.R;
+import com.android.wakemeski.core.Location;
+import com.android.wakemeski.core.LocationFinder;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

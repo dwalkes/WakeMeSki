@@ -40,7 +40,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.android.wakemeski.R;
-import com.android.wakemeski.ui.SnowSettingsSharedPreference;
+import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 public class Report implements Parcelable {
 	private String _location = "";

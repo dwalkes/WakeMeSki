@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
 import com.android.wakemeski.R;
+import com.android.wakemeski.pref.RepeatDaySharedPreference;
 
 /**
  * A preference class to hold a list of days. In this case the list of days is

@@ -16,6 +16,8 @@
  */
 package com.android.wakemeski.ui;
 
+import com.android.wakemeski.pref.TimeSettingsSharedPreference;
+
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;

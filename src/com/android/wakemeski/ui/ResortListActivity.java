@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.android.wakemeski.R;
-import com.android.wakemeski.core.LocationFinderActivity;
 import com.android.wakemeski.core.Resort;
 import com.android.wakemeski.core.ResortManager;
 

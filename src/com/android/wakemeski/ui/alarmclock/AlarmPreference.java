@@ -24,7 +24,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.util.AttributeSet;
 
-import com.android.wakemeski.ui.AlarmToneSharedPreference;
+import com.android.wakemeski.pref.AlarmToneSharedPreference;
 
 public class AlarmPreference extends RingtonePreference {
 	AlarmToneSharedPreference mPreference;

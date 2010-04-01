@@ -29,12 +29,12 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.android.wakemeski.pref.RepeatDaySharedPreference;
+import com.android.wakemeski.pref.SnowSettingsSharedPreference;
+import com.android.wakemeski.pref.TimeSettingsSharedPreference;
 import com.android.wakemeski.ui.AlarmCalculator;
 import com.android.wakemeski.ui.AlarmController;
 import com.android.wakemeski.ui.OnAlarmReceiver;
-import com.android.wakemeski.ui.RepeatDaySharedPreference;
-import com.android.wakemeski.ui.SnowSettingsSharedPreference;
-import com.android.wakemeski.ui.TimeSettingsSharedPreference;
 import com.android.wakemeski.ui.WakeMeSkiPreferences;
 import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 

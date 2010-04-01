@@ -14,9 +14,10 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.pref;
 
 import com.android.wakemeski.core.SnowUnits;
+import com.android.wakemeski.ui.WakeMeSkiPreferences;
 
 import android.content.SharedPreferences;
 
