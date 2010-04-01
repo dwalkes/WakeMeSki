@@ -20,47 +20,45 @@ import android.net.Uri;
 
 /**
  * POJO to access the alarm tone saved in a shared preference
+ * 
  * @author dan
- *
+ * 
  */
 public class AlarmToneSharedPreference {
 
-
 	private String mAlertMediaString = null;
-	
-	
+
 	public AlarmToneSharedPreference(String sharedPrefString) {
 		mAlertMediaString = sharedPrefString;
 	}
 
 	public AlarmToneSharedPreference() {
 	}
-	
-	public void setFromPersistString( String persistString ) {
+
+	public void setFromPersistString(String persistString) {
 		mAlertMediaString = persistString;
 	}
-	
+
 	public String getAlertMediaString() {
 		return mAlertMediaString;
 	}
-	
-	public void setFromUri( Uri uri ) {
-		if( uri != null ) {
+
+	public void setFromUri(Uri uri) {
+		if (uri != null) {
 			mAlertMediaString = uri.toString();
-		}
-		else {
+		} else {
 			mAlertMediaString = null;
 		}
 	}
-	
+
 	public Uri getUri() {
 		Uri returnUri = null;
-		if( mAlertMediaString != null ) {
+		if (mAlertMediaString != null) {
 			Uri.Builder builder = new Uri.Builder();
 			builder.path(mAlertMediaString);
 			returnUri = builder.build();
 		}
-		return returnUri; 
+		return returnUri;
 	}
-	
+
 }

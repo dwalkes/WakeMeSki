@@ -23,15 +23,15 @@ import android.widget.ArrayAdapter;
  * A list adapter for the list of configured resorts.
  * 
  * @author dan
- *
+ * 
  */
 public class WakeupResortListAdapter extends ArrayAdapter<Resort> {
-	
+
 	Resort[] resortList;
-	public WakeupResortListAdapter(Context c, Resort[] items)
-	{
-		super(c,android.R.layout.simple_list_item_multiple_choice,items);
+
+	public WakeupResortListAdapter(Context c, Resort[] items) {
+		super(c, android.R.layout.simple_list_item_multiple_choice, items);
 		resortList = items;
 	}
-	
+
 }

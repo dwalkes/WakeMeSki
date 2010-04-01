@@ -23,17 +23,19 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * This class catches a boot message.  We need to reschedule our alarms on 
- * boot up, since these don't persist 
+ * This class catches a boot message. We need to reschedule our alarms on boot
+ * up, since these don't persist
+ * 
  * @author dan
- *
+ * 
  */
 public class OnBootReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		AlarmAlertWakeLock.acquireCpuWakeLock(context);
-		context.startService(new Intent(WakeMeSkiService.ACTION_ALARM_SCHEDULE,null,context,WakeMeSkiService.class));
+		context.startService(new Intent(WakeMeSkiService.ACTION_ALARM_SCHEDULE,
+				null, context, WakeMeSkiService.class));
 	}
 
 }

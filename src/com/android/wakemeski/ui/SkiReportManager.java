@@ -26,26 +26,28 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 
 /**
- * Wrapper around com.android.wakemeski.core.Report.loadReport to convert report information
- * into ResortSnowInfo
+ * Wrapper around com.android.wakemeski.core.Report.loadReport to convert report
+ * information into ResortSnowInfo
+ * 
  * @author dan
- *
+ * 
  */
 public class SkiReportManager {
 
 	Context mContext;
 	ConnectivityManager mConnectivityMgr;
-	
-	SkiReportManager( Context c, ConnectivityManager cm ) {
+
+	SkiReportManager(Context c, ConnectivityManager cm) {
 		mContext = c;
 		mConnectivityMgr = cm;
 	}
-	
-	ResortSnowInfo [] getSnowInfo( Resort [] resortList ) {
-		Set<ResortSnowInfo> snowInfoSet = new HashSet<ResortSnowInfo>(); 
-		for( Resort resort : resortList ) {
-			Report report = Report.loadReport(mContext, mConnectivityMgr, resort.getLocation());
-			if( report.hasFreshSnowTotal() ) {
+
+	ResortSnowInfo[] getSnowInfo(Resort[] resortList) {
+		Set<ResortSnowInfo> snowInfoSet = new HashSet<ResortSnowInfo>();
+		for (Resort resort : resortList) {
+			Report report = Report.loadReport(mContext, mConnectivityMgr,
+					resort.getLocation());
+			if (report.hasFreshSnowTotal()) {
 				ResortSnowInfo snowInfo = new ResortSnowInfo(resort);
 				snowInfo.setResortSnowDepth24Hours(report.getFreshSnowTotal());
 				snowInfo.setResortReportUnits(report.getSnowUnits());

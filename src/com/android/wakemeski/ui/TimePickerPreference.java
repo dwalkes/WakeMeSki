@@ -16,7 +16,6 @@
  */
 package com.android.wakemeski.ui;
 
-
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
@@ -25,37 +24,36 @@ import android.view.View;
 import android.widget.TimePicker;
 
 /**
- * Configure a time (in this case the time for wakeup resort checks)
- *  and store in persistent storage.
+ * Configure a time (in this case the time for wakeup resort checks) and store
+ * in persistent storage.
  * 
  * @author dan
- *
+ * 
  */
 public class TimePickerPreference extends DialogPreference {
-	private TimePicker 	mTimePicker;
-	private Context 	mContext;
+	private TimePicker mTimePicker;
+	private Context mContext;
 	private AttributeSet mAttributes;
 	private TimeSettingsSharedPreference mPreference;
 
-	
-	public TimePickerPreference( Context context, AttributeSet attrs ) {
-		super(context,attrs);
+	public TimePickerPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
 		mContext = context;
 		mAttributes = attrs;
 		mTimePicker = null;
 		mPreference = new TimeSettingsSharedPreference();
 	}
-	
+
 	protected View onCreateDialogView() {
-		mTimePicker = new TimePicker( mContext, mAttributes );
-		if( mTimePicker != null ) {
+		mTimePicker = new TimePicker(mContext, mAttributes);
+		if (mTimePicker != null) {
 			mTimePicker.setCurrentHour(mPreference.getCurrentHour());
 			mTimePicker.setCurrentMinute(mPreference.getCurrentMinute());
 			mTimePicker.setIs24HourView(mPreference.is24Hour());
 		}
 		return mTimePicker;
 	}
-	
+
 	private void updateSummary() {
 		setSummary(mPreference.getSummaryString());
 	}
@@ -65,38 +63,38 @@ public class TimePickerPreference extends DialogPreference {
 		persistString(mPreference.getPersistString());
 		updateSummary();
 	}
-	
-	public void onDialogClosed( boolean positiveResult ) {
-		if( positiveResult ) {
-			if( mTimePicker != null ) {
+
+	public void onDialogClosed(boolean positiveResult) {
+		if (positiveResult) {
+			if (mTimePicker != null) {
 				mPreference.setCurrentHour(mTimePicker.getCurrentHour());
 				mPreference.setCurrentMinute(mTimePicker.getCurrentMinute());
 				updatePersist();
 			}
 		}
 	}
-	
 
-	
 	/**
 	 * This is our first chance to read persistant data
 	 */
-	protected void onAttachedToHierarchy( PreferenceManager preferenceManager ) {
+	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
-		if( mPreference.setTimeFromPersistString(this.getPersistedString(null)) ) {
-			if( mTimePicker != null ) {
+		if (mPreference.setTimeFromPersistString(this.getPersistedString(null))) {
+			if (mTimePicker != null) {
 				mTimePicker.setCurrentHour(mPreference.getCurrentHour());
 				mTimePicker.setCurrentMinute(mPreference.getCurrentMinute());
 			}
 		}
 		updateSummary();
 	}
+
 	/**
 	 * @return The current hour selected 0-23
 	 */
-	public int getCurrentHour () {
+	public int getCurrentHour() {
 		return mPreference.getCurrentHour();
 	}
+
 	/**
 	 * 
 	 * @return The current minute selected 0-59
@@ -104,11 +102,11 @@ public class TimePickerPreference extends DialogPreference {
 	public int getCurrentMinute() {
 		return mPreference.getCurrentMinute();
 	}
-	
+
 	public TimeSettingsSharedPreference getSharedPreference() {
 		return mPreference;
 	}
-	
+
 	public void setDefaultValue(int hour, int minute) {
 		mPreference.setCurrentHour(hour);
 		mPreference.setCurrentMinute(minute);

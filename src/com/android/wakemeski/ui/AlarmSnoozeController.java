@@ -21,17 +21,18 @@ import android.content.Context;
 
 /**
  * Alarm controller for snooze actions
+ * 
  * @author dan
- *
+ * 
  */
 public class AlarmSnoozeController extends AlarmController {
 
-	public AlarmSnoozeController( Context context ) {
+	public AlarmSnoozeController(Context context) {
 		super(context);
 	}
-	
+
 	protected PendingIntent getPendingIntent() {
 		return super.getPendingIntent(OnAlarmReceiver.ACTION_SNOOZE);
 	}
-	
+
 }

@@ -26,57 +26,60 @@ import android.view.View;
 import android.widget.Spinner;
 
 /**
- * A preference class that shows a dialog for selecting how much snow a 
+ * A preference class that shows a dialog for selecting how much snow a
  * configured resort must receive before enabling a wakeup call.
  * 
  * @author dan
- *
+ * 
  */
 public class SnowSettingsPreference extends DialogPreference {
 
-	Spinner	mDepthSpinner = null;
+	Spinner mDepthSpinner = null;
 	Spinner mUnitsSpinner = null;
-	
+
 	final static int SNOW_DEPTH_1_START_INDEX = 0;
 	final static int SNOW_DEPTH_INCHES_INDEX = 0;
 	final static int SNOW_DEPTH_CENTIMETERS_INDEX = 1;
 	SnowSettingsSharedPreference mPreference;
-	
-	public SnowSettingsPreference( Context context, AttributeSet attrs ) {
-		super(context,attrs);
+
+	public SnowSettingsPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
 		mPreference = new SnowSettingsSharedPreference();
 	}
-	
+
 	SnowUnits getMeasurementUnits() {
 		return mPreference.getMeasurementUnits();
 	}
-	
+
 	int getSnowDepth() {
 		return mPreference.getSnowDepth();
 	}
-	
+
 	/**
 	 * Sets custom properties on the dialog
 	 */
-	protected void onBindDialogView( View view ) {
+	protected void onBindDialogView(View view) {
 		super.onBindDialogView(view);
-		if( view != null ) {
-			mDepthSpinner = (Spinner)view.findViewById(R.id.snow_settings_amount);
-			mUnitsSpinner = (Spinner)view.findViewById(R.id.snow_settings_units);
-			
-			if( mUnitsSpinner != null ) {
-				if( getMeasurementUnits() == SnowUnits.CENTIMETERS ) {
+		if (view != null) {
+			mDepthSpinner = (Spinner) view
+					.findViewById(R.id.snow_settings_amount);
+			mUnitsSpinner = (Spinner) view
+					.findViewById(R.id.snow_settings_units);
+
+			if (mUnitsSpinner != null) {
+				if (getMeasurementUnits() == SnowUnits.CENTIMETERS) {
 					mUnitsSpinner.setSelection(SNOW_DEPTH_CENTIMETERS_INDEX);
 				} else {
 					mUnitsSpinner.setSelection(SNOW_DEPTH_INCHES_INDEX);
 				}
 			}
-			if( mDepthSpinner != null ) {
-				mDepthSpinner.setSelection(getSnowDepth() + SNOW_DEPTH_1_START_INDEX - 1);
+			if (mDepthSpinner != null) {
+				mDepthSpinner.setSelection(getSnowDepth()
+						+ SNOW_DEPTH_1_START_INDEX - 1);
 			}
 		}
 	}
-	
+
 	/**
 	 * Updates persistent storage based on current values of variables
 	 */
@@ -88,22 +91,23 @@ public class SnowSettingsPreference extends DialogPreference {
 		persistString(builder.toString());
 		updateSummary();
 	}
-	
+
 	/**
-	 * Called when the dialog is closed through OK or cancel buttons.  Saves settings back to 
-	 * persistent storage. 
+	 * Called when the dialog is closed through OK or cancel buttons. Saves
+	 * settings back to persistent storage.
 	 */
-	public void onDialogClosed( boolean positiveResult ) {
-		if( positiveResult ) {
-			if( mDepthSpinner != null ) {
+	public void onDialogClosed(boolean positiveResult) {
+		if (positiveResult) {
+			if (mDepthSpinner != null) {
 				int position = mDepthSpinner.getSelectedItemPosition();
-				if( position != Spinner.INVALID_POSITION ) {
-					mPreference.setSnowDepth(position + 1 - SNOW_DEPTH_1_START_INDEX);
+				if (position != Spinner.INVALID_POSITION) {
+					mPreference.setSnowDepth(position + 1
+							- SNOW_DEPTH_1_START_INDEX);
 				}
 			}
-			if( mUnitsSpinner != null ) { 
+			if (mUnitsSpinner != null) {
 				int position = mUnitsSpinner.getSelectedItemPosition();
-				if( position == SNOW_DEPTH_CENTIMETERS_INDEX) {
+				if (position == SNOW_DEPTH_CENTIMETERS_INDEX) {
 					mPreference.setMeasurementUnits(SnowUnits.CENTIMETERS);
 				} else {
 					mPreference.setMeasurementUnits(SnowUnits.INCHES);
@@ -113,10 +117,9 @@ public class SnowSettingsPreference extends DialogPreference {
 		}
 	}
 
-
-	
 	/**
-	 * Updates the summary text of this preference with the status stored in this class
+	 * Updates the summary text of this preference with the status stored in
+	 * this class
 	 */
 	private void updateSummary() {
 		StringBuilder builder = new StringBuilder();
@@ -124,29 +127,29 @@ public class SnowSettingsPreference extends DialogPreference {
 		builder.append(' ');
 		builder.append(Integer.toString(getSnowDepth()));
 		builder.append(' ');
-		String[] measurementUnits = getContext().getResources().getStringArray(R.array.inches_cm);
-		if( getMeasurementUnits() == SnowUnits.CENTIMETERS ) {
+		String[] measurementUnits = getContext().getResources().getStringArray(
+				R.array.inches_cm);
+		if (getMeasurementUnits() == SnowUnits.CENTIMETERS) {
 			builder.append(measurementUnits[SNOW_DEPTH_CENTIMETERS_INDEX]);
-		}
-		else {
+		} else {
 			builder.append(measurementUnits[SNOW_DEPTH_INCHES_INDEX]);
 		}
 		builder.append(' ');
 		builder.append(getContext().getString(R.string.wake_overnight));
 		setSummary(builder.toString());
 	}
-	
+
 	/**
 	 * This is our first chance to read persistent data
 	 */
-	protected void onAttachedToHierarchy( PreferenceManager preferenceManager ) {
+	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
-		if( !mPreference.setFromPersistedString(this.getPersistedString(null)) ) {
+		if (!mPreference.setFromPersistedString(this.getPersistedString(null))) {
 			// set the defaults into persistent storage if not valid at start
 			updatePersist();
 		}
 		updateSummary();
 
 	}
-	
+
 }

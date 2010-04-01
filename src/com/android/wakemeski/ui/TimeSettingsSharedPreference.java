@@ -17,65 +17,66 @@
 package com.android.wakemeski.ui;
 
 /**
- * A POJO used to read/write the time value from persistent storage.  Used
- * by both the dialog preference and by classes accessing the shared preferences
- * datastore. 
+ * A POJO used to read/write the time value from persistent storage. Used by
+ * both the dialog preference and by classes accessing the shared preferences
+ * datastore.
  * 
  * @author dan
- *
+ * 
  */
 public class TimeSettingsSharedPreference {
-	int currentHour=0;
-	int currentMinute=0;
-	boolean is24Hour=false;
+	int currentHour = 0;
+	int currentMinute = 0;
+	boolean is24Hour = false;
+
 	public int getCurrentHour() {
 		return currentHour;
 	}
+
 	public void setCurrentHour(int currentHour) {
 		this.currentHour = currentHour;
 	}
+
 	public int getCurrentMinute() {
 		return currentMinute;
 	}
-	
+
 	public void setCurrentMinute(int mCurrentMinute) {
 		this.currentMinute = mCurrentMinute;
 	}
-	
+
 	public boolean is24Hour() {
 		return is24Hour;
 	}
+
 	public void setIs24Hour(boolean is24Hour) {
 		this.is24Hour = is24Hour;
 	}
-	
+
 	public String getSummaryString() {
 		StringBuilder builder = new StringBuilder();
-		if( !is24Hour() ) {
-			if( (getCurrentHour() % 12) == 0 ) {
+		if (!is24Hour()) {
+			if ((getCurrentHour() % 12) == 0) {
 				builder.append(12);
-			}
-			else {
+			} else {
 				builder.append(getCurrentHour() % 12);
 			}
-		}
-		else {
+		} else {
 			builder.append(getCurrentHour());
 		}
 		builder.append(':');
 		builder.append(getCurrentMinute() / 10);
 		builder.append(getCurrentMinute() % 10);
-		if( !is24Hour() ) {
-			if( getCurrentHour() >= 12 ) {
+		if (!is24Hour()) {
+			if (getCurrentHour() >= 12) {
 				builder.append(" PM");
-			}
-			else {
+			} else {
 				builder.append(" AM");
 			}
 		}
 		return builder.toString();
 	}
-	
+
 	public String getPersistString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getCurrentHour());
@@ -83,40 +84,40 @@ public class TimeSettingsSharedPreference {
 		builder.append(getCurrentMinute());
 		return builder.toString();
 	}
-	
+
 	/**
 	 * Sets the time in this object based on the persisted string
-	 * @param persistedString The string from persistance store
+	 * 
+	 * @param persistedString
+	 *            The string from persistance store
 	 * @return true if the store was parseable and time was changed
 	 */
-	public boolean setTimeFromPersistString( String persistedString ) {
+	public boolean setTimeFromPersistString(String persistedString) {
 		boolean timeSet = false;
-		if( persistedString != null ) {
+		if (persistedString != null) {
 			String[] timePersist = persistedString.split(",");
-			if( timePersist.length >= 2 ) {
-				int hour=0;
-				int minute=0;
+			if (timePersist.length >= 2) {
+				int hour = 0;
+				int minute = 0;
 				timeSet = true;
 				try {
 					hour = Integer.parseInt(timePersist[0]);
-				}
-				catch( NumberFormatException ne ) {
+				} catch (NumberFormatException ne) {
 					timeSet = false;
 				}
 				try {
 					minute = Integer.parseInt(timePersist[1]);
-				}
-				catch( NumberFormatException ne ) {
+				} catch (NumberFormatException ne) {
 					timeSet = false;
 				}
-				if( timeSet ) {
+				if (timeSet) {
 					currentHour = hour;
 					currentMinute = minute;
 				}
-				
+
 			}
 		}
 		return timeSet;
 	}
-	
+
 }

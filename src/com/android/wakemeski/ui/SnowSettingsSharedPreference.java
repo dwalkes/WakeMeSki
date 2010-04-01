@@ -18,68 +18,65 @@ package com.android.wakemeski.ui;
 
 import android.content.SharedPreferences;
 
-
 /**
- * A POJO used to access snow settings from a shared preference.  Shared
- * by the preference dialog class and any class reading snow settings directly
- * out of the shared preferences datastore.
+ * A POJO used to access snow settings from a shared preference. Shared by the
+ * preference dialog class and any class reading snow settings directly out of
+ * the shared preferences datastore.
  * 
  * @author dan
- *
+ * 
  */
 public class SnowSettingsSharedPreference {
-	private int 	snowDepth = 1;	// the default
-	private SnowUnits	measurementUnits = SnowUnits.INCHES;
-	
+	private int snowDepth = 1; // the default
+	private SnowUnits measurementUnits = SnowUnits.INCHES;
+
 	public int getSnowDepth() {
 		return snowDepth;
 	}
-
 
 	public void setSnowDepth(int snowDepth) {
 		this.snowDepth = snowDepth;
 	}
 
-
 	public SnowUnits getMeasurementUnits() {
 		return measurementUnits;
 	}
-
 
 	public void setMeasurementUnits(SnowUnits measurementUnits) {
 		this.measurementUnits = measurementUnits;
 	}
 
 	public boolean setFromPreferences(SharedPreferences prefs) {
-		return setFromPersistedString(
-				prefs.getString(WakeMeSkiPreferences.SNOW_SETTINGS_PREF_KEY,null));
+		return setFromPersistedString(prefs.getString(
+				WakeMeSkiPreferences.SNOW_SETTINGS_PREF_KEY, null));
 	}
+
 	/**
-	 * Converts from a persisted string to 
+	 * Converts from a persisted string to
+	 * 
 	 * @param persistedString
 	 * @return true if set, false if using defaults
 	 */
-	public boolean setFromPersistedString( String persistedString ) {
+	public boolean setFromPersistedString(String persistedString) {
 		boolean snowSet = false;
-		if( persistedString != null ) {
+		if (persistedString != null) {
 			String[] snowPersist = persistedString.split(",");
-			if( snowPersist.length >= 2 ) {
-				int depth=1;
+			if (snowPersist.length >= 2) {
+				int depth = 1;
 				SnowUnits units = SnowUnits.INCHES;
 				snowSet = true;
 				try {
 					depth = Integer.parseInt(snowPersist[0]);
-				}
-				catch( NumberFormatException ne ) {
+				} catch (NumberFormatException ne) {
 					snowSet = false;
 				}
-				if( snowPersist[1].equals(SnowUnits.CENTIMETERS.toString()) ) {
+				if (snowPersist[1].equals(SnowUnits.CENTIMETERS.toString())) {
 					units = SnowUnits.CENTIMETERS;
 				} else {
 					units = SnowUnits.INCHES;
 				}
 
-				if( snowSet ) {
+				if (snowSet) {
 					snowDepth = depth;
 					measurementUnits = units;
 				}
@@ -87,11 +84,11 @@ public class SnowSettingsSharedPreference {
 		}
 		return snowSet;
 	}
-	
+
 	public String toString() {
 		return snowDepth + " " + measurementUnits.getAbbreviation();
 	}
-	
+
 	public String toLog() {
 		return toString() + " in 24 hours";
 	}

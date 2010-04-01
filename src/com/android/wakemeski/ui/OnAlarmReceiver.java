@@ -24,29 +24,34 @@ import android.util.Log;
 import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
- * This class is invoked when an alarm check needs to occur based on 
- * a configured wakeup.
+ * This class is invoked when an alarm check needs to occur based on a
+ * configured wakeup.
+ * 
  * @author dan
- *
+ * 
  */
 public class OnAlarmReceiver extends BroadcastReceiver {
 	public static final String ACTION_WAKE_CHECK = WakeMeSkiService.ACTION_WAKE_CHECK;
 	public static final String ACTION_SNOOZE = AlarmController.ACTION_FIRE_ALARM;
 	private static final String TAG = "OnAlarmReceiver";
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if( intent.getAction() != null ) {
-			if( intent.getAction().equals(ACTION_SNOOZE) ) {
+		if (intent.getAction() != null) {
+			if (intent.getAction().equals(ACTION_SNOOZE)) {
 				AlarmAlertWakeLock.acquireCpuWakeLock(context);
-				context.startService(new Intent(ACTION_SNOOZE,null,context,WakeMeSkiService.class));
-			} else if ( intent.getAction().equals(ACTION_WAKE_CHECK) )  {
+				context.startService(new Intent(ACTION_SNOOZE, null, context,
+						WakeMeSkiService.class));
+			} else if (intent.getAction().equals(ACTION_WAKE_CHECK)) {
 				AlarmAlertWakeLock.acquireCpuWakeLock(context);
-				context.startService(new Intent(WakeMeSkiService.ACTION_WAKE_CHECK,null,context,WakeMeSkiService.class));
+				context.startService(new Intent(
+						WakeMeSkiService.ACTION_WAKE_CHECK, null, context,
+						WakeMeSkiService.class));
 			} else {
 				Log.w(TAG, "Unknown wake action " + intent.getAction());
 			}
 		} else {
-			Log.w(TAG,"Null wake action");
+			Log.w(TAG, "Null wake action");
 		}
 	}
 

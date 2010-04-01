@@ -24,112 +24,125 @@ import android.util.AttributeSet;
 import com.android.wakemeski.R;
 
 /**
- * A preference class to hold a list of days.  In this case the list of 
- * days is used to select when the user would like to be woken up for 
- * good ski conditions.
+ * A preference class to hold a list of days. In this case the list of days is
+ * used to select when the user would like to be woken up for good ski
+ * conditions.
  * 
  * @author dan
- *
+ * 
  */
 public class RepeatDayPreference extends ListPreferenceMultiSelect {
 
 	Preference.OnPreferenceChangeListener prefListener;
-	RepeatDaySharedPreference			sharedPreference;
+	RepeatDaySharedPreference sharedPreference;
 
 	public RepeatDaySharedPreference getSharedPreference() {
 		return sharedPreference;
 	}
 
 	/**
-	 * Updates the RepeatDataPreference summary given the settings in the preference.
-	 *  RepeatData summary (bottom of dialog) will list the first three letters of day1,day2, etc.
-	 * IE Mon,Tue,Wed
+	 * Updates the RepeatDataPreference summary given the settings in the
+	 * preference. RepeatData summary (bottom of dialog) will list the first
+	 * three letters of day1,day2, etc. IE Mon,Tue,Wed
 	 */
 	private void updateSummary() {
-		if( sharedPreference != null ) {
+		if (sharedPreference != null) {
 			StringBuilder builder = new StringBuilder();
-			String [] selectedDays = sharedPreference.getSelectedDays();
-			if( selectedDays != null ) {
-				for( String day : selectedDays ) {
-					if(builder.length() > 0 ) {
+			String[] selectedDays = sharedPreference.getSelectedDays();
+			if (selectedDays != null) {
+				for (String day : selectedDays) {
+					if (builder.length() > 0) {
 						builder.append(",");
 					}
 					// Add the first 3 letters of this day of the week
-					builder.append(day.substring(0, day.length() > 3 ? 3 : day.length()));
+					builder.append(day.substring(0, day.length() > 3 ? 3 : day
+							.length()));
 				}
 			}
-			if( builder.length() > 0 ) {
+			if (builder.length() > 0) {
 				setSummary(builder);
-			}
-			else {
+			} else {
 				setSummary(R.string.none);
 			}
 		} else {
 			setSummary(R.string.none);
 		}
 	}
-	
+
 	/**
 	 * This is the first time the persistent value can be read
-	 * @param preferenceManager - the manager attached to this hierarchy
+	 * 
+	 * @param preferenceManager
+	 *            - the manager attached to this hierarchy
 	 */
-	protected void onAttachedToHierarchy( PreferenceManager preferenceManager ) {
+	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
 		sharedPreference.setFromPersistString(this.getValue());
 		updateSummary();
 	}
-	
+
 	/**
 	 * public c'tor
+	 * 
 	 * @param context
 	 * @param attrs
 	 */
-    public RepeatDayPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        prefListener = null;
-        sharedPreference = new RepeatDaySharedPreference();
-        
-        /**
-         * Setup our own pref change listener in the constructor.  This allows us to update
-         * the summary automatically when the preference is changed. 
-         */
-        super.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-        	public boolean onPreferenceChange(Preference pref,Object newValue) {
-        		if( newValue != null ) {
-        			sharedPreference.setFromPersistString(newValue.toString());
-        			updateSummary();
-        		}
-        		/**
-        		 * Call the registered callback if applicable
-        		 */
-        		boolean returnValue = prefListenerCallback(pref,newValue);
-        		return returnValue;
-        	}
-        });
+	public RepeatDayPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		prefListener = null;
+		sharedPreference = new RepeatDaySharedPreference();
 
-    }
+		/**
+		 * Setup our own pref change listener in the constructor. This allows us
+		 * to update the summary automatically when the preference is changed.
+		 */
+		super
+				.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+					public boolean onPreferenceChange(Preference pref,
+							Object newValue) {
+						if (newValue != null) {
+							sharedPreference.setFromPersistString(newValue
+									.toString());
+							updateSummary();
+						}
+						/**
+						 * Call the registered callback if applicable
+						 */
+						boolean returnValue = prefListenerCallback(pref,
+								newValue);
+						return returnValue;
+					}
+				});
 
-    /**
-     * Since we override setOnPreferenceChangeListener and define our own in the c'tor, we
-     * need a way for classes to register for an additional change listener as necessary
-     * This synchronized method calls a registered pref listener
-     * @param pref The value to pass to the registered pref listener
-     * @param newValue The value to pass to the registered pref listener
-     */
-    private synchronized boolean prefListenerCallback(Preference pref, Object newValue ) {
-    	boolean returnValue = true;
-		if( prefListener != null ) {
-			returnValue = prefListener.onPreferenceChange(pref,newValue);
+	}
+
+	/**
+	 * Since we override setOnPreferenceChangeListener and define our own in the
+	 * c'tor, we need a way for classes to register for an additional change
+	 * listener as necessary This synchronized method calls a registered pref
+	 * listener
+	 * 
+	 * @param pref
+	 *            The value to pass to the registered pref listener
+	 * @param newValue
+	 *            The value to pass to the registered pref listener
+	 */
+	private synchronized boolean prefListenerCallback(Preference pref,
+			Object newValue) {
+		boolean returnValue = true;
+		if (prefListener != null) {
+			returnValue = prefListener.onPreferenceChange(pref, newValue);
 		}
 		return returnValue;
-    }
+	}
 
-    @Override
-    /**
-     * Override setOnPreferenceChangeListener to save a reference to the class to call on preference change
-     */
-    public synchronized void setOnPreferenceChangeListener(Preference.OnPreferenceChangeListener listener) {
-    	prefListener = listener;
-    }
-    	
+	@Override
+	/**
+	 * Override setOnPreferenceChangeListener to save a reference to the class to call on preference change
+	 */
+	public synchronized void setOnPreferenceChangeListener(
+			Preference.OnPreferenceChangeListener listener) {
+		prefListener = listener;
+	}
+
 }

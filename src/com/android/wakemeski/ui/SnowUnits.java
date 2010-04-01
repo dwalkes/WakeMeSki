@@ -17,21 +17,22 @@
 package com.android.wakemeski.ui;
 
 /**
- * An enumeration describing the units of measure for snow totals.  Different
+ * An enumeration describing the units of measure for snow totals. Different
  * resorts may use different display measurements, and the user may want to
  * configure thresholds in terms of different display measurements.
  * 
  * @author dan
- *
+ * 
  */
-public enum 	SnowUnits {
-	INCHES("inches"),
-	CENTIMETERS("cm");
-	
+public enum SnowUnits {
+	INCHES("inches"), CENTIMETERS("cm");
+
 	String abbrev;
+
 	SnowUnits(String abbrev) {
 		this.abbrev = abbrev;
 	}
+
 	public String getAbbreviation() {
 		return abbrev;
 	}

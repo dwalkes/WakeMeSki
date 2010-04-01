@@ -17,54 +17,58 @@
 package com.android.wakemeski.ui;
 
 /**
- * A class to hold information about snow totals for a specific resort.
- * Used to compare 24hr snow totals to a configured setting.
+ * A class to hold information about snow totals for a specific resort. Used to
+ * compare 24hr snow totals to a configured setting.
  * 
  * @author dan
- *
+ * 
  */
 public class ResortSnowInfo implements Comparable<ResortSnowInfo> {
 	private SnowUnits resortReportUnits = SnowUnits.INCHES;
-	
+
 	public void setResortReportUnits(SnowUnits resortReportUnits) {
 		this.resortReportUnits = resortReportUnits;
 	}
 
-	private int	resortSnowDepth24Hours = 0;
+	private int resortSnowDepth24Hours = 0;
 	Resort resort;
-	
-	ResortSnowInfo(Resort resort ) {
+
+	ResortSnowInfo(Resort resort) {
 		this.resort = resort;
 	}
-	
+
 	/**
 	 * Provides for sorting of resort snow info by snow depth
 	 */
 	public int compareTo(ResortSnowInfo compareObject) {
-		return  compareObject.resortSnowDepth24Hours - this.resortSnowDepth24Hours ;
+		return compareObject.resortSnowDepth24Hours
+				- this.resortSnowDepth24Hours;
 	}
-	
-	boolean exceedsOrMatchesPreference( SnowSettingsSharedPreference snowSettings ) {
-		if ( resortReportUnits == snowSettings.getMeasurementUnits() ) {
-			if( resortSnowDepth24Hours >= snowSettings.getSnowDepth() ) {
+
+	boolean exceedsOrMatchesPreference(SnowSettingsSharedPreference snowSettings) {
+		if (resortReportUnits == snowSettings.getMeasurementUnits()) {
+			if (resortSnowDepth24Hours >= snowSettings.getSnowDepth()) {
 				return true;
 			}
 		} else {
 			// units do not agree - change both to centimeters for more accuracy
-			double resortSnowDepth24Hours_cm = ( resortReportUnits == SnowUnits.CENTIMETERS ?
-					resortSnowDepth24Hours : resortSnowDepth24Hours * 2.54 );
-			double prefSnowDepth24Hours_cm = (  snowSettings.getMeasurementUnits() == SnowUnits.CENTIMETERS ?
-					snowSettings.getSnowDepth() : snowSettings.getSnowDepth() * 2.54);
-			
-			if( resortSnowDepth24Hours_cm >= prefSnowDepth24Hours_cm ) {
+			double resortSnowDepth24Hours_cm = (resortReportUnits == SnowUnits.CENTIMETERS ? resortSnowDepth24Hours
+					: resortSnowDepth24Hours * 2.54);
+			double prefSnowDepth24Hours_cm = (snowSettings
+					.getMeasurementUnits() == SnowUnits.CENTIMETERS ? snowSettings
+					.getSnowDepth()
+					: snowSettings.getSnowDepth() * 2.54);
+
+			if (resortSnowDepth24Hours_cm >= prefSnowDepth24Hours_cm) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public String toString() {
-		return resort.toString() + " (" + resortSnowDepth24Hours + " " + resortReportUnits.getAbbreviation() + " in 24 hrs)";
+		return resort.toString() + " (" + resortSnowDepth24Hours + " "
+				+ resortReportUnits.getAbbreviation() + " in 24 hrs)";
 	}
 
 	/**
@@ -73,17 +77,18 @@ public class ResortSnowInfo implements Comparable<ResortSnowInfo> {
 	public String toLog() {
 		return toString();
 	}
-	public void setResortSnowDepth24Hours( int resortSnowDepth ) {
+
+	public void setResortSnowDepth24Hours(int resortSnowDepth) {
 		resortSnowDepth24Hours = resortSnowDepth;
 	}
-	
 
 	public String getSnowDepth() {
-		return resortSnowDepth24Hours + " " + resortReportUnits.getAbbreviation();
+		return resortSnowDepth24Hours + " "
+				+ resortReportUnits.getAbbreviation();
 	}
-	
-    public Resort getResort() {
-    	return resort;
-    }
+
+	public Resort getResort() {
+		return resort;
+	}
 
 }
