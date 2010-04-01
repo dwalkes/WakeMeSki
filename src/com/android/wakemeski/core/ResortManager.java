@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.android.wakemeski.core;
 
@@ -26,16 +26,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.android.wakemeski.ui.Resort;
-
 import android.content.Context;
 import android.util.Log;
 
 /**
  * Manages a list of resorts to/from persistent storage
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class ResortManager {
 
@@ -60,7 +58,7 @@ public class ResortManager {
 
 	/**
 	 * Updates the resort list with the passed list, updates persistent storage
-	 * 
+	 *
 	 * @param resort
 	 */
 	public void update(Resort[] resortList) {

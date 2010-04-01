@@ -14,13 +14,12 @@
  * limitations under the License.
  * 
  */
-package com.android.wakemeski.ui;
+package com.android.wakemeski.core;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.android.wakemeski.core.Location;
 
 /**
  * A class containing resort information destined for persistent storage Uses

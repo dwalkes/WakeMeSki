@@ -12,10 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.android.wakemeski.core;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.IntentService;
@@ -32,9 +33,6 @@ import com.android.wakemeski.ui.AlarmCalculator;
 import com.android.wakemeski.ui.AlarmController;
 import com.android.wakemeski.ui.OnAlarmReceiver;
 import com.android.wakemeski.ui.RepeatDaySharedPreference;
-import com.android.wakemeski.ui.Resort;
-import com.android.wakemeski.ui.ResortSnowInfo;
-import com.android.wakemeski.ui.SkiReportManager;
 import com.android.wakemeski.ui.SnowSettingsSharedPreference;
 import com.android.wakemeski.ui.TimeSettingsSharedPreference;
 import com.android.wakemeski.ui.WakeMeSkiPreferences;
@@ -51,10 +49,11 @@ import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 public class WakeMeSkiService extends IntentService {
 
 	private static final String TAG = "WakeMeSkiService";
-	public static final String ACTION_WAKE_CHECK = "com.android.wakemeski.ui.ACTION_WAKE_CHECK";
+	public static final String ACTION_WAKE_CHECK = "com.dwalkes.android.wakemeski.ACTION_WAKE_CHECK";
 	public static final String ACTION_ALARM_SCHEDULE = "com.walkes.android.wakemeski.ACTION_ALARM_SCHEDULE";
 	public static final String ACTION_DASHBOARD_POPULATE = "com.walkes.android.wakemeski.ACTION_DASHBOARD_POPULATE";
-	private ResortSnowInfo[] mLastSnowInfo = null;
+
+	private ArrayList<Report> mReports = new ArrayList<Report>();
 	private SnowInfoListener mListener = null;
 
 	// This is the object that receives interactions from clients. See
@@ -82,6 +81,7 @@ public class WakeMeSkiService extends IntentService {
 		return mBinder;
 	}
 
+	@Override
 	public void onCreate() {
 		// Maintain a lock during the checking of the alarm. This lock may have
 		// already been acquired in AlarmReceiver. If the process was killed,
@@ -91,26 +91,41 @@ public class WakeMeSkiService extends IntentService {
 	}
 
 	public interface SnowInfoListener {
-		public void onSnowInfoChanged(ResortSnowInfo[] newSnowInfo);
+		/**
+		 * This is called when the service is re-reading all report data
+		 */
+		public void onClear();
 
-		void onErrorObtainingSnowInfo(String userVisibleError);
+		/**
+		 * This is called when a report has been read by the service. When
+		 * called with NULL, there are no more reports
+		 */
+		public void onReport(Report r);
 	}
 
 	synchronized public void registerListener(SnowInfoListener listener) {
 		mListener = listener;
-		mListener.onSnowInfoChanged(mLastSnowInfo);
+
+		for (Report r : mReports)
+			mListener.onReport(r);
 	}
 
 	synchronized public void unregisterListener(SnowInfoListener listener) {
 		mListener = null;
 	}
 
-	synchronized private void notifyResortSnowInfoChange(
-			ResortSnowInfo[] lastSnowInfo) {
+	synchronized private void notifyClear() {
 		if (mListener != null) {
-			mListener.onSnowInfoChanged(lastSnowInfo);
+			mListener.onClear();
 		}
-		mLastSnowInfo = lastSnowInfo;
+		mReports.clear();
+	}
+
+	synchronized private void notifyReport(Report r) {
+		if (mListener != null) {
+			mListener.onReport(r);
+		}
+		mReports.add(r);
 	}
 
 	/**
@@ -119,29 +134,30 @@ public class WakeMeSkiService extends IntentService {
 	 */
 	private boolean checkAlarmAction() {
 		boolean alarmAction = false;
+		Context ctx = getApplicationContext();
 		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+				.getDefaultSharedPreferences(ctx);
 		SnowSettingsSharedPreference snowSettings = new SnowSettingsSharedPreference();
+
+		notifyClear();
+
 		if (snowSettings.setFromPreferences(prefs)) {
-			ResortManager resortManager = ResortManager
-					.getInstance(getApplicationContext());
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			ResortManager resortManager = ResortManager.getInstance(ctx);
 			Resort[] wakeupEnabledResorts = resortManager
 					.getWakeupEnabledResorts();
 			if (wakeupEnabledResorts.length > 0) {
-				SkiReportManager skiReportMgr = new SkiReportManager(
-						getApplicationContext(),
-						(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE));
-				ResortSnowInfo[] resortSnowInfoList = skiReportMgr
-						.getSnowInfo(wakeupEnabledResorts);
-				for (ResortSnowInfo snowInfo : resortSnowInfoList) {
-					if (snowInfo.exceedsOrMatchesPreference(snowSettings)) {
+				for (Resort resort : wakeupEnabledResorts) {
+					Report r = Report.loadReport(ctx, cm, resort.getLocation());
+					if (Report.meetsPreference(r, snowSettings)) {
 						alarmAction = true;
 					} else {
-						Log.d(TAG, "Resort" + snowInfo.toString()
-								+ " did not exceed preference " + snowSettings);
+						Log.d(TAG, "Resort" + r + " did not exceed preference "
+								+ snowSettings);
 					}
+
+					notifyReport(r);
 				}
-				notifyResortSnowInfoChange(resortSnowInfoList);
 			} else {
 				Log.d(TAG, "no resorts enabled, skipping resort check");
 			}
@@ -149,6 +165,9 @@ public class WakeMeSkiService extends IntentService {
 		} else {
 			Log.e(TAG, "snow settings not found, skipping resort check");
 		}
+
+		notifyReport(null);
+
 		return alarmAction;
 	}
 

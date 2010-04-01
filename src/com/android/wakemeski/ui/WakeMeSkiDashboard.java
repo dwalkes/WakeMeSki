@@ -12,17 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.android.wakemeski.ui;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import com.android.wakemeski.R;
-import com.android.wakemeski.core.ResortManager;
-import com.android.wakemeski.core.WakeMeSkiService;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -40,18 +32,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.wakemeski.R;
+import com.android.wakemeski.core.Report;
+import com.android.wakemeski.core.ResortManager;
+import com.android.wakemeski.core.WakeMeSkiService;
+
 /**
  * The application dashboard for WakeMeSki. Shows the status of configured
  * resorts in a list based on total snowfall.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class WakeMeSkiDashboard extends Activity implements
 		WakeMeSkiService.SnowInfoListener {
 	private WakeMeSkiService mBoundService;
 	private ViewGroup mSnowListLayout;
-	private ResortSnowInfo[] mSnowInfoList;
 	private Handler mHandler;
 	private SnowSettingsSharedPreference mSnowSettings;
 	private String TAG = "WakeMeSkiDashboard";
@@ -111,62 +107,47 @@ public class WakeMeSkiDashboard extends Activity implements
 		}
 	}
 
-	private void repaintSnowInfo() {
-		List<ResortSnowInfo> resortSnowList = Arrays.asList(mSnowInfoList);
-		Collections.sort(resortSnowList);
-		int index = 0;
-		mSnowListLayout.removeAllViews();
-		for (ResortSnowInfo snowInfo : resortSnowList) {
-			View hasSnowResortChild = getLayoutInflater().inflate(
-					R.layout.snow_layout, null);
-			if (snowInfo.exceedsOrMatchesPreference(mSnowSettings)) {
-				Drawable d = getResources().getDrawable(
-						R.drawable.exceeds_threshold_background);
-				hasSnowResortChild.setBackgroundDrawable(d);
-			} else {
-				Drawable d = getResources().getDrawable(
-						R.drawable.below_threshold_background);
-				hasSnowResortChild.setBackgroundDrawable(d);
+	/**
+	 * Called by WakeMeSkiService when its refreshing all reports
+	 */
+	@Override
+	public void onClear() {
+		mHandler.post(new Runnable() {
+			public void run() {
+				mSnowListLayout.removeAllViews();
 			}
-			TextView resortName = (TextView) hasSnowResortChild
-					.findViewById(R.id.resort_name);
-			resortName.setText(snowInfo.getResort().getResortName());
-			TextView snowTotal = (TextView) hasSnowResortChild
-					.findViewById(R.id.snow_value);
-			snowTotal.setText(snowInfo.getSnowDepth());
-			mSnowListLayout.addView(hasSnowResortChild, index);
-			index++;
-		}
+		});
 	}
 
-	public void onErrorObtainingSnowInfo(String userVisibleError) {
-		mSnowListLayout.removeAllViews();
-		View configIssue = getLayoutInflater().inflate(
-				R.layout.dashboard_config_detail, mSnowListLayout);
-		TextView configIssueText = (TextView) configIssue
-				.findViewById(R.id.config_detail);
-		Drawable d = getResources().getDrawable(
-				R.drawable.dashboard_com_error_background);
-		configIssue.setBackgroundDrawable(d);
-		configIssueText.setText(userVisibleError);
-	}
+	@Override
+	public void onReport(final Report r) {
 
-	public void onSnowInfoChanged(ResortSnowInfo[] newSnowInfoList) {
-		if (newSnowInfoList != null) {
-			mSnowInfoList = newSnowInfoList;
-			// we don't handle changes to the components once the dialog has
-			// initially been updated
-			mBoundService.unregisterListener(this);
-
-			// must do all UI updates in the main thread - post the ui updates
-			// using our handler
-			mHandler.post(new Runnable() {
-				public void run() {
-					repaintSnowInfo();
+		mHandler.post(new Runnable() {
+			public void run() {
+				if (r == null) {
+					mSnowListLayout.removeViewAt(0);
+					return;
 				}
-			});
+				View v = getLayoutInflater()
+						.inflate(R.layout.snow_layout, null);
 
-		}
+				Drawable d;
+				if (Report.meetsPreference(r, mSnowSettings)) {
+					d = getResources().getDrawable(
+							R.drawable.exceeds_threshold_background);
+				} else {
+					d = getResources().getDrawable(
+							R.drawable.below_threshold_background);
+				}
+				v.setBackgroundDrawable(d);
+
+				TextView tv = (TextView) v.findViewById(R.id.resort_name);
+				tv.setText(r.getLabel());
+				tv = (TextView) v.findViewById(R.id.snow_value);
+				tv.setText(r.getFreshAsString());
+				mSnowListLayout.addView(v);
+			}
+		});
 	}
 
 	@Override

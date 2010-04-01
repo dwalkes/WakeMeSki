@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.android.wakemeski.R;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -40,6 +38,9 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+
+import com.android.wakemeski.R;
+import com.android.wakemeski.ui.SnowSettingsSharedPreference;
 
 public class Report implements Parcelable {
 	private String _location = "";
@@ -117,6 +118,20 @@ public class Report implements Parcelable {
 			return new Report[size];
 		}
 	};
+
+	public static boolean meetsPreference(Report r,
+			SnowSettingsSharedPreference s) {
+		double depth = s.getSnowDepth();
+		double reported = r.getFreshSnowTotal();
+
+		if (r.getSnowUnits() != SnowUnits.CENTIMETERS)
+			reported *= 2.54;
+
+		if (s.getMeasurementUnits() == SnowUnits.CENTIMETERS)
+			depth *= 2.54;
+
+		return (reported >= depth);
+	}
 
 	/**
 	 * Private constructor. loadReport should be used to construct an instance.
@@ -204,6 +219,14 @@ public class Report implements Parcelable {
 			snowTotal = -1;
 		}
 		return snowTotal;
+	}
+
+	public String getFreshAsString() {
+		String unit = " \"";
+		if (getSnowUnits() == SnowUnits.CENTIMETERS)
+			unit = " cm";
+
+		return getFreshSnowTotal() + unit;
 	}
 
 	public String getSnowConditions() {

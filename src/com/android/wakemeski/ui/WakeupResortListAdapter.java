@@ -16,6 +16,8 @@
  */
 package com.android.wakemeski.ui;
 
+import com.android.wakemeski.core.Resort;
+
 import android.content.Context;
 import android.widget.ArrayAdapter;
 
