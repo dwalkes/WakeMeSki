@@ -124,7 +124,7 @@ public class Report implements Parcelable {
 		double depth = s.getSnowDepth();
 		double reported = r.getFreshSnowTotal();
 
-		if (r.getSnowUnits() != SnowUnits.CENTIMETERS)
+		if (r.getSnowUnits() == SnowUnits.CENTIMETERS)
 			reported *= 2.54;
 
 		if (s.getMeasurementUnits() == SnowUnits.CENTIMETERS)
