@@ -36,6 +36,7 @@ import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
 import com.android.wakemeski.core.ResortManager;
 import com.android.wakemeski.core.WakeMeSkiService;
+import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 /**
  * The application dashboard for WakeMeSki. Shows the status of configured
