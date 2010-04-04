@@ -12,6 +12,7 @@
 <string name="alarm_summary">Configure your wake-up time</string>
 <string name="alarm_repeat">Wake-up Days</string>
 <string name="enable">Enable</string>
+<string name="enabled">Enabled</string>
 <string name="wakeup_time">Wake-up Time</string>
 <string name="snow_settings">Snow Settings</string>
 <string name="snow_settings_detail">Snow Totals Required For Wake-up</string>
@@ -36,6 +37,9 @@
 <string name="please_wait_for_service">Please wait while snow status is obtained for selected resorts.</string>
 <string name="alarm_updated">WakeMeSki alarm successfully updated</string>
 <string name="alarm_disabled">WakeMeSki alarm is currently disabled</string>
+<string name="resort_list_title">WakeMeSki Selected Resorts</string>
+<string name="wakeup">Wake Up</string>
+<string name="resort_name">Resort Name</string>
     <string name="app_name_loading">Ski Report - Loading...</string>
     
     <string name="selection_activity">Mountain Selection</string>
@@ -48,6 +52,7 @@
 	<string name="nourl_info">This report has no additional information.</string>
     
     <string name="add_location">Add Location</string>
+    <string name="remove_location">Remove Location</string>
 	<string name="clear_locations">Clear All</string>
 	<string name="refresh">Refresh</string>
 	
