@@ -33,7 +33,13 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-         <activity android:name=".ui.WakeMeSkiDashboard"
+        <activity android:name=".ui.WakeMeSkiDashboard"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.ReportActivity"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

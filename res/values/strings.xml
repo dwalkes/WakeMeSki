@@ -43,42 +43,28 @@
     
     <string name="selection_activity">Mountain Selection</string>
     <string name="selection_activity_loading">Mountain Selection - Loading...</string>
-    <string name="app_settings">Settings</string>
-    
-    <string name="app_help">You have no configured locations. Press the
-                            menu button to add one.</string>
-
-	<string name="nourl_info">This report has no additional information.</string>
     
     <string name="add_location">Add Location</string>
     <string name="remove_location">Remove Location</string>
 	<string name="clear_locations">Clear All</string>
 	<string name="refresh">Refresh</string>
-	
-	<string name="show_details">Show details</string>
-	<string name="show_weather">Show weather</string>
+
 	<string name="map_location">Map it</string>
-	<string name="delete_location">Delete location</string>
-	<string name="move_location">Move down</string>
-	
-	<string name="snow.total">Snow Depths: </string>
-	<string name="snow.daily">Daily Snowfall: </string>
-	<string name="snow.condition">Snow Conditions: %s</string>
-	<string name="trails">Trails Open: %d of %d</string>
-	<string name="lifts">Lifts Open: %d of %d</string>
-	<string name="trails2">Trails Open: %d</string>
-	<string name="lifts2">Lifts Open: %d</string>
-	<string name="temps">Temperatures: </string>
-	<string name="wind">Wind Speed: %s</string>
-	<string name="report_data">Report Date: %s</string>
+
 	<string name="report_error">An error occurred while retrieving the report: %s</string>
-	
 	<string name="error_title">Error Finding Location Data</string>
-	
 	<string name="error_no_connection">No data connection. Please try again later.</string>
 	
-	<string name="pref_title">Ski Report Settings</string>
-	<string name="pref_server">Location Server</string>
-	
 	<string name="loading">Loading...</string>
+	
+	<!-- ReportActivity (report.xml) strings -->
+	<string name="report_date">Date: %s</string>
+	<string name="report_snow">Snowfall</string>
+	<string name="report_base">Base Depths: %s</string>
+	<string name="report_trails_lifts">Trails: %s Lifts: %s</string>
+	<string name="report_weather">Forecast</string>
+	<string name="report_weather_link">Weather Details</string>
+	<string name="report_details_link">Report Info</string>
+	<string name="report_info_link">Resort Info</string>
+	<string name="report_mapit_link">Map It</string>
 </resources>

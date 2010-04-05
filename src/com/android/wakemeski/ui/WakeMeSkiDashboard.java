@@ -24,14 +24,16 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
 import com.android.wakemeski.core.ResortManager;
 import com.android.wakemeski.core.WakeMeSkiService;
-import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 /**
  * The application dashboard for WakeMeSki. Shows the status of configured
@@ -56,10 +58,12 @@ public class WakeMeSkiDashboard extends Activity implements
 		setContentView(R.layout.dashboard);
 
 		mHandler = new Handler();
-		
+
 		mReportsList = (ListView)findViewById(R.id.dashboard_list);
 		mListAdapter = new ReportListAdapter(getApplicationContext());
 		mReportsList.setAdapter(mListAdapter);
+
+		mReportsList.setOnItemClickListener(mClickListener);
 	}
 
 	@Override
@@ -117,6 +121,18 @@ public class WakeMeSkiDashboard extends Activity implements
 			mBoundService = null;
 		}
 	}
+
+	private OnItemClickListener mClickListener = new OnItemClickListener() {
+		public void onItemClick(AdapterView<?> parent, View v, int pos, long id)
+		{
+			Report r = (Report)mListAdapter.getItem(pos);
+			if( r != null ) {
+				Intent i = new Intent(WakeMeSkiDashboard.this, ReportActivity.class);
+				i.putExtra("report", r);
+				startActivityForResult(i, 0);
+			}
+		}
+	};
 
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {

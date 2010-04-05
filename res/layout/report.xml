@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:background="#ffC0C0C0">
+
+	<!--  Title Area -->
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingBottom="5px">
+	
+		<ImageView 
+			android:id="@+id/report_weather"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" />
+		
+		<TextView 			
+			android:id="@+id/report_label"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="5px"
+			android:textColor = "#000000"
+			android:textSize="10pt"
+			android:textStyle="bold" />
+	</LinearLayout>
+
+<ScrollView
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:paddingLeft="5px">
+	
+		<!-- Basic report data -->
+		<TextView
+			android:text="@string/report_snow"
+			android:textColor = "#000000"
+			android:textStyle="bold"
+			android:textSize="9pt"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+
+		<TextView
+			android:id="@+id/report_date"
+			android:textColor = "#000000"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="5px"/>
+		<TextView
+			android:id="@+id/report_fresh"
+			android:textColor = "#000000"
+			android:textStyle="bold"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="5px"/>
+
+		<TextView
+			android:id="@+id/report_base"
+			android:textColor = "#000000"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="5px"/>
+
+		<TextView
+			android:id="@+id/report_trails_lifts"
+			android:textColor = "#000000"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="5px"/>
+
+		<!--  Weather -->
+		<TextView
+			android:text="@string/report_weather"
+			android:textColor = "#000000"
+			android:textStyle="bold"
+			android:textSize="9pt"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<LinearLayout 
+			android:id="@+id/weather_list"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:orientation="vertical"
+			android:paddingLeft="5px" />
+	</LinearLayout>
+</ScrollView>
+</LinearLayout>

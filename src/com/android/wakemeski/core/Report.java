@@ -47,6 +47,7 @@ public class Report implements Parcelable {
 	private String _date = "";
 	private String _windAvg = "";
 	private String _detailsURL = "";
+	private String _locationURL = "";
 
 	private int _trailsOpen = 0;
 	private int _trailsTotal = 0;
@@ -56,6 +57,7 @@ public class Report implements Parcelable {
 
 	private String _weatherUrl = "";
 	private String _weatherIcon = "";
+	private ArrayList<Weather> _weather = new ArrayList<Weather>();
 
 	private String _latitude = "";
 	private String _longitude = "";
@@ -84,6 +86,7 @@ public class Report implements Parcelable {
 			r._date = source.readString();
 			r._windAvg = source.readString();
 			r._detailsURL = source.readString();
+			r._locationURL = source.readString();
 
 			r._trailsOpen = source.readInt();
 			r._trailsTotal = source.readInt();
@@ -96,6 +99,7 @@ public class Report implements Parcelable {
 
 			r._weatherUrl = source.readString();
 			r._weatherIcon = source.readString();
+			source.readTypedList(r._weather, Weather.CREATOR);
 
 			r._latitude = source.readString();
 			r._longitude = source.readString();
@@ -168,12 +172,32 @@ public class Report implements Parcelable {
 		return _trailsTotal;
 	}
 
+	public String getTrailsAsString() {
+		String s = "n/a";
+		if( _trailsTotal > 0 )
+			s = _trailsOpen + "/" + _trailsTotal;
+		else if( _trailsOpen > 0 )
+			s = String.valueOf(_trailsOpen);
+
+		return s;
+	}
+
 	public int getLiftsOpen() {
 		return _liftsOpen;
 	}
 
 	public int getLiftsTotal() {
 		return _liftsTotal;
+	}
+
+	public String getLiftsAsString() {
+		String s = "n/a";
+		if( _liftsTotal > 0 )
+			s = _liftsOpen + "/" + _liftsTotal;
+		else if( _liftsOpen > 0 )
+			s = String.valueOf(_liftsOpen);
+
+		return s;
 	}
 
 	/**
@@ -183,11 +207,45 @@ public class Report implements Parcelable {
 		return _snowTotals.toArray(new String[_snowTotals.size()]);
 	}
 
+	public String getSnowDepthsAsString() {
+		StringBuffer sb = new StringBuffer();
+		int len = _snowTotals.size();
+
+		for(int i = 0; i < len; i++) {
+			sb.append(_snowTotals.get(i));
+			if( i+2< len)
+				sb.append(',');
+			sb.append(' ');
+		}
+
+		return sb.toString();
+	}
+
 	/**
 	 * Returns an array of all daily snow reports found
 	 */
 	public String[] getDailySnow() {
 		return _dailySnow.toArray(new String[_dailySnow.size()]);
+	}
+
+	/**
+	 * Returns the list of daily snow fall plus snow conditions if available
+	 */
+	public String getDailyDetails() {
+		StringBuffer sb = new StringBuffer();
+		int len = _dailySnow.size();
+
+		for(int i = 0; i < len; i++) {
+			sb.append(_dailySnow.get(i));
+			if( i+2< len)
+				sb.append(',');
+			sb.append(' ');
+		}
+
+		if(_snowConditions != null && _snowConditions.length() > 0 )
+			sb.append(_snowConditions);
+
+		return sb.toString();
 	}
 
 	/**
@@ -247,6 +305,16 @@ public class Report implements Parcelable {
 		return _errMsg;
 	}
 
+	/**
+	 * Returns true if the report include latitude and longitude coordinates
+	 */
+	public boolean hasGeo() {
+		if( _latitude != null && _latitude.length() > 0 &&
+			_longitude != null && _longitude.length() > 0 )
+			return true;
+		return false;
+	}
+
 	public Uri getGeo() {
 		return Uri.parse("geo:" + _latitude + "," + _longitude);
 	}
@@ -258,8 +326,20 @@ public class Report implements Parcelable {
 		return _detailsURL;
 	}
 
+	/**
+	 * Similar to getDetailsURL. This is more for the resport web site, whereas
+	 * the getDetailsURL is more for drilling down into snow information
+	 */
+	public String getLocationURL() {
+		return _locationURL;
+	}
+
 	public String getWeatherURL() {
 		return _weatherUrl;
+	}
+
+	public Weather[] getWeather() {
+		return _weather.toArray(new Weather[_weather.size()]);
 	}
 
 	public String getWeatherIcon() {
@@ -298,6 +378,7 @@ public class Report implements Parcelable {
 		dest.writeString(_date);
 		dest.writeString(_windAvg);
 		dest.writeString(_detailsURL);
+		dest.writeString(_locationURL);
 
 		dest.writeInt(_trailsOpen);
 		dest.writeInt(_trailsTotal);
@@ -310,6 +391,7 @@ public class Report implements Parcelable {
 
 		dest.writeString(_weatherUrl);
 		dest.writeString(_weatherIcon);
+		dest.writeTypedList(_weather);
 
 		dest.writeString(_latitude);
 		dest.writeString(_longitude);
@@ -382,6 +464,8 @@ public class Report implements Parcelable {
 			}
 		}
 
+		String when[] = new String[3];
+		String desc[] = new String[3];
 		for (String line : lines) {
 			String parts[] = line.split("=", 2);
 			if (parts.length == 2) {
@@ -394,6 +478,8 @@ public class Report implements Parcelable {
 					r._date = parts[1];
 				} else if (parts[0].equals("details.url")) {
 					r._detailsURL = parts[1];
+				} else if (parts[0].equals("location.info")) {
+					r._locationURL = parts[1];
 				} else if (parts[0].equals("trails.open")) {
 					r._trailsOpen = getInt(parts[1]);
 				} else if (parts[0].equals("trails.total")) {
@@ -406,7 +492,14 @@ public class Report implements Parcelable {
 					r._weatherUrl = parts[1];
 				} else if (parts[0].equals("weather.icon")) {
 					r._weatherIcon = parts[1];
-				} else if (parts[0].equals("location")) {
+				} else if( parts[0].startsWith("weather.forecast.when.")) {
+					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
+					when[idx] = parts[1];
+				} else if( parts[0].startsWith("weather.forecast.desc.")) {
+					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
+					desc[idx] = parts[1];
+				}
+				else if (parts[0].equals("location")) {
 					r._location = parts[1];
 				} else if (parts[0].equals("location.latitude")) {
 					r._latitude = parts[1];
@@ -441,6 +534,11 @@ public class Report implements Parcelable {
 				Log.e(TAG, "Error invalid line from report URL("
 						+ l.getReportUrl() + " line: " + line);
 			}
+		}
+
+		for( int i = 0; i < when.length; i++ ) {
+			if( when[i].length() > 0 && desc[i].length() > 0 )
+				r._weather.add(new Weather(when[i], desc[i]));
 		}
 
 		return r;
