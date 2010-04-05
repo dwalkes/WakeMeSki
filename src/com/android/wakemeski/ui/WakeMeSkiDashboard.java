@@ -21,16 +21,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.Window;
+import android.widget.ListView;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
@@ -47,62 +42,42 @@ import com.android.wakemeski.pref.SnowSettingsSharedPreference;
  */
 public class WakeMeSkiDashboard extends Activity implements
 		WakeMeSkiService.SnowInfoListener {
+
 	private WakeMeSkiService mBoundService;
-	private ViewGroup mSnowListLayout;
 	private Handler mHandler;
-	private SnowSettingsSharedPreference mSnowSettings;
-	private String TAG = "WakeMeSkiDashboard";
+
+	private ListView          mReportsList;
+	private ReportListAdapter mListAdapter;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.dashboard);
-		mSnowListLayout = (ViewGroup) this.findViewById(R.id.snow_list_layout);
+
 		mHandler = new Handler();
+		
+		mReportsList = (ListView)findViewById(R.id.dashboard_list);
+		mListAdapter = new ReportListAdapter(getApplicationContext());
+		mReportsList.setAdapter(mListAdapter);
 	}
 
 	@Override
 	protected void onResume() {
-		boolean startService = false;
 		super.onResume();
-		mSnowListLayout.removeAllViews();
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+		mListAdapter.clearReports();
+
 		ResortManager selectedResorts = ResortManager
 				.getInstance(getApplicationContext());
+
 		// If the user hasn't selected any resorts, no sense trying to start the
 		// service.. put up config issue text instead
-		if (selectedResorts.getResorts().length == 0) {
-			View configIssue = getLayoutInflater().inflate(
-					R.layout.dashboard_config_detail, mSnowListLayout);
-			Drawable d = getResources().getDrawable(
-					R.drawable.dashboard_config_issue_background);
-			configIssue.setBackgroundDrawable(d);
-			TextView configIssueText = (TextView) configIssue
-					.findViewById(R.id.config_detail);
-			configIssueText.setText(R.string.no_resorts_selected_please_select);
-		} else {
-			startService = true;
-		}
-		mSnowSettings = new SnowSettingsSharedPreference();
-		if (!mSnowSettings.setFromPreferences(prefs)) {
-			Log.e(TAG, "Error obtaining snow settings preferences");
-		}
-
-		if (startService) {
-			View waitText = getLayoutInflater().inflate(
-					R.layout.dashboard_config_detail, null);
-			TextView configIssueText = (TextView) waitText
-					.findViewById(R.id.config_detail);
-			configIssueText.setText(R.string.please_wait_for_service);
-			Drawable d = getResources().getDrawable(
-					R.drawable.dashboard_wait_background);
-			waitText.setBackgroundDrawable(d);
-			mSnowListLayout.addView(waitText);
-
+		if (selectedResorts.getResorts().length > 0) {
 			Intent serviceIntent = new Intent(
 					WakeMeSkiService.ACTION_DASHBOARD_POPULATE, null, this,
 					WakeMeSkiService.class);
+
+			setProgressBarIndeterminateVisibility(true);
 			bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
 			startService(serviceIntent);
 		}
@@ -115,7 +90,7 @@ public class WakeMeSkiDashboard extends Activity implements
 	public void onClear() {
 		mHandler.post(new Runnable() {
 			public void run() {
-				mSnowListLayout.removeAllViews();
+				mListAdapter.clearReports();
 			}
 		});
 	}
@@ -126,27 +101,9 @@ public class WakeMeSkiDashboard extends Activity implements
 		mHandler.post(new Runnable() {
 			public void run() {
 				if (r == null) {
-					mSnowListLayout.removeViewAt(0);
-					return;
+					setProgressBarIndeterminateVisibility(false);
 				}
-				View v = getLayoutInflater()
-						.inflate(R.layout.snow_layout, null);
-
-				Drawable d;
-				if (Report.meetsPreference(r, mSnowSettings)) {
-					d = getResources().getDrawable(
-							R.drawable.exceeds_threshold_background);
-				} else {
-					d = getResources().getDrawable(
-							R.drawable.below_threshold_background);
-				}
-				v.setBackgroundDrawable(d);
-
-				TextView tv = (TextView) v.findViewById(R.id.resort_name);
-				tv.setText(r.getLabel());
-				tv = (TextView) v.findViewById(R.id.snow_value);
-				tv.setText(r.getFreshAsString());
-				mSnowListLayout.addView(v);
+				mListAdapter.addReport(r);
 			}
 		});
 	}
