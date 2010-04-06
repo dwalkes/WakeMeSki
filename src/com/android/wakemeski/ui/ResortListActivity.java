@@ -50,7 +50,7 @@ public class ResortListActivity extends ListActivity {
 	private Resort[] mResortList;
 	private static final int ADD_ID = Menu.FIRST;
 	private static final int CLEAR_ID = ADD_ID + 1;	
-	private static final int REMOVE_ID = ADD_ID + 1;
+	private static final int REMOVE_ID = ADD_ID + 2;
 	private WakeupResortListAdapter mListAdapter;
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
