@@ -215,6 +215,15 @@ public class WakeMeSkiService extends IntentService {
 		return nextAlarm;
 	}
 
+	private void scheduleNextAlarm() {
+		Calendar nextAlarm = getNextAlarm();
+		if (nextAlarm != null) {
+			AlarmController alarmController = new AlarmController(this
+					.getApplicationContext());
+			alarmController.setAlarm(nextAlarm);
+		}
+	}
+
 	@Override
 	public void onHandleIntent(Intent intent) {
 		boolean alarmFired = false;
@@ -229,7 +238,7 @@ public class WakeMeSkiService extends IntentService {
 		if (mCurrentAction.equals(ACTION_DASHBOARD_POPULATE)) {
 			checkAlarmAction();
 			AlarmAlertWakeLock.release(); // this wasn't a wakeup, just a check
-											// to populate teh dashboard
+											// to populate the dashboard
 		} else {
 
 			if (mCurrentAction.equals(ACTION_WAKE_CHECK)) {
@@ -239,13 +248,14 @@ public class WakeMeSkiService extends IntentService {
 					alarmController.fireAlarm();
 					alarmFired = true;
 				}
+				/*
+				 * We always need to schedule the next alarm after a check
+				 * Otherwise we won't get a new wakeup on the next configured check day
+				 */
+				scheduleNextAlarm();
+
 			} else if (mCurrentAction.equals(ACTION_ALARM_SCHEDULE)) {
-				Calendar nextAlarm = getNextAlarm();
-				if (nextAlarm != null) {
-					AlarmController alarmController = new AlarmController(this
-							.getApplicationContext());
-					alarmController.setAlarm(nextAlarm);
-				}
+				scheduleNextAlarm();
 			} else if (mCurrentAction.equals(OnAlarmReceiver.ACTION_SNOOZE)) {
 				AlarmController alarmController = new AlarmController(this
 						.getApplicationContext());
