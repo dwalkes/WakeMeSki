@@ -99,7 +99,7 @@ public class Location implements Parcelable, Serializable {
 	 * @return True if location refers to the same location
 	 */
 	public boolean equals(Location loc) {
-		return loc.getLabel() == this.getLabel();
+		return loc.getLabel().equals(this.getLabel());
 	}
 
 	public boolean equals(Object obj) {
