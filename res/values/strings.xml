@@ -40,6 +40,7 @@
 <string name="resort_list_title">WakeMeSki Selected Resorts</string>
 <string name="wakeup">Wake Up</string>
 <string name="resort_name">Resort Name</string>
+<string name="set_preferences">Set Preferences</string>
     
     <string name="selection_activity">Mountain Selection</string>
     <string name="selection_activity_loading">Mountain Selection - Loading...</string>

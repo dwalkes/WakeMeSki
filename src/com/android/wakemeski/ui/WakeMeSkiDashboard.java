@@ -24,6 +24,8 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -50,7 +52,8 @@ public class WakeMeSkiDashboard extends Activity implements
 
 	private ListView          mReportsList;
 	private ReportListAdapter mListAdapter;
-
+	private static final int PREFERENCES_ID = Menu.FIRST;
+	
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -121,6 +124,27 @@ public class WakeMeSkiDashboard extends Activity implements
 			mBoundService = null;
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+
+		MenuItem item = menu.add(0, PREFERENCES_ID, 0, R.string.set_preferences);
+		item.setIcon(android.R.drawable.ic_menu_preferences);
+		return result;
+	}
+	
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == PREFERENCES_ID) {
+			Intent i = new Intent(this, WakeMeSkiPreferences.class);
+			startActivity(i);
+			return true;
+		} 
+		return super.onOptionsItemSelected(item);
+	}
+
 
 	private OnItemClickListener mClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View v, int pos, long id)
