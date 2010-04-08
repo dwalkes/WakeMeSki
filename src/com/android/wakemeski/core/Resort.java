@@ -86,10 +86,9 @@ public class Resort implements Serializable, Comparable<Resort> {
 	 * @return null if not found, or a resort with location matching this
 	 *         location
 	 */
-	public static Resort getResortWithLocation(Location location,
-			Set<Resort> resortList) {
+	public static Resort getResortWithLocation(Location location, Resort list[]) {
 		Resort matchingResort = null;
-		for (Resort resort : resortList) {
+		for (Resort resort : list) {
 			if (location.equals(resort.getLocation())) {
 				matchingResort = resort;
 				break;

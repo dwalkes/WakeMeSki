@@ -16,9 +16,8 @@
  */
 package com.android.wakemeski.ui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -115,33 +114,32 @@ public class ResortListActivity extends ListActivity {
 	}
 
 	private void addResort(Resort r) {
-		Set<Resort> resortSet = new HashSet<Resort>(Arrays.asList(mResortList));
-		Resort matchingLocation = Resort.getResortWithLocation(r.getLocation(),
-				resortSet);
-		if (matchingLocation == null) {
-			// this resort does not exist in the list yet, add it
-			resortSet.add(r);
-		} else {
-			// update the resort
-			resortSet.remove(matchingLocation);
-			resortSet.add(r);
+		Resort matchingLocation =
+			Resort.getResortWithLocation(r.getLocation(), mResortList);
+		ArrayList<Resort> rl =
+			new ArrayList<Resort>(Arrays.asList(mResortList));
+		if (matchingLocation != null) {
+			// remove the resort, and we'll add the latest one selected
+			rl.remove(matchingLocation);
 		}
-		mResortList = resortSet.toArray(new Resort[resortSet.size()]);
+		rl.add(r);
+		mResortList = rl.toArray(new Resort[rl.size()]);
+		Arrays.sort(mResortList);
 		mResortManager.update(mResortList);
 	}
 
 	private void removeResort(Resort r) {
-		Set<Resort> resortSet = new HashSet<Resort>(Arrays.asList(mResortList));
-		Resort matchingLocation = Resort.getResortWithLocation(r.getLocation(),
-				resortSet);
+		Resort matchingLocation =
+			Resort.getResortWithLocation(r.getLocation(), mResortList);
 		if (matchingLocation != null) {
-			// update the resort
-			resortSet.remove(matchingLocation);
+			ArrayList<Resort> rl = 
+				new ArrayList<Resort>(Arrays.asList(mResortList));
+			rl.remove(matchingLocation);
+			mResortList = rl.toArray(new Resort[rl.size()]);
+			mResortManager.update(mResortList);
 		}
-		mResortList = resortSet.toArray(new Resort[resortSet.size()]);
-		mResortManager.update(mResortList);
 	}
-	
+
 	private void clearAllResorts() {
 		mResortList = new Resort[0];
 		mResortManager.update(mResortList);
