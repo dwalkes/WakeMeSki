@@ -22,9 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import android.content.Context;
 import android.util.Log;
@@ -42,7 +41,7 @@ public class ResortManager {
 	private Context context;
 	private static ResortManager instance = null;
 
-	Set<Resort> resorts = new HashSet<Resort>();
+	private Resort mResorts[];
 
 	public static synchronized ResortManager getInstance(Context c) {
 		if (instance == null) {
@@ -62,7 +61,8 @@ public class ResortManager {
 	 * @param resort
 	 */
 	public void update(Resort[] resortList) {
-		resorts = new HashSet<Resort>(Arrays.asList(resortList));
+		mResorts = resortList;
+		Arrays.sort(mResorts);
 		update();
 	}
 
@@ -73,7 +73,7 @@ public class ResortManager {
 		try {
 			fos = context.openFileOutput(resortFile, 0);
 			oos = new ObjectOutputStream(fos);
-			oos.writeObject(resorts.toArray(new Resort[resorts.size()]));
+			oos.writeObject(mResorts);
 		} catch (Exception e) {
 			Log.e(TAG, "Exception " + e + " writing " + resortFile);
 		} finally {
@@ -95,8 +95,8 @@ public class ResortManager {
 		try {
 			fis = context.openFileInput(resortFile);
 			ois = new ObjectInputStream(fis);
-			Resort[] resortArray = (Resort[]) ois.readObject();
-			resorts = new HashSet<Resort>(Arrays.asList(resortArray));
+			mResorts = (Resort[]) ois.readObject();
+			Arrays.sort(mResorts);
 		} catch (FileNotFoundException fnf) {
 			Log.w(TAG, "File " + resortFile
 					+ " not found setting selected resorts");
@@ -118,7 +118,7 @@ public class ResortManager {
 	 * @return The current resort list from persistent storage
 	 */
 	public Resort[] getResorts() {
-		return resorts.toArray(new Resort[resorts.size()]);
+		return mResorts;
 	}
 
 	/**
@@ -126,13 +126,12 @@ public class ResortManager {
 	 *         configured
 	 */
 	public Resort[] getWakeupEnabledResorts() {
-		Set<Resort> wakeupEnabledResortSet = new HashSet<Resort>();
-		for (Resort resort : resorts) {
+		ArrayList<Resort> wakeupEnabled = new ArrayList<Resort>();
+		for (Resort resort : mResorts) {
 			if (resort.isWakeupEnabled()) {
-				wakeupEnabledResortSet.add(resort);
+				wakeupEnabled.add(resort);
 			}
 		}
-		return wakeupEnabledResortSet.toArray(new Resort[wakeupEnabledResortSet
-				.size()]);
+		return wakeupEnabled.toArray(new Resort[wakeupEnabled.size()]);
 	}
 }

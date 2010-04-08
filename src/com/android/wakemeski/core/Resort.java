@@ -28,7 +28,7 @@ import java.util.Set;
  * @author dan
  * 
  */
-public class Resort implements Serializable {
+public class Resort implements Serializable, Comparable<Resort> {
 
 	boolean wakeupEnabled = false;
 	private Location mLocation;
@@ -69,6 +69,11 @@ public class Resort implements Serializable {
 
 	public String toString() {
 		return mLocation.toString();
+	}
+
+	@Override
+	public int compareTo(Resort another) {
+		return getResortName().compareTo(another.getResortName());
 	}
 
 	/**
