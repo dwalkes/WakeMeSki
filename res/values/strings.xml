@@ -30,8 +30,7 @@
 <string name="resort_snow_detail">Resort snow detail:</string>
 <string name="does_not_exceed_wakeup_value">Does not exceed wakeup value</string>
 <string name="exceeds_wakeup_value">Exceeds wakeup value</string>
-<string name="no_resorts_selected">No resorts selected</string>
-<string name="no_resorts_selected_please_select">No resorts selected.  Please select resorts from the main preferences page.</string>
+<string name="no_resorts_configured">Please configure a resort.</string>
 <string name="show_dashboard">Show Dashboard</string>
 <string name="show_dashboard_summary">Check current snow status for selected resorts</string>
 <string name="please_wait_for_service">Please wait while snow status is obtained for selected resorts.</string>

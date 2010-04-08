@@ -80,7 +80,10 @@ public class ReportListAdapter implements ListAdapter {
 	@Override
 	public synchronized int getCount() {
 		int size = mReports.size();
-		if( mLoading )
+		// If size = 0 and we aren't loading, then no resorts have been
+		// configured by the user. We want to return a single item telling
+		// them to add a resort.
+		if( mLoading || (size ==0 && !mLoading) )
 			size++;
 		return size;
 	}
@@ -88,7 +91,7 @@ public class ReportListAdapter implements ListAdapter {
 	@Override
 	public synchronized Object getItem(int position) {
 		if( position >= mReports.size() )
-			return null; //we are loading. This would be the "loading" item
+			return null; //This would be the "loading" or "not configured" item
 
 		return mReports.get(position);
 	}
@@ -141,7 +144,10 @@ public class ReportListAdapter implements ListAdapter {
 			tv.setText(r.getFreshAsString());
 		}
 		else {
-			tv.setText(R.string.loading);
+			if( mLoading )
+				tv.setText(R.string.loading);
+			else
+				tv.setText(R.string.no_resorts_configured);
 		}
 
 		return v;

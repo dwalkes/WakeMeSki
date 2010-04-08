@@ -34,7 +34,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
-import com.android.wakemeski.core.ResortManager;
 import com.android.wakemeski.core.WakeMeSkiService;
 
 /**
@@ -74,20 +73,13 @@ public class WakeMeSkiDashboard extends Activity implements
 		super.onResume();
 		mListAdapter.clearReports();
 
-		ResortManager selectedResorts = ResortManager
-				.getInstance(getApplicationContext());
-
-		// If the user hasn't selected any resorts, no sense trying to start the
-		// service.. put up config issue text instead
-		if (selectedResorts.getResorts().length > 0) {
-			Intent serviceIntent = new Intent(
+		Intent serviceIntent = new Intent(
 					WakeMeSkiService.ACTION_DASHBOARD_POPULATE, null, this,
 					WakeMeSkiService.class);
 
-			setProgressBarIndeterminateVisibility(true);
-			bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
-			startService(serviceIntent);
-		}
+		setProgressBarIndeterminateVisibility(true);
+		bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+		startService(serviceIntent);
 	}
 
 	/**
