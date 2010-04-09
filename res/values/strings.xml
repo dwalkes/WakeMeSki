@@ -31,8 +31,8 @@
 <string name="does_not_exceed_wakeup_value">Does not exceed wakeup value</string>
 <string name="exceeds_wakeup_value">Exceeds wakeup value</string>
 <string name="no_resorts_configured">Please configure a resort.</string>
-<string name="show_dashboard">Show Dashboard</string>
-<string name="show_dashboard_summary">Check current snow status for selected resorts</string>
+<string name="my_report">My Report</string>
+<string name="show_report_summary">Check status for selected resorts</string>
 <string name="please_wait_for_service">Please wait while snow status is obtained for selected resorts.</string>
 <string name="alarm_updated">WakeMeSki alarm successfully updated</string>
 <string name="alarm_disabled">WakeMeSki alarm is currently disabled</string>
@@ -40,7 +40,8 @@
 <string name="wakeup">Wake Up</string>
 <string name="resort_name">Resort Name</string>
 <string name="set_preferences">Set Preferences</string>
-    
+<string name="wakemeski_report">WakeMeSki Report</string>
+<string name="fresh_snow">New Snow</string>
     <string name="selection_activity">Mountain Selection</string>
     <string name="selection_activity_loading">Mountain Selection - Loading...</string>
     

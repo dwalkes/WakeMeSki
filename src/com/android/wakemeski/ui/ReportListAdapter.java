@@ -129,14 +129,6 @@ public class ReportListAdapter implements ListAdapter {
 
 		Resources rs = mCtx.getResources();
 
-		Drawable d;
-		if (r != null && Report.meetsPreference(r, getPrefs())) {
-			d = rs.getDrawable(R.drawable.exceeds_threshold_background);
-		} else {
-			d = rs.getDrawable(R.drawable.below_threshold_background);
-		}
-		v.setBackgroundDrawable(d);
-
 		TextView tv = (TextView) v.findViewById(R.id.resort_name);
 		if( r != null ) {
 			tv.setText(r.getLabel());

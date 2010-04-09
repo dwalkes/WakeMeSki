@@ -33,9 +33,9 @@
         android:showSilent="false" />
    </PreferenceScreen>
    	<PreferenceScreen 
-	android:title="@string/show_dashboard"
+	android:title="@string/my_report"
 	android:key="dashboard"
-	android:summary="@string/show_dashboard_summary">
+	android:summary="@string/show_report_summary">
 	</PreferenceScreen>
 </PreferenceCategory>
     
