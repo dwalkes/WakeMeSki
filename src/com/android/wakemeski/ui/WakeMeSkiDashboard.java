@@ -147,6 +147,12 @@ public class WakeMeSkiDashboard extends Activity implements
 				i.putExtra("report", r);
 				startActivityForResult(i, 0);
 			}
+			else {
+				//there are no reports and the user pressed the
+				// "please configure" item
+				Intent i = new Intent(WakeMeSkiDashboard.this, WakeMeSkiPreferences.class);
+				startActivity(i);
+			}
 		}
 	};
 

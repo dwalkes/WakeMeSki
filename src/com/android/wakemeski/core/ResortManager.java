@@ -118,6 +118,9 @@ public class ResortManager {
 	 * @return The current resort list from persistent storage
 	 */
 	public Resort[] getResorts() {
+		if( mResorts == null ) {
+			mResorts = new Resort[0];
+		}
 		return mResorts;
 	}
 
@@ -127,7 +130,7 @@ public class ResortManager {
 	 */
 	public Resort[] getWakeupEnabledResorts() {
 		ArrayList<Resort> wakeupEnabled = new ArrayList<Resort>();
-		for (Resort resort : mResorts) {
+		for (Resort resort : getResorts()) {
 			if (resort.isWakeupEnabled()) {
 				wakeupEnabled.add(resort);
 			}
