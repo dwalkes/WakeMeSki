@@ -18,25 +18,19 @@ package com.android.wakemeski.ui;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.graphics.drawable.Drawable;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
-import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 public class ReportListAdapter implements ListAdapter {
-	private final static String TAG = "ReportListAdapter";
 
 	private ArrayList<Report> mReports = new ArrayList<Report>();
 	private boolean mLoading = true;
@@ -45,10 +39,7 @@ public class ReportListAdapter implements ListAdapter {
 
 	private LayoutInflater mInflater;
 
-	private Context mCtx;
-
 	public ReportListAdapter(Context c) {
-		mCtx = c;
 		mInflater = (LayoutInflater) c
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
@@ -106,16 +97,6 @@ public class ReportListAdapter implements ListAdapter {
 		return 0;
 	}
 
-	private SnowSettingsSharedPreference getPrefs() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(mCtx);
-		SnowSettingsSharedPreference ssp = new SnowSettingsSharedPreference();
-		if (!ssp.setFromPreferences(prefs)) {
-			Log.e(TAG, "Error obtaining snow settings preferences");
-		}
-		return ssp;
-	}
-
 	@Override
 	public synchronized View getView(int position, View convertView,
 			ViewGroup parent) {
@@ -127,13 +108,14 @@ public class ReportListAdapter implements ListAdapter {
 
 		View v = mInflater.inflate(R.layout.snow_layout, parent, false);
 
-		Resources rs = mCtx.getResources();
-
 		TextView tv = (TextView) v.findViewById(R.id.resort_name);
 		if( r != null ) {
 			tv.setText(r.getLabel());
 			tv = (TextView) v.findViewById(R.id.snow_value);
 			tv.setText(r.getFreshAsString());
+
+			ImageView iv = (ImageView)v.findViewById(R.id.snow_layout_icon);
+			iv.setImageResource(r.getWeatherIconResId());
 		}
 		else {
 			if( mLoading )
