@@ -16,10 +16,13 @@
 package com.android.wakemeski.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +32,15 @@ import android.widget.TextView;
 
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
+import com.android.wakemeski.core.ReportController;
+import com.android.wakemeski.core.ReportListener;
 
 public class ReportListAdapter implements ListAdapter {
 
+	Handler mHandler = new Handler();
+
 	private ArrayList<Report> mReports = new ArrayList<Report>();
-	private boolean mLoading = true;
+	private boolean mLoading = false;
 
 	private DataSetObservable mDataSetObservable = new DataSetObservable();
 
@@ -42,20 +49,13 @@ public class ReportListAdapter implements ListAdapter {
 	public ReportListAdapter(Context c) {
 		mInflater = (LayoutInflater) c
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	}
 
-	public synchronized void addReport(Report r) {
-		if (r == null)
-			mLoading = false;			
-		else
-			mReports.add(r);
-
-		mDataSetObservable.notifyChanged();
-	}
-
-	public synchronized void clearReports() {
-		mReports.clear();
-		mDataSetObservable.notifyChanged();
+		synchronized (mReports) {
+			ReportController.getInstance(null).addListener(mListener);
+			Report reports[] = ReportController.getInstance(null).getLoadedReports();
+			for(Report r: reports)
+				mReports.add(r);
+		}
 	}
 
 	@Override
@@ -151,4 +151,56 @@ public class ReportListAdapter implements ListAdapter {
 	public void unregisterDataSetObserver(DataSetObserver observer) {
 		mDataSetObservable.unregisterObserver(observer);
 	}
+
+	ReportListener mListener = new ReportListener() {
+		
+		@Override
+		public void onRemoved(Report r) {
+			synchronized (mReports) {
+				mReports.remove(r);
+			}
+			mHandler.post(new Runnable() {
+				public void run() {
+					mDataSetObservable.notifyChanged();
+				}
+			});
+		}
+
+		@Override
+		public void onLoading(boolean started) {
+			synchronized (mReports) {
+				mLoading = started;
+				if( mLoading )
+					mReports.clear();
+			}			
+			mHandler.post(new Runnable() {
+				public void run() {
+					mDataSetObservable.notifyChanged();
+				}
+			});
+		}
+
+		@Override
+		public void onAdded(Report r) {
+			synchronized (mReports) {
+				mReports.add(r);
+				if( !mLoading ) {
+					//this report was just added, we need to make sure we keep
+					//the list sorted alphabetically
+					Collections.sort(mReports, new Comparator<Report>() {
+						public int compare(Report r1, Report r2){
+							String n1 = r1.getResort().getResortName();
+							String n2 = r2.getResort().getResortName();
+							return n1.compareTo(n2);
+						}
+					});
+				}
+			}
+			mHandler.post(new Runnable() {
+				public void run() {
+					mDataSetObservable.notifyChanged();
+				}
+			});
+		}
+	};
 }

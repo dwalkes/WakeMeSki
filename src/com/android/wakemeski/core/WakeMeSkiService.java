@@ -16,7 +16,6 @@
  */
 package com.android.wakemeski.core;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.IntentService;
@@ -53,9 +52,6 @@ public class WakeMeSkiService extends IntentService {
 	public static final String ACTION_ALARM_SCHEDULE = "com.walkes.android.wakemeski.ACTION_ALARM_SCHEDULE";
 	public static final String ACTION_DASHBOARD_POPULATE = "com.walkes.android.wakemeski.ACTION_DASHBOARD_POPULATE";
 
-	private ArrayList<Report> mReports = new ArrayList<Report>();
-	private SnowInfoListener mListener = null;
-
 	// This is the object that receives interactions from clients. See
 	// RemoteService for a more complete example.
 	private final IBinder mBinder = new LocalBinder();
@@ -90,44 +86,6 @@ public class WakeMeSkiService extends IntentService {
 		super.onCreate();
 	}
 
-	public interface SnowInfoListener {
-		/**
-		 * This is called when the service is re-reading all report data
-		 */
-		public void onClear();
-
-		/**
-		 * This is called when a report has been read by the service. When
-		 * called with NULL, there are no more reports
-		 */
-		public void onReport(Report r);
-	}
-
-	synchronized public void registerListener(SnowInfoListener listener) {
-		mListener = listener;
-
-		for (Report r : mReports)
-			mListener.onReport(r);
-	}
-
-	synchronized public void unregisterListener(SnowInfoListener listener) {
-		mListener = null;
-	}
-
-	synchronized private void notifyClear() {
-		if (mListener != null) {
-			mListener.onClear();
-		}
-		mReports.clear();
-	}
-
-	synchronized private void notifyReport(Report r) {
-		if (mListener != null) {
-			mListener.onReport(r);
-		}
-		mReports.add(r);
-	}
-
 	/**
 	 * @return true if the alarm should fire based on preferences and current
 	 *         snow settings
@@ -138,8 +96,6 @@ public class WakeMeSkiService extends IntentService {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(ctx);
 		SnowSettingsSharedPreference snowSettings = new SnowSettingsSharedPreference();
-
-		notifyClear();
 
 		if (snowSettings.setFromPreferences(prefs)) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -155,8 +111,6 @@ public class WakeMeSkiService extends IntentService {
 						Log.d(TAG, "Resort" + r + " did not exceed preference "
 								+ snowSettings);
 					}
-
-					notifyReport(r);
 				}
 			} else {
 				Log.d(TAG, "no resorts enabled, skipping resort check");
@@ -165,8 +119,6 @@ public class WakeMeSkiService extends IntentService {
 		} else {
 			Log.e(TAG, "snow settings not found, skipping resort check");
 		}
-
-		notifyReport(null);
 
 		return alarmAction;
 	}

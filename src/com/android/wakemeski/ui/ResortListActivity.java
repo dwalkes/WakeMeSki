@@ -30,6 +30,7 @@ import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.android.wakemeski.R;
+import com.android.wakemeski.core.ReportController;
 import com.android.wakemeski.core.Resort;
 import com.android.wakemeski.core.ResortManager;
 
@@ -125,6 +126,7 @@ public class ResortListActivity extends ListActivity {
 		rl.add(r);
 		mResortList = rl.toArray(new Resort[rl.size()]);
 		Arrays.sort(mResortList);
+		ReportController.getInstance(null).addResort(r);
 		mResortManager.update(mResortList);
 	}
 
@@ -135,6 +137,7 @@ public class ResortListActivity extends ListActivity {
 			ArrayList<Resort> rl = 
 				new ArrayList<Resort>(Arrays.asList(mResortList));
 			rl.remove(matchingLocation);
+			ReportController.getInstance(null).removeResort(r);
 			mResortList = rl.toArray(new Resort[rl.size()]);
 			mResortManager.update(mResortList);
 		}
