@@ -148,7 +148,7 @@ public class WakeMeSkiService extends IntentService {
 					.getWakeupEnabledResorts();
 			if (wakeupEnabledResorts.length > 0) {
 				for (Resort resort : wakeupEnabledResorts) {
-					Report r = Report.loadReport(ctx, cm, resort.getLocation());
+					Report r = Report.loadReport(ctx, cm, resort);
 					if (Report.meetsPreference(r, snowSettings)) {
 						alarmAction = true;
 					} else {

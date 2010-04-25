@@ -110,7 +110,7 @@ public class ReportListAdapter implements ListAdapter {
 
 		TextView tv = (TextView) v.findViewById(R.id.resort_name);
 		if( r != null ) {
-			tv.setText(r.getLabel());
+			tv.setText(r.getResort().getResortName());
 			tv = (TextView) v.findViewById(R.id.snow_value);
 			tv.setText(r.getFreshAsString());
 

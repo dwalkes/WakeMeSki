@@ -59,7 +59,7 @@ public class ReportActivity extends Activity {
 		mReport = r;
 
 		// Title
-		setTitle(getTitle() + " - " + r.getLabel());
+		setTitle(getTitle() + " - " + r.getResort().getResortName());
 
 		// Weather Icon
 		ImageView iv = (ImageView) findViewById(R.id.report_weather);
@@ -67,7 +67,7 @@ public class ReportActivity extends Activity {
 
 		// Title
 		TextView t = (TextView) findViewById(R.id.report_label);
-		t.setText(r.getLabel());
+		t.setText(r.getResort().getResortName());
 
 		t = (TextView) findViewById(R.id.report_date);
 		t.setText(getString(R.string.report_date, r.getDate()));
@@ -154,7 +154,7 @@ public class ReportActivity extends Activity {
 				startActivity(new Intent(Intent.ACTION_VIEW, mReport.getGeo()));
 			}
 			catch(Exception e){
-				Log.e(TAG, "Error launching map for: " + mReport.getLabel(), e);
+				Log.e(TAG, "Error launching map for: " + mReport.getResort().getResortName(), e);
 			}
 		}
 		return super.onOptionsItemSelected(item);

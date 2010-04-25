@@ -70,7 +70,7 @@ public class Report implements Parcelable {
 	private String _freshSnow = "";
 	private String _snowUnits = "inches";
 
-	private String _label;
+	private Resort _resort;
 
 	// Used to display an error if one occurred
 	private String _errMsg = null;
@@ -94,7 +94,7 @@ public class Report implements Parcelable {
 			r._liftsOpen = source.readInt();
 			r._liftsTotal = source.readInt();
 
-			r._label = source.readString();
+			r._resort = (Resort)source.readSerializable();
 			r._errMsg = source.readString();
 
 			r._weatherUrl = source.readString();
@@ -144,10 +144,10 @@ public class Report implements Parcelable {
 	}
 
 	/**
-	 * Returns the name of the location the report is for
+	 * Returns the resort the report is for
 	 */
-	public String getLabel() {
-		return _label;
+	public Resort getResort() {
+		return _resort;
 	}
 
 	/**
@@ -386,7 +386,7 @@ public class Report implements Parcelable {
 		dest.writeInt(_liftsOpen);
 		dest.writeInt(_liftsTotal);
 
-		dest.writeString(_label);
+		dest.writeSerializable(_resort);
 		dest.writeString(_errMsg);
 
 		dest.writeString(_weatherUrl);
@@ -433,7 +433,7 @@ public class Report implements Parcelable {
 	 * Loads a report from the given location
 	 */
 	public static Report loadReport(Context c, ConnectivityManager cm,
-			Location l) {
+		Resort resort) {
 		// A report will be in the format:
 		// location = OSOALP
 		// date = 12-6-2008
@@ -449,7 +449,9 @@ public class Report implements Parcelable {
 		// wind.avg = 20
 
 		Report r = new Report();
-		r._label = l.getLabel();
+		r._resort = resort;
+
+		Location l = resort.getLocation();
 
 		String lines[] = new String[0];
 
