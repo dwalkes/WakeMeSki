@@ -15,7 +15,7 @@
  */
 package com.android.wakemeski.core;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -44,8 +44,11 @@ public class ReportController implements Runnable {
 
 	/**
 	 * All access to mListeners *must* be synchronized
+	 * Using a HashSet will ensure only one instance of a listener will be present
+	 * in mListeners.  Therefore add and remove may be called multiple times for
+	 * a given listener
 	 */
-	private ArrayList<ReportListener> mListeners = new ArrayList<ReportListener>();
+	private HashSet<ReportListener> mListeners = new HashSet<ReportListener>();
 	private boolean mBusy;
 	private Context mContext;
 
@@ -128,16 +131,28 @@ public class ReportController implements Runnable {
 		mActions.add(a);
 	}
 
+	/**
+	 * Adds a listener if not already present
+	 * @param listener
+	 */
 	public void addListener(ReportListener listener) {
 		synchronized (mListeners) {
 			mListeners.add(listener);
 		}
 	}
 
-	public void removeListener(ReportListener listener) {
+	/**
+	 * Removes a listener if present
+	 * @param listener
+	 * @return true if the list contained this listener, false if the listener had already
+	 * been removed or was never in the list
+	 */
+	public boolean removeListener(ReportListener listener) {
+		boolean containedElement;
 		synchronized (mListeners) {
-			mListeners.remove(listener);
+			containedElement = mListeners.remove(listener);
 		}
+		return containedElement;
 	}
 
 	abstract class Action {

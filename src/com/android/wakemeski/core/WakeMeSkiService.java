@@ -18,12 +18,11 @@ package com.android.wakemeski.core;
 
 import java.util.Calendar;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -45,38 +44,153 @@ import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
  * @author dan
  * 
  */
-public class WakeMeSkiService extends IntentService {
+public class WakeMeSkiService extends Service {
 
 	private static final String TAG = "WakeMeSkiService";
 	public static final String ACTION_WAKE_CHECK = "com.dwalkes.android.wakemeski.ACTION_WAKE_CHECK";
 	public static final String ACTION_ALARM_SCHEDULE = "com.walkes.android.wakemeski.ACTION_ALARM_SCHEDULE";
 	public static final String ACTION_DASHBOARD_POPULATE = "com.walkes.android.wakemeski.ACTION_DASHBOARD_POPULATE";
 
-	// This is the object that receives interactions from clients. See
-	// RemoteService for a more complete example.
-	private final IBinder mBinder = new LocalBinder();
-
-	public WakeMeSkiService() {
-		super("WakeMeSkiService");
-	}
-
-	private String mCurrentAction;
-
+	private SnowSettingsSharedPreference	mSnowSettings = null;
+	private SharedPreferences			 	mSharedPreferences = null;
+	private AlarmController				 	mAlarmController=null;
+	private int mActiveStartId;
 	/**
-	 * Class for clients to access. Because we know this service always runs in
-	 * the same process as its clients, we don't need to deal with IPC.
+	 * Handle events in the service thread
 	 */
-	public class LocalBinder extends Binder {
-		public WakeMeSkiService getService() {
-			return WakeMeSkiService.this;
+	Handler h = new Handler();
+	
+	@Override
+	public IBinder onBind( Intent intent ) {
+		return null;
+	}
+	
+	/**
+	 * A report listener class which receives notifications on new
+	 * reports from ReportController
+	 */
+	private ReportListener mReportListener = new ReportListener() {
+
+
+		@Override
+		public void onAdded(final Report r) {
+			h.post(new Runnable() {
+				public void run() {
+					onReportAdded(r);
+				}
+			});
+		}
+
+		@Override
+		public void onRemoved(Report r) {	
+		}
+
+		@Override
+		public void onLoading(final boolean started) {
+			h.post(new Runnable() {
+				public void run() {
+					onReportLoading(started);
+				}
+			});
+		}
+	};
+	
+	/**
+	 * Called in the service thread when the ReportListener onAdded() callback occurs
+	 * and mDoAlarmActionCheck is true
+	 * @param r The report added to the list of reports
+	 */
+	private void onReportAdded(Report r) {
+		if( r.getResort().isWakeupEnabled() ) {
+			if (r.meetsPreference(getSnowSettings())) {
+				Log.i(TAG, "Resort " + r.getResort() + " met preference "
+						+ getSnowSettings());
+				/**
+				 * Done listening now that we've fired the alarm
+				 */
+				if( ReportController.getInstance(null).removeListener(mReportListener) ) {
+					/**
+					 * Only fire the alarm once.  By checking for removeListener = true we know
+					 * that this was the first case and not a queue'd handler thread action
+					 * Don't release the wake lock, we will do that when the alarm activity starts
+					 */
+					getAlarmController().fireAlarm();
+					Log.d(TAG, "Found wakeup resort, stopping service");
+					stopSelf(mActiveStartId);
+				}
+			} else {
+				Log.d(TAG, "Resort " + r.getResort() + " did not meet preference "
+						+ getSnowSettings());
+			}
+		} else {
+			Log.d(TAG, "Resort " + r.getResort() + " is not wakeup enabled");
 		}
 	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return mBinder;
+	
+	/**
+	 * Called in the service thread when ReportListener onAdded() callback occurs and
+	 * mDoAlarmActionCheck is true
+	 * @param started true when the report loading has started, false when completed
+	 */
+	private void onReportLoading(final boolean started) {
+		if( started == true ) {
+			/**
+			 * Force a reload of snow settings when the report loading starts
+			 */
+			mSnowSettings = null;	
+		} else {
+			Log.d(TAG, "Report load completed, stopping service");
+			/**
+			 * Done listening now that report load has completed
+			 * Note: missing logic to determine whether the listener was active for at least
+			 * one start + one stop.  This means we could potentially just catch the end of
+			 * a loadReport() started by another thread.  This seems unlikely enough that we should
+			 * be safe to ignore it.
+			 */
+			ReportController.getInstance(null).removeListener(mReportListener);
+			/**
+			 * If the alarm didn't fire and report load has complete, release the wake lock and
+			 * stop the service.  Nothing else to do at this time
+			 */
+			AlarmAlertWakeLock.release();
+			stopSelf(mActiveStartId);
+		}
 	}
+	
+	
+	/**
+	 * @return An alarm controller instance used by the service
+	 */
+	private AlarmController getAlarmController() {
+		if( mAlarmController == null ) {
+			mAlarmController = new AlarmController(this
+				.getApplicationContext());
+		}
+		return mAlarmController;
+	}
+	
+	private SharedPreferences getSharedPreferences() {
+		if( mSharedPreferences == null ) {
+			Context ctx = getApplicationContext();
+			mSharedPreferences = PreferenceManager
+					.getDefaultSharedPreferences(ctx);
+		}
+		return mSharedPreferences;
+	}
+	
+	private SnowSettingsSharedPreference getSnowSettings() {
 
+		if( mSnowSettings == null ) {
+			mSnowSettings = new SnowSettingsSharedPreference();
+			// update snow settings based on current preferences
+			if( !mSnowSettings.setFromPreferences(getSharedPreferences()) ) {
+				Log.e(TAG, "snow settings not found");
+			}
+		}
+
+		return mSnowSettings;
+	}
+		
 	@Override
 	public void onCreate() {
 		// Maintain a lock during the checking of the alarm. This lock may have
@@ -86,41 +200,29 @@ public class WakeMeSkiService extends IntentService {
 		super.onCreate();
 	}
 
+	@Override
+	public void onDestroy() {
+		/**
+		 * Make sure our listener is removed before destroy.  Should be safe to call
+		 * even if the listener is not currently in the list
+		 */
+		ReportController.getInstance(null).removeListener(mReportListener);
+		super.onDestroy();
+	}
 	/**
-	 * @return true if the alarm should fire based on preferences and current
-	 *         snow settings
+	 * Checks whether an alarm action needs to occur based on stored preferences.
+	 * Kicks off report load using ReportController.  onReportAdded() and onReportLoading() will
+	 * take care of handling the cases where an alarm action is or is not needed
 	 */
-	private boolean checkAlarmAction() {
-		boolean alarmAction = false;
-		Context ctx = getApplicationContext();
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(ctx);
-		SnowSettingsSharedPreference snowSettings = new SnowSettingsSharedPreference();
-
-		if (snowSettings.setFromPreferences(prefs)) {
-			ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-			ResortManager resortManager = ResortManager.getInstance(ctx);
-			Resort[] wakeupEnabledResorts = resortManager
-					.getWakeupEnabledResorts();
-			if (wakeupEnabledResorts.length > 0) {
-				for (Resort resort : wakeupEnabledResorts) {
-					Report r = Report.loadReport(ctx, cm, resort);
-					if (Report.meetsPreference(r, snowSettings)) {
-						alarmAction = true;
-					} else {
-						Log.d(TAG, "Resort" + r + " did not exceed preference "
-								+ snowSettings);
-					}
-				}
-			} else {
-				Log.d(TAG, "no resorts enabled, skipping resort check");
-			}
-
-		} else {
-			Log.e(TAG, "snow settings not found, skipping resort check");
-		}
-
-		return alarmAction;
+	private void checkAlarmAction() {
+		/**
+		 * Add our listener here - note in the odd case where we've already added a listener
+		 * and have not removed it (two checks in a row occuring before first load completed) it should
+		 * still be safe to call addListener - the second add will be a no-op and the listener will
+		 * be removed when the first loadReports() completes
+		 */
+		ReportController.getInstance(null).addListener(mReportListener);
+		ReportController.getInstance(null).loadReports();
 	}
 
 	/**
@@ -131,13 +233,7 @@ public class WakeMeSkiService extends IntentService {
 	 */
 	private Calendar getNextAlarm() {
 		Calendar nextAlarm = null;
-		// TODO: read enable, enable alarm if necessary
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
-		if (prefs == null) {
-			Log.w(TAG, "Unable to get shared preferences, no alarm scheduled");
-			return null;
-		}
+		SharedPreferences prefs =getSharedPreferences();
 
 		if (prefs.getBoolean(WakeMeSkiPreferences.ALARM_ENABLE_PREF_KEY, false)) {
 
@@ -153,7 +249,7 @@ public class WakeMeSkiService extends IntentService {
 					if (nextAlarm == null) {
 						Log
 								.d(TAG,
-										"Alarm caculator returnned null, no alarm scheduled");
+										"Alarm caculator returned null, no alarm scheduled");
 					}
 				} else {
 					Log.d(TAG, "No time set, no alarm scheduled");
@@ -170,55 +266,67 @@ public class WakeMeSkiService extends IntentService {
 	private void scheduleNextAlarm() {
 		Calendar nextAlarm = getNextAlarm();
 		if (nextAlarm != null) {
-			AlarmController alarmController = new AlarmController(this
-					.getApplicationContext());
-			alarmController.setAlarm(nextAlarm);
+			getAlarmController().setAlarm(nextAlarm);
+		}
+	}
+
+	public void onHandleIntent(Intent intent, int startId) {
+		boolean releaseWakeLock = true;
+		boolean stopService = true;
+		String 	currentAction;
+		currentAction = intent.getAction();
+
+		if (currentAction == null) {
+			Log.e(TAG, "Error - null intent action passed");
+		}
+		else if (currentAction.equals(ACTION_WAKE_CHECK)) {
+			checkAlarmAction();
+			/*
+			 * We will release wake lock when check completes
+			 */
+			releaseWakeLock = false;
+			/*
+			 * Don't stop the service, we will stop it after resorts are checked
+			 */
+			stopService = false;
+
+
+		} else if (currentAction.equals(ACTION_ALARM_SCHEDULE)) {
+			// alarm will be scheduled below
+		} else if (currentAction.equals(OnAlarmReceiver.ACTION_SNOOZE)) {
+			getAlarmController().fireAlarm();
+			// we will release wake lock in the alarm controller
+			releaseWakeLock = false;
+		}
+		
+		/*
+		 * We always need to schedule the next alarm after a check or snooze event
+		 * Otherwise we won't get a new wakeup on the next configured check day
+		 */
+		scheduleNextAlarm();
+		
+		if (releaseWakeLock) {
+			AlarmAlertWakeLock.release();
+		}
+		
+		if(stopService) {
+			stopSelfResult(startId);
+		} else {
+			/**
+			 * Save the active start ID so we can use it to eventually stop the service
+			 * when we are done
+			 */
+			mActiveStartId = startId;
 		}
 	}
 
 	@Override
-	public void onHandleIntent(Intent intent) {
-		boolean alarmFired = false;
-
-		mCurrentAction = intent.getAction();
-
-		if (mCurrentAction == null) {
-			Log.e(TAG, "Error - null intent action passed");
-			AlarmAlertWakeLock.release(); // bad intent, release wake lock
-			return;
-		}
-		if (mCurrentAction.equals(ACTION_DASHBOARD_POPULATE)) {
-			checkAlarmAction();
-			AlarmAlertWakeLock.release(); // this wasn't a wakeup, just a check
-											// to populate the dashboard
-		} else {
-
-			if (mCurrentAction.equals(ACTION_WAKE_CHECK)) {
-				if (checkAlarmAction()) {
-					AlarmController alarmController = new AlarmController(this
-							.getApplicationContext());
-					alarmController.fireAlarm();
-					alarmFired = true;
-				}
-				/*
-				 * We always need to schedule the next alarm after a check
-				 * Otherwise we won't get a new wakeup on the next configured check day
-				 */
-				scheduleNextAlarm();
-
-			} else if (mCurrentAction.equals(ACTION_ALARM_SCHEDULE)) {
-				scheduleNextAlarm();
-			} else if (mCurrentAction.equals(OnAlarmReceiver.ACTION_SNOOZE)) {
-				AlarmController alarmController = new AlarmController(this
-						.getApplicationContext());
-				alarmController.fireAlarm();
-				alarmFired = true;
+	public void onStart( final Intent intent, final int startId ) {
+		h.post(new Runnable() {
+			public void run() {
+				onHandleIntent(intent,startId);
 			}
-			if (!alarmFired) {
-				AlarmAlertWakeLock.release();
-			}
-		}
-
+		});
 	}
-
+	
 }

@@ -123,12 +123,11 @@ public class Report implements Parcelable {
 		}
 	};
 
-	public static boolean meetsPreference(Report r,
-			SnowSettingsSharedPreference s) {
+	public boolean meetsPreference(SnowSettingsSharedPreference s) {
 		double depth = s.getSnowDepth();
-		double reported = r.getFreshSnowTotal();
+		double reported = getFreshSnowTotal();
 
-		if (r.getSnowUnits() == SnowUnits.CENTIMETERS)
+		if (getSnowUnits() == SnowUnits.CENTIMETERS)
 			reported *= 2.54;
 
 		if (s.getMeasurementUnits() == SnowUnits.CENTIMETERS)
