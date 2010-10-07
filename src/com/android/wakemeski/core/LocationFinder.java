@@ -56,14 +56,15 @@ public class LocationFinder {
 	public static Location[] getLocations(SharedPreferences pref, String region)
 			throws ClientProtocolException, IOException {
 		ArrayList<Location> locations = new ArrayList<Location>();
+		String locServer = HttpUtils.getLocationServer(pref);
 
-		String url = HttpUtils.getLocationServer(pref)
+		String url = locServer 
 				+ "/location_finder.php?region=" + region;
 		String rows[] = HttpUtils.fetchUrl(url);
 		for (String row : rows) {
 			String vals[] = row.split("=", 2);
 			if (vals.length == 2) {
-				Location l = new Location(vals[0].trim(), vals[1].trim());
+				Location l = new Location(vals[0].trim(), locServer + "/" + vals[1].trim());
 				locations.add(l);
 			} else {
 				Log.e(TAG, "Bad location line for region [" + region + "]: ["

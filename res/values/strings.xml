@@ -68,4 +68,9 @@
 	<string name="report_details_link">Report Info</string>
 	<string name="report_info_link">Resort Info</string>
 	<string name="report_mapit_link">Map It</string>
+	<!-- Upgrade dialog strings -->
+	<string name="out_of_date_dialog_title">Please Upgrade</string>
+	<string name="out_of_date_dialog_body">An updated version of wakemeski is available.</string>
+	<string name="update_button">Update</string>
+	<string name="quit_button">Exit</string>
 </resources>

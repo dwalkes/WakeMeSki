@@ -17,9 +17,16 @@
 package com.android.wakemeski.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +53,8 @@ public class WakeMeSkiDashboard extends Activity {
 	private ReportListAdapter mListAdapter;
 	private static final int PREFERENCES_ID = Menu.FIRST;
 	private static final int REFRESH_ID     = Menu.FIRST + 1;
+	private static final String TAG = "WakeMeSkiDashboard";
+	private int mApVersion = 0;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -53,6 +62,15 @@ public class WakeMeSkiDashboard extends Activity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.dashboard);
 
+		try 
+		{
+			mApVersion = getApplicationContext().getPackageManager().
+					getPackageInfo(getPackageName(),PackageManager.GET_ACTIVITIES).versionCode;
+		} catch (NameNotFoundException e)
+		{
+			Log.e(TAG,"Caught NameNotFoundException quering my package!" + e.getLocalizedMessage() );
+		}
+		
 		mReportsList = (ListView)findViewById(R.id.dashboard_list);
 		mListAdapter = new ReportListAdapter(getApplicationContext());
 		mReportsList.setAdapter(mListAdapter);
@@ -100,11 +118,20 @@ public class WakeMeSkiDashboard extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
+
+	
 	private ReportListener mReportListener = new ReportListener() {
 		Handler h = new Handler();
 
 		@Override
 		public void onAdded(Report r) {
+			if( r.getApMinSupportedVersion() > mApVersion ) {
+				h.post(new Runnable() {
+					public void run() {
+						showDialog(0);
+					}
+				});
+			}
 		}
 
 		@Override
@@ -120,6 +147,26 @@ public class WakeMeSkiDashboard extends Activity {
 			});	
 		}
 	};
+	
+    protected Dialog onCreateDialog(int id) {
+        
+        return new AlertDialog.Builder(this)
+            .setTitle(R.string.out_of_date_dialog_title)
+            .setMessage(R.string.out_of_date_dialog_body)
+            .setPositiveButton(R.string.update_button, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                        "http://market.android.com/details?id=" + getPackageName()));
+                    startActivity(marketIntent);
+                }
+            })
+            .setNegativeButton(R.string.quit_button, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            })
+            .create();
+    }
 
 	private OnItemClickListener mClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View v, int pos, long id)

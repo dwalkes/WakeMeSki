@@ -43,6 +43,7 @@ import com.android.wakemeski.R;
 import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 public class Report implements Parcelable {
+	private int _apMinSupportedVersion = 0;
 	private String _location = "";
 	private String _date = "";
 	private String _windAvg = "";
@@ -113,7 +114,7 @@ public class Report implements Parcelable {
 			source.readList(r._snowTotals, getClass().getClassLoader());
 			source.readList(r._dailySnow, getClass().getClassLoader());
 			source.readList(r._tempReadings, getClass().getClassLoader());
-
+			r._apMinSupportedVersion = source.readInt();
 			return r;
 		}
 
@@ -313,6 +314,13 @@ public class Report implements Parcelable {
 			return true;
 		return false;
 	}
+	
+	/**
+	 * @return The minimum android:versionCode version supported by this report
+	 */
+	public int getApMinSupportedVersion() {
+		return _apMinSupportedVersion;
+	}
 
 	public Uri getGeo() {
 		return Uri.parse("geo:" + _latitude + "," + _longitude);
@@ -403,6 +411,7 @@ public class Report implements Parcelable {
 		dest.writeList(_snowTotals);
 		dest.writeList(_dailySnow);
 		dest.writeList(_tempReadings);
+		dest.writeInt(_apMinSupportedVersion);
 	}
 
 	private static ArrayList<String> toList(String vals[]) {
@@ -472,7 +481,9 @@ public class Report implements Parcelable {
 			if (parts.length == 2) {
 				parts[0] = parts[0].trim();
 				parts[1] = parts[1].trim();
-
+				if (parts[0].equals("ap.min.supported.version")) {
+					r._apMinSupportedVersion = getInt(parts[1]);
+				}
 				if (parts[0].equals("wind.avg")) {
 					r._windAvg = parts[1];
 				} else if (parts[0].equals("date")) {

@@ -40,7 +40,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.SharedPreferences;
 
 public class HttpUtils {
+	/**
+	 * TODO: support dual server
+	 */
 	public final static String LOC_SERVER = "http://bettykrocks.com/skireport";
+	//public final static String LOC_SERVER = "http://danwhome.no-ip.org/skireport";
 
 	static HttpClient getHttpClient() {
 		return new DefaultHttpClient();
@@ -76,6 +80,6 @@ public class HttpUtils {
 	 * Returns the server to retrieve location data from.
 	 */
 	public static String getLocationServer(SharedPreferences pref) {
-		return pref.getString("location_server", LOC_SERVER);
+		return pref.getString("location_server",LOC_SERVER);
 	}
 }
