@@ -112,7 +112,10 @@ public class ReportListAdapter implements ListAdapter {
 		if( r != null ) {
 			tv.setText(r.getResort().getResortName());
 			tv = (TextView) v.findViewById(R.id.snow_value);
-			tv.setText(r.getFreshAsString());
+			if( r.hasErrors() )
+				tv.setText(R.string.report_error_summary);
+			else
+				tv.setText(r.getFreshAsString());
 
 			ImageView iv = (ImageView)v.findViewById(R.id.snow_layout_icon);
 			iv.setImageResource(r.getWeatherIconResId());

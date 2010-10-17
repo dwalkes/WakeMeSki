@@ -304,6 +304,10 @@ public class Report implements Parcelable {
 	public String getError() {
 		return _errMsg;
 	}
+	
+	public boolean hasErrors() {
+		return (_errMsg != null);
+	}
 
 	/**
 	 * Returns true if the report include latitude and longitude coordinates
@@ -472,6 +476,7 @@ public class Report implements Parcelable {
 			} else {
 				r._errMsg = e.getLocalizedMessage();
 			}
+			return r;
 		}
 
 		String when[] = new String[3];

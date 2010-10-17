@@ -68,6 +68,12 @@ public class ReportActivity extends Activity {
 		// Title
 		TextView t = (TextView) findViewById(R.id.report_label);
 		t.setText(r.getResort().getResortName());
+		
+		if( r.hasErrors() ) {
+			t = (TextView) findViewById(R.id.report_fresh);
+			t.setText(getString(R.string.report_error, r.getError()));
+			return;
+		}
 
 		t = (TextView) findViewById(R.id.report_date);
 		t.setText(getString(R.string.report_date, r.getDate()));

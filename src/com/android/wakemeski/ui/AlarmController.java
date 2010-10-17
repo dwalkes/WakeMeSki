@@ -120,7 +120,7 @@ public class AlarmController {
 		context.sendBroadcast(i);
 
 		// Decide which activity to start based on the state of the keyguard.
-		Class c = AlarmAlert.class;
+		Class<?> c = AlarmAlert.class;
 		KeyguardManager km = (KeyguardManager) context
 				.getSystemService(Context.KEYGUARD_SERVICE);
 		if (km.inKeyguardRestrictedInputMode()) {
