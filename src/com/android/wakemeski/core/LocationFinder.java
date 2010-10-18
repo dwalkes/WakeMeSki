@@ -31,7 +31,6 @@ import java.util.ArrayList;
 
 import org.apache.http.client.ClientProtocolException;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 
 /**
@@ -40,23 +39,36 @@ import android.util.Log;
  */
 public class LocationFinder {
 	private static final String TAG = "LocationFinder";
-
+	private String serverUrl = null;
+	
+	/**
+	 * Get the server URL to use with location requests.  Makes sure
+	 * we use the same server for getRegions() and getLocations() requests
+	 * @return the server URL to use when searching for locations. 
+	 */
+	private synchronized String getServerUrl() {
+		if (serverUrl == null) {
+			serverUrl = HttpUtils.getLocationServer();
+		}
+		return serverUrl;
+	}
+	
 	/**
 	 * Gets the top-level regions to start the search for a location from.
 	 */
-	public static String[] getRegions(SharedPreferences pref)
+	public String[] getRegions()
 			throws ClientProtocolException, IOException {
-		String url = HttpUtils.getLocationServer(pref) + "/location_finder.php";
+		String url = getServerUrl() + "/location_finder.php";
 		return HttpUtils.fetchUrl(url);
 	}
 
 	/**
 	 * Returns the location objects associated with a given region.
 	 */
-	public static Location[] getLocations(SharedPreferences pref, String region)
+	public Location[] getLocations(String region)
 			throws ClientProtocolException, IOException {
 		ArrayList<Location> locations = new ArrayList<Location>();
-		String locServer = HttpUtils.getLocationServer(pref);
+		String locServer = getServerUrl();
 
 		String url = locServer 
 				+ "/location_finder.php?region=" + region;
@@ -64,7 +76,7 @@ public class LocationFinder {
 		for (String row : rows) {
 			String vals[] = row.split("=", 2);
 			if (vals.length == 2) {
-				Location l = new Location(vals[0].trim(), locServer + "/" + vals[1].trim());
+				Location l = new Location(vals[0].trim(), vals[1].trim());
 				locations.add(l);
 			} else {
 				Log.e(TAG, "Bad location line for region [" + region + "]: ["

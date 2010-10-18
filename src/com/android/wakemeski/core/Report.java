@@ -468,7 +468,8 @@ public class Report implements Parcelable {
 		String lines[] = new String[0];
 
 		try {
-			lines = HttpUtils.fetchUrl(l.getReportUrl());
+			String server = HttpUtils.getLocationServer();
+			lines = HttpUtils.fetchUrl(server + "/" + l.getReportUrlPath());
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {
@@ -544,12 +545,12 @@ public class Report implements Parcelable {
 						r._tempReadings = vals;
 					} else {
 						Log.i(TAG, "Unknown key-value from from report URL("
-								+ l.getReportUrl() + " line: " + line);
+								+ l.getReportUrlPath() + " line: " + line);
 					}
 				}
 			} else {
 				Log.e(TAG, "Error invalid line from report URL("
-						+ l.getReportUrl() + " line: " + line);
+						+ l.getReportUrlPath() + " line: " + line);
 			}
 		}
 

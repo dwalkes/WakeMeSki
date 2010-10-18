@@ -37,7 +37,7 @@ import android.os.Parcelable;
  */
 public class Location implements Parcelable, Serializable {
 	private String _label;
-	private String _url;
+	private String _urlPath;
 
 	private static final long serialVersionUID = 0;
 
@@ -56,9 +56,14 @@ public class Location implements Parcelable, Serializable {
 		}
 	};
 
-	public Location(String label, String url) {
+	/**
+	 * 
+	 * @param label A human readable label for this location
+	 * @param urlPath Path+file portion of the URL (does NOT include the server)
+	 */
+	public Location(String label, String urlPath) {
 		_label = label;
-		_url = url;
+		_urlPath = urlPath;
 	}
 
 	/**
@@ -69,10 +74,10 @@ public class Location implements Parcelable, Serializable {
 	}
 
 	/**
-	 * The URL where the report from the location can be found
+	 * The path portion of the URL where the report from the location can be found
 	 */
-	public String getReportUrl() {
-		return _url;
+	public String getReportUrlPath() {
+		return _urlPath;
 	}
 
 	@Override
@@ -83,7 +88,7 @@ public class Location implements Parcelable, Serializable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(_label);
-		dest.writeString(_url);
+		dest.writeString(_urlPath);
 	}
 
 	@Override

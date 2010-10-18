@@ -26,26 +26,24 @@
  */
 package com.android.wakemeski.ui;
 
-import com.android.wakemeski.R;
-import com.android.wakemeski.core.Location;
-import com.android.wakemeski.core.LocationFinder;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.android.wakemeski.R;
+import com.android.wakemeski.core.Location;
+import com.android.wakemeski.core.LocationFinder;
 
 public class LocationFinderActivity extends ListActivity {
 	// Spawned activity id's
@@ -126,7 +124,7 @@ public class LocationFinderActivity extends ListActivity {
 
 			i.putExtra("region", _region);
 			i.putExtra("location", loc.getLabel());
-			i.putExtra("url", loc.getReportUrl());
+			i.putExtra("url", loc.getReportUrlPath());
 			setResult(RESULT_OK, i);
 			finish();
 		}
@@ -194,15 +192,14 @@ public class LocationFinderActivity extends ListActivity {
 		public void run() {
 			Bundle b = new Bundle();
 			try {
-				SharedPreferences pref = PreferenceManager
-						.getDefaultSharedPreferences(getApplicationContext());
 
+				LocationFinder finder = new LocationFinder();
+				
 				if (_region == null) {
-					String regions[] = LocationFinder.getRegions(pref);
+					String regions[] = finder.getRegions();
 					b.putStringArray("regions", regions);
 				} else {
-					Location locations[] = LocationFinder.getLocations(pref,
-							_region);
+					Location locations[] = finder.getLocations(_region);
 
 					b.putParcelableArray("locations", locations);
 				}
