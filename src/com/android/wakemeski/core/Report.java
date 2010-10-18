@@ -489,8 +489,7 @@ public class Report implements Parcelable {
 				parts[1] = parts[1].trim();
 				if (parts[0].equals("ap.min.supported.version")) {
 					r._apMinSupportedVersion = getInt(parts[1]);
-				}
-				if (parts[0].equals("wind.avg")) {
+				} else if (parts[0].equals("wind.avg")) {
 					r._windAvg = parts[1];
 				} else if (parts[0].equals("date")) {
 					r._date = parts[1];
