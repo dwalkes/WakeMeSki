@@ -445,7 +445,7 @@ public class Report implements Parcelable {
 	 * Loads a report from the given location
 	 */
 	public static Report loadReport(Context c, ConnectivityManager cm,
-		Resort resort) {
+		Resort resort, WakeMeSkiServer server) {
 		// A report will be in the format:
 		// location = OSOALP
 		// date = 12-6-2008
@@ -468,8 +468,7 @@ public class Report implements Parcelable {
 		String lines[] = new String[0];
 
 		try {
-			String server = HttpUtils.getLocationServer();
-			lines = HttpUtils.fetchUrl(server + "/" + l.getReportUrlPath());
+			lines = HttpUtils.fetchUrl(server.getServerUrl() + "/" + l.getReportUrlPath());
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {

@@ -39,18 +39,15 @@ import android.util.Log;
  */
 public class LocationFinder {
 	private static final String TAG = "LocationFinder";
-	private String serverUrl = null;
-	
+	private WakeMeSkiServer mServer = new WakeMeSkiServer();
+
 	/**
 	 * Get the server URL to use with location requests.  Makes sure
 	 * we use the same server for getRegions() and getLocations() requests
 	 * @return the server URL to use when searching for locations. 
 	 */
-	private synchronized String getServerUrl() {
-		if (serverUrl == null) {
-			serverUrl = HttpUtils.getLocationServer();
-		}
-		return serverUrl;
+	private String getServerUrl() {
+		return mServer.getServerUrl();
 	}
 	
 	/**

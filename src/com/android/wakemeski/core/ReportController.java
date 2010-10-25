@@ -51,6 +51,7 @@ public class ReportController implements Runnable {
 	private HashSet<ReportListener> mListeners = new HashSet<ReportListener>();
 	private boolean mBusy;
 	private Context mContext;
+	private WakeMeSkiServer mServer = new WakeMeSkiServer();
 
 	private ReportController(Context c) {
 		mContext = c;
@@ -171,7 +172,7 @@ public class ReportController implements Runnable {
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-			Report r = Report.loadReport(c, cm, resort);			
+			Report r = Report.loadReport(c, cm, resort, mServer);			
 			synchronized (mListeners) {
 				mReports.put(resort, r);
 				for(ReportListener rl: mListeners) {					
@@ -216,7 +217,7 @@ public class ReportController implements Runnable {
 			}
 
 			for( Resort res: resorts ) {
-				Report r = Report.loadReport(c, cm, res);				
+				Report r = Report.loadReport(c, cm, res, mServer);				
 				synchronized (mListeners) {
 					mReports.put(res, r);
 					for(ReportListener l: mListeners)
