@@ -104,4 +104,12 @@ public class Resort implements Serializable, Comparable<Resort> {
 		}
 		return locationSet.toArray(new Location[locationSet.size()]);
 	}
+	
+	public static Resort[] fromLocationList(Location[] locationList) {
+		Set<Resort> resortSet = new HashSet<Resort>();
+		for (Location location : locationList) {
+			resortSet.add(new Resort(location));
+		}
+		return resortSet.toArray(new Resort[resortSet.size()]);
+	}
 }

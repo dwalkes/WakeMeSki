@@ -45,7 +45,7 @@ public class HttpUtils {
 	/**
 	 * list of supported servers
 	 */
-	private final static String SERVER_LIST[] = {
+	public final static String SERVER_LIST[] = {
 		"http://bettykrocks.com/skireport",
 		"http://ddubtech.com/wakemeski/skireport"
 	};

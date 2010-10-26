@@ -44,6 +44,7 @@ import android.widget.ListView;
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.Location;
 import com.android.wakemeski.core.LocationFinder;
+import com.android.wakemeski.core.WakeMeSkiServer;
 
 public class LocationFinderActivity extends ListActivity {
 	// Spawned activity id's
@@ -193,7 +194,7 @@ public class LocationFinderActivity extends ListActivity {
 			Bundle b = new Bundle();
 			try {
 
-				LocationFinder finder = new LocationFinder();
+				LocationFinder finder = new LocationFinder(new WakeMeSkiServer());
 				
 				if (_region == null) {
 					String regions[] = finder.getRegions();

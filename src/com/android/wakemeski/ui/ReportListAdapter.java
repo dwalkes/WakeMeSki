@@ -34,6 +34,7 @@ import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
 import com.android.wakemeski.core.ReportController;
 import com.android.wakemeski.core.ReportListener;
+import com.android.wakemeski.core.WakeMeSkiFactory;
 
 public class ReportListAdapter implements ListAdapter {
 
@@ -51,8 +52,9 @@ public class ReportListAdapter implements ListAdapter {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		synchronized (mReports) {
-			ReportController.getInstance(null).addListener(mListener);
-			Report reports[] = ReportController.getInstance(null).getLoadedReports();
+			ReportController reportController = WakeMeSkiFactory.getInstance(c).getReportController();
+			reportController.addListener(mListener);
+			Report reports[] = reportController.getLoadedReports();
 			for(Report r: reports)
 				mReports.add(r);
 		}

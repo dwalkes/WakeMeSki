@@ -33,16 +33,24 @@ package com.android.wakemeski.core;
  */
 public class WakeMeSkiServer {
 
-	private String serverUrl = null;
+	private String mServerUrl = null;
+	
+	public WakeMeSkiServer() {
+		mServerUrl = null;
+	}
+	
+	public WakeMeSkiServer( String serverUrl ) {
+		mServerUrl = serverUrl;
+	}
 
 	/**
 	 * @return The server URL as obtained from HttpUtils as necessary or 
 	 * cached version from previous request
 	 */
 	public synchronized String getServerUrl() {
-		if (serverUrl == null) {
-			serverUrl = HttpUtils.getLocationServer();
+		if (mServerUrl == null) {
+			mServerUrl = HttpUtils.getLocationServer();
 		}
-		return serverUrl;
+		return mServerUrl;
 	}
 }

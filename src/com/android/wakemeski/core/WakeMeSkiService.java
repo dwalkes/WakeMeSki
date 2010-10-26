@@ -54,6 +54,7 @@ public class WakeMeSkiService extends Service {
 	private SnowSettingsSharedPreference	mSnowSettings = null;
 	private SharedPreferences			 	mSharedPreferences = null;
 	private AlarmController				 	mAlarmController=null;
+	private ReportController				mReportController;
 	private int mActiveStartId;
 	/**
 	 * Handle events in the service thread
@@ -108,7 +109,7 @@ public class WakeMeSkiService extends Service {
 				/**
 				 * Done listening now that we've fired the alarm
 				 */
-				if( ReportController.getInstance(null).removeListener(mReportListener) ) {
+				if( mReportController.removeListener(mReportListener) ) {
 					/**
 					 * Only fire the alarm once.  By checking for removeListener = true we know
 					 * that this was the first case and not a queue'd handler thread action
@@ -147,7 +148,7 @@ public class WakeMeSkiService extends Service {
 			 * a loadReport() started by another thread.  This seems unlikely enough that we should
 			 * be safe to ignore it.
 			 */
-			ReportController.getInstance(null).removeListener(mReportListener);
+			mReportController.removeListener(mReportListener);
 			/**
 			 * If the alarm didn't fire and report load has complete, release the wake lock and
 			 * stop the service.  Nothing else to do at this time
@@ -193,11 +194,13 @@ public class WakeMeSkiService extends Service {
 		
 	@Override
 	public void onCreate() {
+		Context c = this.getApplicationContext();
 		// Maintain a lock during the checking of the alarm. This lock may have
 		// already been acquired in AlarmReceiver. If the process was killed,
 		// the global wake lock is gone. Acquire again just to be sure.
-		AlarmAlertWakeLock.acquireCpuWakeLock(this.getApplicationContext());
+		AlarmAlertWakeLock.acquireCpuWakeLock(c);
 		super.onCreate();
+		mReportController = WakeMeSkiFactory.getInstance(c).getReportController();
 	}
 
 	@Override
@@ -206,7 +209,7 @@ public class WakeMeSkiService extends Service {
 		 * Make sure our listener is removed before destroy.  Should be safe to call
 		 * even if the listener is not currently in the list
 		 */
-		ReportController.getInstance(null).removeListener(mReportListener);
+		mReportController.removeListener(mReportListener);
 		super.onDestroy();
 	}
 	/**
@@ -221,8 +224,8 @@ public class WakeMeSkiService extends Service {
 		 * still be safe to call addListener - the second add will be a no-op and the listener will
 		 * be removed when the first loadReports() completes
 		 */
-		ReportController.getInstance(null).addListener(mReportListener);
-		ReportController.getInstance(null).loadReports();
+		mReportController.addListener(mReportListener);
+		mReportController.loadReports();
 	}
 
 	/**

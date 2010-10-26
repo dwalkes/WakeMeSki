@@ -15,9 +15,9 @@
  */
 package com.android.wakemeski;
 
-import com.android.wakemeski.core.ReportController;
-
 import android.app.Application;
+
+import com.android.wakemeski.core.WakeMeSkiFactory;
 
 public class WakeMeSki extends Application {
 
@@ -25,6 +25,6 @@ public class WakeMeSki extends Application {
 	public void onCreate() {
 		super.onCreate();
 		
-		ReportController.getInstance(this);
+		WakeMeSkiFactory.getInstance(this);
 	}
 }

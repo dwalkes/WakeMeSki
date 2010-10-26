@@ -39,6 +39,7 @@ import com.android.wakemeski.R;
 import com.android.wakemeski.core.Report;
 import com.android.wakemeski.core.ReportController;
 import com.android.wakemeski.core.ReportListener;
+import com.android.wakemeski.core.WakeMeSkiFactory;
 
 /**
  * The application dashboard for WakeMeSki. Shows the status of configured
@@ -55,10 +56,14 @@ public class WakeMeSkiDashboard extends Activity {
 	private static final int REFRESH_ID     = Menu.FIRST + 1;
 	private static final String TAG = "WakeMeSkiDashboard";
 	private int mApVersion = 0;
+	private ReportController mReportController;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+
+		mReportController = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getReportController();
+
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.dashboard);
 
@@ -82,14 +87,14 @@ public class WakeMeSkiDashboard extends Activity {
 	protected void onResume() {
 		super.onResume();		
 
-		ReportController.getInstance(null).addListener(mReportListener);
+		mReportController.addListener(mReportListener);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 
-		ReportController.getInstance(null).removeListener(mReportListener);
+		mReportController.removeListener(mReportListener);
 	}
 
 	@Override
@@ -112,7 +117,7 @@ public class WakeMeSkiDashboard extends Activity {
 			startActivity(i);
 			return true;
 		} else if (item.getItemId() == REFRESH_ID) {
-			ReportController.getInstance(null).loadReports();
+			mReportController.loadReports();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

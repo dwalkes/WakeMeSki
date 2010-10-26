@@ -51,21 +51,27 @@ public class ReportController implements Runnable {
 	private HashSet<ReportListener> mListeners = new HashSet<ReportListener>();
 	private boolean mBusy;
 	private Context mContext;
-	private WakeMeSkiServer mServer = new WakeMeSkiServer();
+	private WakeMeSkiServer mServer;
+	private ResortManager mResortManager;
 
-	private ReportController(Context c) {
+	private ReportController(Context c, ResortManager rm, WakeMeSkiServer server) {
 		mContext = c;
 		mThread = new Thread(this);
 		mThread.start();
+		mResortManager = rm;
+		mServer = server;
 	}
-
+	
+	
 	/**
-	 * Gets or creates the singleton instance. WakeMeSki is used to provide a
-	 * Context to classes that need it.
+	 * @param c context
+	 * @param rm resort manager
+	 * @param server The server to use with this report controller
+	 * @return the static synchronized instance of this class
 	 */
-	public synchronized static ReportController getInstance(Context c) {
-		if (inst == null) {
-			inst = new ReportController(c);
+	public static synchronized ReportController getInstance(Context c, ResortManager rm, WakeMeSkiServer server) {
+		if( inst == null ) {
+			inst = new ReportController(c,rm,server);
 		}
 		return inst;
 	}
@@ -90,8 +96,7 @@ public class ReportController implements Runnable {
     }
 
 	public void loadReports() {
-		ResortManager rm = ResortManager.getInstance(mContext);
-		Action a = new LoadResortsAction(rm.getResorts());
+		Action a = new LoadResortsAction(mResortManager.getResorts());
 		mActions.add(a);
 	}
 

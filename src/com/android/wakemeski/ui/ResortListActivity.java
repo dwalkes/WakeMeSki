@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -32,7 +33,8 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import com.android.wakemeski.R;
 import com.android.wakemeski.core.ReportController;
 import com.android.wakemeski.core.Resort;
-import com.android.wakemeski.core.ResortManager;
+import com.android.wakemeski.core.ResortManagerFile;
+import com.android.wakemeski.core.WakeMeSkiFactory;
 
 /**
  * A list activity that allows selection of resorts for the purposes of setting
@@ -45,13 +47,14 @@ import com.android.wakemeski.core.ResortManager;
  * 
  */
 public class ResortListActivity extends ListActivity {
-	private ResortManager mResortManager;
+	private ResortManagerFile mResortManager;
 	private static final int SELECT_LOCATION = 1;
 	private Resort[] mResortList;
 	private static final int ADD_ID = Menu.FIRST;
 	private static final int CLEAR_ID = ADD_ID + 1;	
 	private static final int REMOVE_ID = ADD_ID + 2;
 	private WakeupResortListAdapter mListAdapter;
+	private ReportController mReportController;
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
@@ -80,8 +83,10 @@ public class ResortListActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		mResortManager = ResortManager
-				.getInstance(this.getApplicationContext());
+		Context c = this.getApplicationContext();
+		mResortManager = ResortManagerFile
+				.getInstance(c);
+		mReportController = WakeMeSkiFactory.getInstance(c).getReportController();
 		mResortList = mResortManager.getResorts();
 		setTitle(R.string.resort_list_title);
 		setContentView(R.layout.resort_list_activity);
@@ -126,7 +131,7 @@ public class ResortListActivity extends ListActivity {
 		rl.add(r);
 		mResortList = rl.toArray(new Resort[rl.size()]);
 		Arrays.sort(mResortList);
-		ReportController.getInstance(null).addResort(r);
+		mReportController.addResort(r);
 		mResortManager.update(mResortList);
 	}
 
@@ -137,7 +142,7 @@ public class ResortListActivity extends ListActivity {
 			ArrayList<Resort> rl = 
 				new ArrayList<Resort>(Arrays.asList(mResortList));
 			rl.remove(matchingLocation);
-			ReportController.getInstance(null).removeResort(r);
+			mReportController.removeResort(r);
 			mResortList = rl.toArray(new Resort[rl.size()]);
 			mResortManager.update(mResortList);
 		}
