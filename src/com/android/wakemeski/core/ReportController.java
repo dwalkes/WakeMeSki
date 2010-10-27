@@ -51,27 +51,24 @@ public class ReportController implements Runnable {
 	private HashSet<ReportListener> mListeners = new HashSet<ReportListener>();
 	private boolean mBusy;
 	private Context mContext;
-	private WakeMeSkiServer mServer;
 	private ResortManager mResortManager;
 
-	private ReportController(Context c, ResortManager rm, WakeMeSkiServer server) {
+	private ReportController(Context c, ResortManager rm) {
 		mContext = c;
 		mThread = new Thread(this);
 		mThread.start();
-		mResortManager = rm;
-		mServer = server;
+		mResortManager = rm;		
 	}
 	
 	
 	/**
 	 * @param c context
 	 * @param rm resort manager
-	 * @param server The server to use with this report controller
 	 * @return the static synchronized instance of this class
 	 */
-	public static synchronized ReportController getInstance(Context c, ResortManager rm, WakeMeSkiServer server) {
+	public static synchronized ReportController getInstance(Context c, ResortManager rm) {
 		if( inst == null ) {
-			inst = new ReportController(c,rm,server);
+			inst = new ReportController(c, rm);
 		}
 		return inst;
 	}
@@ -177,7 +174,7 @@ public class ReportController implements Runnable {
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-			Report r = Report.loadReport(c, cm, resort, mServer);			
+			Report r = Report.loadReport(c, cm, resort, new WakeMeSkiServer());			
 			synchronized (mListeners) {
 				mReports.put(resort, r);
 				for(ReportListener rl: mListeners) {					
@@ -221,8 +218,9 @@ public class ReportController implements Runnable {
 					l.onLoading(true);
 			}
 
+			WakeMeSkiServer server = new WakeMeSkiServer();
 			for( Resort res: resorts ) {
-				Report r = Report.loadReport(c, cm, res, mServer);				
+				Report r = Report.loadReport(c, cm, res, server);				
 				synchronized (mListeners) {
 					mReports.put(res, r);
 					for(ReportListener l: mListeners)

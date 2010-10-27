@@ -10,7 +10,7 @@ public class WakeMeSkiFactory {
 	
 	private WakeMeSkiFactory(Context c) {
 		mResortManager = ResortManagerFile.getInstance(c);
-		mReportController = ReportController.getInstance(c,mResortManager,new WakeMeSkiServer());
+		mReportController = ReportController.getInstance(c, mResortManager);
 	}
 	
 	public ReportController getReportController() {

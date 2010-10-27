@@ -279,12 +279,21 @@ public class Report implements Parcelable {
 		return snowTotal;
 	}
 
+	/**
+	 * @return A string representing the snow total with units, or N/A if not available
+	 */
 	public String getFreshAsString() {
 		String unit = " \"";
+		String snowTotal;
 		if (getSnowUnits() == SnowUnits.CENTIMETERS)
 			unit = " cm";
 
-		return getFreshSnowTotal() + unit;
+		if( hasFreshSnowTotal() ) {
+			snowTotal = getFreshSnowTotal() + unit;
+		} else {
+			snowTotal = "N/A";
+		}
+		return snowTotal;
 	}
 
 	public String getSnowConditions() {
@@ -510,10 +519,14 @@ public class Report implements Parcelable {
 					r._weatherIcon = parts[1];
 				} else if( parts[0].startsWith("weather.forecast.when.")) {
 					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
-					when[idx] = parts[1];
+					if(idx < when.length) {
+						when[idx] = parts[1];
+					}
 				} else if( parts[0].startsWith("weather.forecast.desc.")) {
 					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
-					desc[idx] = parts[1];
+					if(idx < parts.length) {
+						desc[idx] = parts[1];
+					}
 				}
 				else if (parts[0].equals("location")) {
 					r._location = parts[1];
@@ -552,8 +565,9 @@ public class Report implements Parcelable {
 			}
 		}
 
-		for( int i = 0; i < when.length; i++ ) {
-			if( when[i].length() > 0 && desc[i].length() > 0 )
+		for( int i = 0; i < when.length && i < desc.length ; i++ ) {
+			if( when[i] != null && when[i].length() > 0 &&
+					desc[i] != null && desc[i].length() > 0 )
 				r._weather.add(new Weather(when[i], desc[i]));
 		}
 
