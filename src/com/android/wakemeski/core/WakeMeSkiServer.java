@@ -53,4 +53,8 @@ public class WakeMeSkiServer {
 		}
 		return mServerUrl;
 	}
+	
+	public String toString() {
+		return mServerUrl;
+	}
 }

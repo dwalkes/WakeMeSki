@@ -71,6 +71,7 @@ public class Report implements Parcelable {
 	private ArrayList<String> _tempReadings = new ArrayList<String>();
 	private String _freshSnow = "";
 	private String _snowUnits = "inches";
+	private String _requestUrl = "";
 
 	private Resort _resort;
 
@@ -362,6 +363,13 @@ public class Report implements Parcelable {
 		return _freshSourceUrl;
 	}
 	
+	/**
+	 * @return The string URL requested of a wakemeski server to build this report
+	 */
+	public String getRequestURL() {
+		return _requestUrl;
+	}
+	
 	public String getWeatherURL() {
 		return _weatherUrl;
 	}
@@ -506,9 +514,10 @@ public class Report implements Parcelable {
 
 		String lines[] = new String[0];
 
+		r._requestUrl = server.getServerUrl() + "/" + l.getReportUrlPath() 
+				+ appendUrl;
 		try {
-			lines = HttpUtils.fetchUrl(server.getServerUrl() + "/" + l.getReportUrlPath() 
-					+ appendUrl);
+			lines = HttpUtils.fetchUrl(r._requestUrl);
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {
