@@ -49,6 +49,7 @@ public class Report implements Parcelable {
 	private String _windAvg = "";
 	private String _detailsURL = "";
 	private String _locationURL = "";
+	private String _freshSourceUrl = "";
 
 	private int _trailsOpen = 0;
 	private int _trailsTotal = 0;
@@ -354,6 +355,13 @@ public class Report implements Parcelable {
 		return _locationURL;
 	}
 
+	/**
+	 * @return The url where "fresh" snow information is obtained by the PHP parsing script
+	 */
+	public String getFreshSourceURL() {
+		return _freshSourceUrl;
+	}
+	
 	public String getWeatherURL() {
 		return _weatherUrl;
 	}
@@ -451,10 +459,32 @@ public class Report implements Parcelable {
 	}
 
 	/**
-	 * Loads a report from the given location
+	 * Loads a report from the given location with default URL
 	 */
 	public static Report loadReport(Context c, ConnectivityManager cm,
-		Resort resort, WakeMeSkiServer server) {
+		Resort resort, WakeMeSkiServer server)
+	{
+		return loadReportWithAppendUrl(c,cm,resort,server,"");
+	}
+	
+	/**
+	 * Loads a report from the given location without caching
+	 */
+	public static Report loadReportNoCache(Context c, ConnectivityManager cm,
+			Resort resort, WakeMeSkiServer server)
+	{
+		return loadReportWithAppendUrl(c,cm,resort,server,"&nocache=1");
+	}
+	
+
+	/**
+	 * Loads a report.  Allows specifying custom append values to the URL request
+	 * (such as nocache=1)
+	 * @return
+	 */
+	private static Report loadReportWithAppendUrl(Context c, ConnectivityManager cm,
+			Resort resort, WakeMeSkiServer server, String appendUrl) {
+		
 		// A report will be in the format:
 		// location = OSOALP
 		// date = 12-6-2008
@@ -477,7 +507,8 @@ public class Report implements Parcelable {
 		String lines[] = new String[0];
 
 		try {
-			lines = HttpUtils.fetchUrl(server.getServerUrl() + "/" + l.getReportUrlPath());
+			lines = HttpUtils.fetchUrl(server.getServerUrl() + "/" + l.getReportUrlPath() 
+					+ appendUrl);
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {
@@ -495,7 +526,9 @@ public class Report implements Parcelable {
 			if (parts.length == 2) {
 				parts[0] = parts[0].trim();
 				parts[1] = parts[1].trim();
-				if (parts[0].equals("ap.min.supported.version")) {
+				if( parts[0].equals("fresh.source.url")) {
+					r._freshSourceUrl = parts[1];
+				} else if (parts[0].equals("ap.min.supported.version")) {
 					r._apMinSupportedVersion = getInt(parts[1]);
 				} else if (parts[0].equals("wind.avg")) {
 					r._windAvg = parts[1];
