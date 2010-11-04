@@ -21,11 +21,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,7 +58,11 @@ public class WakeMeSkiDashboard extends Activity {
 	private static final int REFRESH_ID     = Menu.FIRST + 1;
 	private static final String TAG = "WakeMeSkiDashboard";
 	private int mApVersion = 0;
+	private int mApLatestVersion = 0;
 	private ReportController mReportController;
+	private static final int DIALOG_ID_LESS_THAN_MIN_VERSION = 0;
+	private static final int DIALOG_ID_LESS_THAN_LATEST_VERSION = 1;
+	private static final String UPDATE_IGNORE_PREF_KEY = "updateIgnoredVersion";
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -130,12 +136,34 @@ public class WakeMeSkiDashboard extends Activity {
 
 		@Override
 		public void onAdded(Report r) {
-			if( r.getApMinSupportedVersion() > mApVersion ) {
+			if( r.getServerInfo().getApMinSupportedVersion() > mApVersion ) {
 				h.post(new Runnable() {
 					public void run() {
-						showDialog(0);
+						showDialog(DIALOG_ID_LESS_THAN_MIN_VERSION);
 					}
 				});
+			} else if ( r.getServerInfo().getApLatestVersion() > mApVersion ) {
+            	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+				/*
+				 * I'd rather pass this in as a bundle item to showDialog
+				 * but it looks like we don't have API support for this with 1.5
+				 */
+				mApLatestVersion = r.getServerInfo().getApLatestVersion();
+
+            	if( !prefs.contains(UPDATE_IGNORE_PREF_KEY) ||
+            			prefs.getInt(UPDATE_IGNORE_PREF_KEY,0) 
+            				< r.getServerInfo().getApLatestVersion() ) {
+    				h.post(new Runnable() {
+    					public void run() {
+    						showDialog(DIALOG_ID_LESS_THAN_LATEST_VERSION);
+    					}
+    				});				
+            	} else {
+            		Log.d(TAG,"Not on latest version " + r.getServerInfo().getApLatestVersion() + " but I've already bugged you once...");
+            	}
+
+
 			}
 		}
 
@@ -152,11 +180,29 @@ public class WakeMeSkiDashboard extends Activity {
 			});	
 		}
 	};
+
 	
     protected Dialog onCreateDialog(int id) {
-        
-        return new AlertDialog.Builder(this)
-            .setTitle(R.string.out_of_date_dialog_title)
+        if( id == DIALOG_ID_LESS_THAN_MIN_VERSION) {
+	        return new AlertDialog.Builder(this)
+	            .setTitle(R.string.please_upgrade)
+	            .setMessage(R.string.no_longer_supported)
+	            .setPositiveButton(R.string.update_button, new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int which) {
+	                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+	                        "http://market.android.com/details?id=" + getPackageName()));
+	                    startActivity(marketIntent);
+	                }
+	            })
+	            .setNegativeButton(R.string.quit_button, new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int which) {
+	                    finish();
+	                }
+	            })
+	            .create();
+        } else if (id ==  DIALOG_ID_LESS_THAN_LATEST_VERSION ) {
+	        return new AlertDialog.Builder(this)
+            .setTitle(R.string.please_upgrade)
             .setMessage(R.string.out_of_date_dialog_body)
             .setPositiveButton(R.string.update_button, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -165,13 +211,33 @@ public class WakeMeSkiDashboard extends Activity {
                     startActivity(marketIntent);
                 }
             })
-            .setNegativeButton(R.string.quit_button, new DialogInterface.OnClickListener() {
+            .setNegativeButton(R.string.ignore_button, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    finish();
+					/*
+					 * If the user selected ignore and this isn't a mandatory
+					 * update don't bother them until the next update.
+					 */
+                	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                	SharedPreferences.Editor editor = prefs.edit();
+                	/*
+                	 * Save the fact that the user ignored this update, don't bug
+                	 * again until the next update
+                	 */
+                	editor.putInt(UPDATE_IGNORE_PREF_KEY, mApLatestVersion);
+                	if( editor.commit() ) {
+                		Log.d(TAG,"OK I promise I won't bug you again... until the next version");
+                	} else {
+                		Log.w(TAG, "Ignore pref key commit failed");
+                	}
+                	
                 }
             })
             .create();
+        } else {
+        	return super.onCreateDialog(id);
+        }
     }
+        
 
 	private OnItemClickListener mClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View v, int pos, long id)

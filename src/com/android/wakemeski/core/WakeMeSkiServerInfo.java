@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2008 nombre.usario@gmail.com
+ /* 
+ * Copyright (c) 2010 Dan Walkes, Andy Doan
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,53 +24,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.android.wakemeski.core;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.http.client.ClientProtocolException;
-
-import android.util.Log;
-
 /**
- * This class helps find a location and its corresponding URL from which it can
- * get the ski report.
+ * A class to hold server info for this wakemeski server instance,
+ * as found in server_info.php
  */
-public class LocationFinder {
-	private static final String TAG = "LocationFinder";
-	private WakeMeSkiServer mServer;
-
-	public LocationFinder(WakeMeSkiServer server) {
-		mServer = server;
+public class WakeMeSkiServerInfo {
+	private int mApMinSupportedVersion = -1;
+	private int mApLatestVersion = -1;
+	private int mServerVersion = -1;
+	
+	
+	public int getApMinSupportedVersion() {
+		return mApMinSupportedVersion;
 	}
 	
-	/**
-	 * Gets the top-level regions to start the search for a location from.
-	 */
-	public String[] getRegions()
-			throws ClientProtocolException, IOException {
-		return mServer.fetchUrl("/location_finder.php");
+	public int getApLatestVersion() {
+		return mApLatestVersion;
 	}
-
-	/**
-	 * Returns the location objects associated with a given region.
-	 */
-	public Location[] getLocations(String region)
-			throws ClientProtocolException, IOException {
-		ArrayList<Location> locations = new ArrayList<Location>();
-
-		String rows[] = mServer.fetchUrl("/location_finder.php?region=" + region);
-		for (String row : rows) {
-			String vals[] = row.split("=", 2);
-			if (vals.length == 2) {
-				Location l = new Location(vals[0].trim(), vals[1].trim());
-				locations.add(l);
-			} else {
-				Log.e(TAG, "Bad location line for region [" + region + "]: ["
-						+ row + "]");
-			}
-		}
-		return locations.toArray(new Location[locations.size()]);
+	
+	public int getServerVersion() {
+		return mServerVersion;
+	}
+	
+	public void setApMinSupportedVersion( int version ) {
+		mApMinSupportedVersion = version;
+	}
+	
+	public void setApLatestVersion( int version ) {
+		mApLatestVersion = version;
+	}
+	
+	public void setServerVersion( int version ) {
+		mServerVersion = version;
 	}
 }

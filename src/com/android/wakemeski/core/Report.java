@@ -43,7 +43,7 @@ import com.android.wakemeski.R;
 import com.android.wakemeski.pref.SnowSettingsSharedPreference;
 
 public class Report implements Parcelable {
-	private int _apMinSupportedVersion = 0;
+
 	private String _location = "";
 	private String _date = "";
 	private String _windAvg = "";
@@ -72,6 +72,7 @@ public class Report implements Parcelable {
 	private String _freshSnow = "";
 	private String _snowUnits = "inches";
 	private String _requestUrl = "";
+	private WakeMeSkiServerInfo _serverInfo = new WakeMeSkiServerInfo();
 
 	private Resort _resort;
 
@@ -116,7 +117,6 @@ public class Report implements Parcelable {
 			source.readList(r._snowTotals, getClass().getClassLoader());
 			source.readList(r._dailySnow, getClass().getClassLoader());
 			source.readList(r._tempReadings, getClass().getClassLoader());
-			r._apMinSupportedVersion = source.readInt();
 			return r;
 		}
 
@@ -320,6 +320,10 @@ public class Report implements Parcelable {
 		return (_errMsg != null);
 	}
 
+	public WakeMeSkiServerInfo getServerInfo() {
+		return _serverInfo;
+	}
+	
 	/**
 	 * Returns true if the report include latitude and longitude coordinates
 	 */
@@ -330,13 +334,6 @@ public class Report implements Parcelable {
 		return false;
 	}
 	
-	/**
-	 * @return The minimum android:versionCode version supported by this report
-	 */
-	public int getApMinSupportedVersion() {
-		return _apMinSupportedVersion;
-	}
-
 	public Uri getGeo() {
 		return Uri.parse("geo:" + _latitude + "," + _longitude);
 	}
@@ -440,7 +437,6 @@ public class Report implements Parcelable {
 		dest.writeList(_snowTotals);
 		dest.writeList(_dailySnow);
 		dest.writeList(_tempReadings);
-		dest.writeInt(_apMinSupportedVersion);
 	}
 
 	private static ArrayList<String> toList(String vals[]) {
@@ -514,10 +510,11 @@ public class Report implements Parcelable {
 
 		String lines[] = new String[0];
 
-		r._requestUrl = server.getServerUrl() + "/" + l.getReportUrlPath() 
-				+ appendUrl;
+		String url = "/" + l.getReportUrlPath() 
+						+ appendUrl;
+		r._requestUrl = server.getFetchUrl(url);
 		try {
-			lines = HttpUtils.fetchUrl(r._requestUrl);
+			lines = server.fetchUrl(url);
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {
@@ -537,8 +534,6 @@ public class Report implements Parcelable {
 				parts[1] = parts[1].trim();
 				if( parts[0].equals("fresh.source.url")) {
 					r._freshSourceUrl = parts[1];
-				} else if (parts[0].equals("ap.min.supported.version")) {
-					r._apMinSupportedVersion = getInt(parts[1]);
 				} else if (parts[0].equals("wind.avg")) {
 					r._windAvg = parts[1];
 				} else if (parts[0].equals("date")) {
@@ -613,6 +608,7 @@ public class Report implements Parcelable {
 				r._weather.add(new Weather(when[i], desc[i]));
 		}
 
+		r._serverInfo = server.getServerInfo();
 		return r;
 	}
 
