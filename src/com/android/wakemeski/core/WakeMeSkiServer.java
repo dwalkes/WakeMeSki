@@ -31,6 +31,8 @@ import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -40,6 +42,8 @@ import android.util.Log;
  */
 public class WakeMeSkiServer {
 	private static final String TAG = "WakeMeSkiServer";
+	
+	private String mID = null;
 	
 	private String mServerUrl=null;
 	
@@ -53,12 +57,20 @@ public class WakeMeSkiServer {
 		"http://ddubtech.com/wakemeski/skireport"
 	};
 	
-	public WakeMeSkiServer() {
+	public WakeMeSkiServer(Context c) {
 		mServerInfo = null;
+		initID(c.getContentResolver());	
 	}
 	
-	public WakeMeSkiServer( String serverUrl ) {
+	public WakeMeSkiServer(Context c, String serverUrl ) {
 		mServerUrl = serverUrl;
+		initID(c.getContentResolver());
+	}
+
+	private void initID(ContentResolver cr) {
+		mID = Settings.Secure.getString(cr, Settings.Secure.ANDROID_ID);
+		if( mID == null )
+			mID = "unknown";
 	}
 
 	/**
@@ -104,7 +116,7 @@ public class WakeMeSkiServer {
 	 */
 	public String[] fetchUrlWithID(String url)
 		throws ClientProtocolException, IOException {
-		return fetchUrl(url + "&id=" + Settings.Secure.ANDROID_ID);
+		return fetchUrl(url + "&id=" + mID);
 	}
 	
 	/**

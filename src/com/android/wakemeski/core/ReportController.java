@@ -174,7 +174,8 @@ public class ReportController implements Runnable {
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-			Report r = Report.loadReport(c, cm, resort, new WakeMeSkiServer());			
+			WakeMeSkiServer srv = new WakeMeSkiServer(mContext);
+			Report r = Report.loadReport(c, cm, resort, srv);			
 			synchronized (mListeners) {
 				mReports.put(resort, r);
 				for(ReportListener rl: mListeners) {					
@@ -218,7 +219,7 @@ public class ReportController implements Runnable {
 					l.onLoading(true);
 			}
 
-			WakeMeSkiServer server = new WakeMeSkiServer();
+			WakeMeSkiServer server = new WakeMeSkiServer(mContext);
 			for( Resort res: resorts ) {
 				Report r = Report.loadReport(c, cm, res, server);				
 				synchronized (mListeners) {

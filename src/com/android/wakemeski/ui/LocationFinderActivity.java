@@ -194,7 +194,8 @@ public class LocationFinderActivity extends ListActivity {
 			Bundle b = new Bundle();
 			try {
 
-				LocationFinder finder = new LocationFinder(new WakeMeSkiServer());
+				WakeMeSkiServer srv = new WakeMeSkiServer(getApplicationContext());
+				LocationFinder finder = new LocationFinder(srv);
 				
 				if (_region == null) {
 					String regions[] = finder.getRegions();
