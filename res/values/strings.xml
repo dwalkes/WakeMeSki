@@ -76,4 +76,7 @@
 	<string name="update_button">Update</string>
 	<string name="quit_button">Exit</string>
 	<string name="ignore_button">Ignore</string>
+	<string name="eula_title">License Agreement</string>
+    <string name="eula_accept">Accept</string>
+    <string name="eula_refuse">Don't Accept</string>
 </resources>

@@ -68,6 +68,8 @@ public class WakeMeSkiDashboard extends Activity {
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
+		Eula.show(this);
+		
 		mReportController = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getReportController();
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
