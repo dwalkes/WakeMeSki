@@ -514,7 +514,7 @@ public class Report implements Parcelable {
 						+ appendUrl;
 		r._requestUrl = server.getFetchUrl(url);
 		try {
-			lines = server.fetchUrl(url);
+			lines = server.fetchUrlWithID(url);
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {

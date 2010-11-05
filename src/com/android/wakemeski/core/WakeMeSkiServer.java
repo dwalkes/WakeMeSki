@@ -31,6 +31,7 @@ import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 
+import android.provider.Settings;
 import android.util.Log;
 
 /**
@@ -95,6 +96,15 @@ public class WakeMeSkiServer {
 	public String[] fetchUrl( String url )
 		throws ClientProtocolException, IOException {
 		return HttpUtils.fetchUrl(getFetchUrl(url));
+	}
+
+	/**
+	 * Same as the fetchURL but adds the phone's unique ID to the query
+	 * string so the server can track usage patterns
+	 */
+	public String[] fetchUrlWithID(String url)
+		throws ClientProtocolException, IOException {
+		return fetchUrl(url + "&id=" + Settings.Secure.ANDROID_ID);
 	}
 	
 	/**

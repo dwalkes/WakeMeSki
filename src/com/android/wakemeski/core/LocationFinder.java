@@ -60,7 +60,7 @@ public class LocationFinder {
 			throws ClientProtocolException, IOException {
 		ArrayList<Location> locations = new ArrayList<Location>();
 
-		String rows[] = mServer.fetchUrl("/location_finder.php?region=" + region);
+		String rows[] = mServer.fetchUrlWithID("/location_finder.php?region=" + region);
 		for (String row : rows) {
 			String vals[] = row.split("=", 2);
 			if (vals.length == 2) {
