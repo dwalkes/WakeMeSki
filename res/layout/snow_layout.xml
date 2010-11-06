@@ -5,16 +5,17 @@
 	android:id="@+id/resort_snow_layout"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content">
+	android:layout_height="50dip">
    	
 	<ImageView
 		android:id="@+id/snow_layout_icon" 
+		android:layout_height="fill_parent"
 		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" />
+		android:gravity="center" />
 
 	<TextView
 		android:id="@+id/resort_name"
-		android:layout_height="50dip"
+		android:layout_height="fill_parent"
 		android:layout_width="0dp"
 		android:layout_weight="70"
 		android:textStyle="bold"
@@ -23,7 +24,7 @@
 
 	<TextView
 		android:id="@+id/snow_value"
-		android:layout_height="50dip"
+		android:layout_height="fill_parent"
 		android:layout_width="0dp"
 		android:layout_weight="30"
 		android:textStyle="bold"

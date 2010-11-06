@@ -52,8 +52,9 @@
 
 	<string name="map_location">Map it</string>
 
-	<string name="report_error_summary">ERROR!</string>
-	<string name="report_error">An error occurred while retrieving the report: %s</string>
+	<string name="fresh_not_available">Not Available</string>
+	<string name="report_error_working_on_it">The report for this resort is not currently available.  We are working on the problem and hope to resolve soon.  Thank you for your patience.</string>
+	<string name="report_error_localized_detail">An error occurred while attempting to retrieve the report for this resort: %s</string>
 	<string name="error_title">Error Finding Location Data</string>
 	<string name="error_no_connection">No data connection. Please try again later.</string>
 	

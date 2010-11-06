@@ -115,7 +115,7 @@ public class ReportListAdapter implements ListAdapter {
 			tv.setText(r.getResort().getResortName());
 			tv = (TextView) v.findViewById(R.id.snow_value);
 			if( r.hasErrors() )
-				tv.setText(R.string.report_error_summary);
+				tv.setText(R.string.fresh_not_available);
 			else
 				tv.setText(r.getFreshAsString());
 

@@ -77,8 +77,11 @@ public class Report implements Parcelable {
 	private Resort _resort;
 
 	// Used to display an error if one occurred
-	private String _errMsg = null;
-
+	private String _errMsgLocalized = "";
+	
+	// The error message from the server, will not be localized
+	private String _errMsgServer = "";
+	
 	private static final String TAG = "com.android.wakemeski.core.Report";
 
 	public static final Parcelable.Creator<Report> CREATOR = new Parcelable.Creator<Report>() {
@@ -99,7 +102,8 @@ public class Report implements Parcelable {
 			r._liftsTotal = source.readInt();
 
 			r._resort = (Resort)source.readSerializable();
-			r._errMsg = source.readString();
+			r._errMsgLocalized = source.readString();
+			r._errMsgServer = source.readString();
 
 			r._weatherUrl = source.readString();
 			r._weatherIcon = source.readString();
@@ -310,14 +314,38 @@ public class Report implements Parcelable {
 	}
 
 	/**
-	 * Used to display an error if one occurred
+	 * @return the localized error if one occurred. Note that hasErrors() does
+	 * not mean this string will be length > 0.  See hasServerError()
 	 */
-	public String getError() {
-		return _errMsg;
+	public String getLocalizedError() {
+		return _errMsgLocalized;
 	}
 	
+	/**
+	 * @return any localized error message + any message obtained from the server
+	 */
+	public String getNonLocalizedError() {
+		return _errMsgLocalized + _errMsgServer;
+	}
+	
+	/**
+	 * @return true if an error condition was found on the server.  In this
+	 * case the error message will not be localized.  It basically means we
+	 * know about the error and we are working on it.  Our test scripts will catch
+	 * it and print the non-localized version with getNonLocalizedError()
+	 */
+	public boolean hasServerError() {
+		return _errMsgServer.length() != 0;
+	}
+	
+	/**
+	 * @return true if hasServerError() or has a localized error available
+	 * with getLocalizedError()
+	 */
 	public boolean hasErrors() {
-		return (_errMsg != null);
+		return ( (_errMsgLocalized.length() != 0 ) ||
+				 (_errMsgServer.length() != 0 	 ) 
+				 );
 	}
 
 	public WakeMeSkiServerInfo getServerInfo() {
@@ -420,7 +448,8 @@ public class Report implements Parcelable {
 		dest.writeInt(_liftsTotal);
 
 		dest.writeSerializable(_resort);
-		dest.writeString(_errMsg);
+		dest.writeString(_errMsgLocalized);
+		dest.writeString(_errMsgServer);
 
 		dest.writeString(_weatherUrl);
 		dest.writeString(_weatherIcon);
@@ -518,9 +547,9 @@ public class Report implements Parcelable {
 		} catch (Exception e) {
 			NetworkInfo n = cm.getActiveNetworkInfo();
 			if (n == null || !n.isConnected()) {
-				r._errMsg = c.getString(R.string.error_no_connection);
+				r._errMsgLocalized = c.getString(R.string.error_no_connection);
 			} else {
-				r._errMsg = e.getLocalizedMessage();
+				r._errMsgLocalized = e.getLocalizedMessage();
 			}
 			return r;
 		}
@@ -574,8 +603,15 @@ public class Report implements Parcelable {
 				} else if (parts[0].equals("snow.conditions")) {
 					r._snowConditions = parts[1];
 				} else if (parts[0].equals("err.msg")) {
-					r._errMsg = parts[1];
-				} else if (parts[0].equals("snow.fresh")) {
+					r._errMsgServer = parts[1];
+				} else if (parts[0].equals("err.msg.localized")) {
+					/*
+					 * Include a method to set a localized error message from the
+					 * server, doubtful that we'd want to do this but never say never
+					 */
+					r._errMsgLocalized = parts[1];
+				}
+				else if (parts[0].equals("snow.fresh")) {
 					r._freshSnow = parts[1];
 				} else if (parts[0].equals("snow.units")) {
 					r._snowUnits = parts[1];
@@ -609,12 +645,6 @@ public class Report implements Parcelable {
 		}
 
 		r._serverInfo = server.getServerInfo();
-		return r;
-	}
-
-	public static Report createError(String msg) {
-		Report r = new Report();
-		r._errMsg = msg;
 		return r;
 	}
 

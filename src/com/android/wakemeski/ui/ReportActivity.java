@@ -71,9 +71,28 @@ public class ReportActivity extends Activity {
 		
 		if( r.hasErrors() ) {
 			t = (TextView) findViewById(R.id.report_fresh);
-			t.setText(getString(R.string.report_error, r.getError()));
+			if( r.hasServerError() ) {
+				/*
+				 * The server can't find the info for this report, we've got a bug
+				 * to fix on the server (and since we're running our unit tests we are
+				 * probably already working on it :)
+				 */
+				t.setText(getString(R.string.report_error_working_on_it));
+			} else {
+				/*
+				 * This was an error that happened client side (missing data connection,timeout, etc)
+				 * so we have a localized error to display
+				 */
+				t.setText(getString(R.string.report_error_localized_detail, r.getLocalizedError()));
+			}
 			return;
 		}
+		
+		t = (TextView) findViewById(R.id.report_snow_text);
+		t.setText(getString(R.string.report_snow));
+		
+		t = (TextView) findViewById(R.id.report_weather_text);
+		t.setText(getString(R.string.report_weather));
 
 		t = (TextView) findViewById(R.id.report_date);
 		t.setText(getString(R.string.report_date, r.getDate()));
