@@ -561,7 +561,7 @@ public class Report implements Parcelable {
 					}
 				} else if( parts[0].startsWith("weather.forecast.desc.")) {
 					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
-					if(idx < parts.length) {
+					if(idx < desc.length) {
 						desc[idx] = parts[1];
 					}
 				}
