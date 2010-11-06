@@ -48,8 +48,9 @@ public class Report implements Parcelable {
 	private String _date = "";
 	private String _windAvg = "";
 	private String _detailsURL = "";
-	private String _locationURL = "";
 	private String _freshSourceUrl = "";
+	private String _locationURL = "";
+	private String _locationComments = "";
 
 	private int _trailsOpen = 0;
 	private int _trailsTotal = 0;
@@ -94,6 +95,7 @@ public class Report implements Parcelable {
 			r._windAvg = source.readString();
 			r._detailsURL = source.readString();
 			r._locationURL = source.readString();
+			r._locationComments = source.readString();
 
 			r._trailsOpen = source.readInt();
 			r._trailsTotal = source.readInt();
@@ -382,6 +384,14 @@ public class Report implements Parcelable {
 	}
 
 	/**
+	 * An optional field some feeds provide that give information on the resort.
+	 * Its usually something like "Come Saturday for Elvis Presley Day!"
+	 */
+	public String getLocationComments() {
+		return _locationComments;
+	}
+
+	/**
 	 * @return The url where "fresh" snow information is obtained by the PHP parsing script
 	 */
 	public String getFreshSourceURL() {
@@ -440,6 +450,7 @@ public class Report implements Parcelable {
 		dest.writeString(_windAvg);
 		dest.writeString(_detailsURL);
 		dest.writeString(_locationURL);
+		dest.writeString(_locationComments);
 
 		dest.writeInt(_trailsOpen);
 		dest.writeInt(_trailsTotal);
@@ -571,6 +582,8 @@ public class Report implements Parcelable {
 					r._detailsURL = parts[1];
 				} else if (parts[0].equals("location.info")) {
 					r._locationURL = parts[1];
+				} else if (parts[0].equals("location.comments")) {
+					r._locationComments = parts[1];
 				} else if (parts[0].equals("trails.open")) {
 					r._trailsOpen = getInt(parts[1]);
 				} else if (parts[0].equals("trails.total")) {

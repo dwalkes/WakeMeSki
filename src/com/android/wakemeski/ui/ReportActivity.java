@@ -115,6 +115,9 @@ public class ReportActivity extends Activity {
 		for(Weather w: r.getWeather()) {
 			addForecast(vg, w);
 		}
+
+		t = (TextView) findViewById(R.id.report_comments);
+		t.setText(r.getLocationComments());
 	}
 
 	private void addForecast(ViewGroup vg, Weather w) {
