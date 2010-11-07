@@ -62,9 +62,9 @@ public class WakeMeSkiServer {
 		initID(c.getContentResolver());	
 	}
 	
-	public WakeMeSkiServer(Context c, String serverUrl ) {
+	protected WakeMeSkiServer(Context c, String serverUrl) {
+		initID(c.getContentResolver());	
 		mServerUrl = serverUrl;
-		initID(c.getContentResolver());
 	}
 
 	private void initID(ContentResolver cr) {
@@ -110,13 +110,17 @@ public class WakeMeSkiServer {
 		return HttpUtils.fetchUrl(getFetchUrl(url));
 	}
 
+	public String getId() {
+		return mID;
+	}
+	
 	/**
 	 * Same as the fetchURL but adds the phone's unique ID to the query
 	 * string so the server can track usage patterns
 	 */
 	public String[] fetchUrlWithID(String url)
 		throws ClientProtocolException, IOException {
-		return fetchUrl(url + "&id=" + mID);
+		return fetchUrl(url + "&id=" + getId());
 	}
 	
 	/**
