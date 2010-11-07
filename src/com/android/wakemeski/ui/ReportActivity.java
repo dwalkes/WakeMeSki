@@ -116,8 +116,13 @@ public class ReportActivity extends Activity {
 			addForecast(vg, w);
 		}
 
-		t = (TextView) findViewById(R.id.report_comments);
-		t.setText(r.getLocationComments());
+		// Report Comments (optional)
+		if( r.hasLocationComments() ) {
+			t = (TextView) findViewById(R.id.report_comments_text);
+			t.setText(getString(R.string.report_comments_header));
+			t = (TextView) findViewById(R.id.report_comments);
+			t.setText(r.getLocationComments());
+		}
 	}
 
 	private void addForecast(ViewGroup vg, Weather w) {

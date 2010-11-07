@@ -70,6 +70,7 @@
 	<string name="report_details_link">Report Info</string>
 	<string name="report_info_link">Resort Info</string>
 	<string name="report_mapit_link">Map It</string>
+	<string name="report_comments_header">Comments</string>
 	<!-- Upgrade dialog strings -->
 	<string name="please_upgrade">Please Upgrade</string>
 	<string name="no_longer_supported">This application version is no longer supported.</string>

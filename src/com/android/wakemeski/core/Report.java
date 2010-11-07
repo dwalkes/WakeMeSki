@@ -384,6 +384,13 @@ public class Report implements Parcelable {
 	}
 
 	/**
+	 * @return true if this report contains location comments available in
+	 * getLocationComments()
+	 */
+	public boolean hasLocationComments() {
+		return _locationComments.length() != 0 ;
+	}
+	/**
 	 * An optional field some feeds provide that give information on the resort.
 	 * Its usually something like "Come Saturday for Elvis Presley Day!"
 	 */
