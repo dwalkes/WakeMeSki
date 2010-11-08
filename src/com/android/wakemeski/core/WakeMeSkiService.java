@@ -47,15 +47,17 @@ import com.android.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 public class WakeMeSkiService extends Service {
 
 	private static final String TAG = "WakeMeSkiService";
-	public static final String ACTION_WAKE_CHECK = "com.dwalkes.android.wakemeski.ACTION_WAKE_CHECK";
-	public static final String ACTION_ALARM_SCHEDULE = "com.walkes.android.wakemeski.ACTION_ALARM_SCHEDULE";
-	public static final String ACTION_DASHBOARD_POPULATE = "com.walkes.android.wakemeski.ACTION_DASHBOARD_POPULATE";
+	public static final String ACTION_WAKE_CHECK = "com.android.wakemeski.core.ACTION_WAKE_CHECK";
+	public static final String ACTION_ALARM_SCHEDULE = "com.android.wakemeski.core.ACTION_ALARM_SCHEDULE";
+	public static final String ACTION_SHUTDOWN = "com.android.wakemeski.core.ACTION_SHUTDOWN";
 
 	private SnowSettingsSharedPreference	mSnowSettings = null;
 	private SharedPreferences			 	mSharedPreferences = null;
 	private AlarmController				 	mAlarmController=null;
 	private ReportController				mReportController;
-	private int mActiveStartId;
+	private boolean							mAlarmFired=false;
+	private int 							mActiveStartId;
+
 	/**
 	 * Handle events in the service thread
 	 */
@@ -109,15 +111,19 @@ public class WakeMeSkiService extends Service {
 				/**
 				 * Done listening now that we've fired the alarm
 				 */
-				if( mReportController.removeListener(mReportListener) ) {
+				if( mAlarmFired == false ) {
 					/**
-					 * Only fire the alarm once.  By checking for removeListener = true we know
-					 * that this was the first case and not a queue'd handler thread action
+					 * Only fire the alarm once
 					 * Don't release the wake lock, we will do that when the alarm activity starts
 					 */
 					getAlarmController().fireAlarm();
-					Log.d(TAG, "Found wakeup resort, stopping service");
-					stopSelf(mActiveStartId);
+					mAlarmFired = true;
+					
+					/*
+					 * Not safe to stop the service here because the 
+					 * alarm activity has not yet started. Will be stopped by the alarm
+					 * activity.
+					 */
 				}
 			} else {
 				Log.d(TAG, "Resort " + r.getResort() + " did not meet preference "
@@ -139,8 +145,9 @@ public class WakeMeSkiService extends Service {
 			 * Force a reload of snow settings when the report loading starts
 			 */
 			mSnowSettings = null;	
+			mAlarmFired = false;
 		} else {
-			Log.d(TAG, "Report load completed, stopping service");
+			Log.d(TAG, "Report load completed");
 			/**
 			 * Done listening now that report load has completed
 			 * Note: missing logic to determine whether the listener was active for at least
@@ -149,12 +156,17 @@ public class WakeMeSkiService extends Service {
 			 * be safe to ignore it.
 			 */
 			mReportController.removeListener(mReportListener);
+			
+			if( !mAlarmFired ) {
+				Log.d(TAG, "Alarm did not fire, stopping service and removing wake lock");
+				stopSelf(mActiveStartId);
+			}
 			/**
-			 * If the alarm didn't fire and report load has complete, release the wake lock and
-			 * stop the service.  Nothing else to do at this time
+			 * Else if the alarm fired the Alarm class will shutdown the service when it
+			 * has completed running.  Shutting down here could create a race condition between
+			 * lock acquire on the alarm application and shutdown of the service.
 			 */
-			AlarmAlertWakeLock.release();
-			stopSelf(mActiveStartId);
+
 		}
 	}
 	
@@ -279,6 +291,12 @@ public class WakeMeSkiService extends Service {
 		String 	currentAction;
 		currentAction = intent.getAction();
 
+		/**
+		 * Save the most recent start ID in case we need to stop the service
+		 * after the report loading completes
+		 */
+		mActiveStartId = startId;
+		
 		if (currentAction == null) {
 			Log.e(TAG, "Error - null intent action passed");
 		}
@@ -314,12 +332,6 @@ public class WakeMeSkiService extends Service {
 		
 		if(stopService) {
 			stopSelfResult(startId);
-		} else {
-			/**
-			 * Save the active start ID so we can use it to eventually stop the service
-			 * when we are done
-			 */
-			mActiveStartId = startId;
 		}
 	}
 

@@ -19,6 +19,7 @@
 package com.android.wakemeski.ui.alarmclock;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -31,7 +32,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.wakemeski.R;
+import com.android.wakemeski.core.WakeMeSkiService;
 import com.android.wakemeski.ui.AlarmSnoozeController;
+import com.android.wakemeski.ui.OnAlarmReceiver;
 import com.android.wakemeski.ui.WakeMeSkiDashboard;
 import com.android.wakemeski.ui.WakeMeSkiPreferences;
 
@@ -55,8 +58,8 @@ public class AlarmAlert extends Activity {
 	private int mAlarmId = 0;
 	private String mLabel;
 
-	public static final String MEDIA_ALERT_SOURCE_STRING_EXTRA = "com.dwalkes.android.alarmclock.media_alert_source";
-	public static final String VIBRATE_BOOLEAN_EXTRA = "com.dwalkes.android.alarmclock.vibrate";
+	public static final String MEDIA_ALERT_SOURCE_STRING_EXTRA = "com.android.wakemeski.ui.alarmclock.media_alert_source";
+	public static final String VIBRATE_BOOLEAN_EXTRA = "com.android.wakemeski.ui.alarmclock.vibrate";
 
 	/*
 	 * FIXME: it would be nice for this to live in an xml config file.
@@ -119,7 +122,7 @@ public class AlarmAlert extends Activity {
 
 	private void setTitleFromIntent(Intent i) {
 		// mLabel = i.getStringExtra(Alarms.LABEL);
-		mLabel = "Ski Wake Up!!";
+		mLabel = this.getApplicationContext().getString(R.string.ski_wake_up);
 		// if (mLabel == null || mLabel.length() == 0) {
 		// mLabel = getString(R.string.default_label);
 		// }
@@ -331,6 +334,12 @@ public class AlarmAlert extends Activity {
 	 * release wake and keyguard locks
 	 */
 	private synchronized void releaseLocks() {
+		/*
+		 * Done with the service now, stop it.
+		 */
+		stopService(new Intent(this.getApplicationContext(),
+				WakeMeSkiService.class));
+
 		AlarmAlertWakeLock.release();
 	}
 }

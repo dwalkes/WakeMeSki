@@ -54,7 +54,7 @@ public class WakeMeSkiServer {
 	 */
 	public final static String SERVER_LIST[] = {
 		"http://bettykrocks.com/skireport",
-		"http://ddubtech.com/wakemeski/skireport"
+		"http://wakemeski.com/skireport"
 	};
 	
 	public WakeMeSkiServer(Context c) {
