@@ -56,7 +56,7 @@ public class HttpUtils {
 		if (resp.getStatusLine().getStatusCode() == 200) {
 			InputStreamReader ir = new InputStreamReader(resp.getEntity()
 					.getContent());
-			BufferedReader r = new BufferedReader(ir);
+			BufferedReader r = new BufferedReader(ir,1024);
 
 			String line;
 			while ((line = r.readLine()) != null)

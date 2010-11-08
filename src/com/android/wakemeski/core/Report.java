@@ -54,6 +54,10 @@ public class Report implements Parcelable {
 
 	private int _trailsOpen = 0;
 	private int _trailsTotal = 0;
+	/*
+	 * Some reports indicate trails open as percentage only (ie the Euro resorts)
+	 */
+	private String _trailsPercentOpen = "";
 
 	private int _liftsOpen = 0;
 	private int _liftsTotal = 0;
@@ -99,6 +103,7 @@ public class Report implements Parcelable {
 
 			r._trailsOpen = source.readInt();
 			r._trailsTotal = source.readInt();
+			r._trailsPercentOpen = source.readString();
 
 			r._liftsOpen = source.readInt();
 			r._liftsTotal = source.readInt();
@@ -186,6 +191,8 @@ public class Report implements Parcelable {
 			s = _trailsOpen + "/" + _trailsTotal;
 		else if( _trailsOpen > 0 )
 			s = String.valueOf(_trailsOpen);
+		else if( _trailsPercentOpen.length() != 0 ) 
+			s = _trailsPercentOpen;
 
 		return s;
 	}
@@ -461,6 +468,7 @@ public class Report implements Parcelable {
 
 		dest.writeInt(_trailsOpen);
 		dest.writeInt(_trailsTotal);
+		dest.writeString(_trailsPercentOpen);
 
 		dest.writeInt(_liftsOpen);
 		dest.writeInt(_liftsTotal);
@@ -500,10 +508,17 @@ public class Report implements Parcelable {
 	 */
 	private static int getInt(String val) {
 		int v = 0;
-		try {
-			v = Integer.parseInt(val);
-		} catch (Throwable t) {
-			Log.e(TAG, "Unable to parse value to int: " + val);
+		/*
+		 * Don't bother to try parsing if no value is returned or if
+		 * n/a is returned.
+		 */
+		if (val.length() != 0 &&
+				!val.equals("n/a") ) {
+			try {
+				v = Integer.parseInt(val);
+			} catch (Throwable t) {
+				Log.e(TAG, "Unable to parse value to int: " + val);
+			}
 		}
 
 		return v;
@@ -595,6 +610,8 @@ public class Report implements Parcelable {
 					r._trailsOpen = getInt(parts[1]);
 				} else if (parts[0].equals("trails.total")) {
 					r._trailsTotal = getInt(parts[1]);
+				} else if (parts[0].equals("trails.percent.open")) {
+					r._trailsPercentOpen = parts[1];
 				} else if (parts[0].equals("lifts.open")) {
 					r._liftsOpen = getInt(parts[1]);
 				} else if (parts[0].equals("lifts.total")) {
@@ -635,6 +652,8 @@ public class Report implements Parcelable {
 					r._freshSnow = parts[1];
 				} else if (parts[0].equals("snow.units")) {
 					r._snowUnits = parts[1];
+				} else if (parts[0].equals("cache.found")) {
+					// do nothing, but avoid warning about unknown key-value pair.
 				} else {
 					String values[] = parts[1].split("\\s+");
 					ArrayList<String> vals = toList(values);

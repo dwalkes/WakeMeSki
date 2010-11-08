@@ -28,6 +28,7 @@ package com.android.wakemeski.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -50,7 +51,9 @@ public class LocationFinder {
 	 */
 	public String[] getRegions()
 			throws ClientProtocolException, IOException {
-		return mServer.fetchUrl("/location_finder.php");
+		String [] regions = mServer.fetchUrl("/location_finder.php");
+		Arrays.sort(regions);
+		return regions;
 	}
 
 	/**
@@ -61,6 +64,7 @@ public class LocationFinder {
 		ArrayList<Location> locations = new ArrayList<Location>();
 
 		String rows[] = mServer.fetchUrlWithID("/location_finder.php?region=" + region);
+		Arrays.sort(rows);
 		for (String row : rows) {
 			String vals[] = row.split("=", 2);
 			if (vals.length == 2) {
