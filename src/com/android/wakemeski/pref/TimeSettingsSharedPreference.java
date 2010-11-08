@@ -16,8 +16,11 @@
  */
 package com.android.wakemeski.pref;
 
+import android.content.Context;
+import android.text.format.DateFormat;
+
 /**
- * A POJO used to read/write the time value from persistent storage. Used by
+ * Read/write the time value from persistent storage. Used by
  * both the dialog preference and by classes accessing the shared preferences
  * datastore.
  * 
@@ -25,10 +28,17 @@ package com.android.wakemeski.pref;
  * 
  */
 public class TimeSettingsSharedPreference {
+	/*
+	 * Always stored in 24 hour time format
+	 */
 	int currentHour = 0;
 	int currentMinute = 0;
-	boolean is24Hour = false;
+	Context mContext;
 
+	public TimeSettingsSharedPreference( Context c )
+	{
+		mContext = c;
+	}
 	public int getCurrentHour() {
 		return currentHour;
 	}
@@ -46,13 +56,13 @@ public class TimeSettingsSharedPreference {
 	}
 
 	public boolean is24Hour() {
-		return is24Hour;
+		return DateFormat.is24HourFormat(mContext);
 	}
 
-	public void setIs24Hour(boolean is24Hour) {
-		this.is24Hour = is24Hour;
-	}
-
+	/**
+	 * @return A summary string suitable for display to the user
+	 * Will format in 24 hour or 12 hour time as specified by preferences
+	 */
 	public String getSummaryString() {
 		StringBuilder builder = new StringBuilder();
 		if (!is24Hour()) {

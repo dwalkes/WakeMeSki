@@ -243,7 +243,7 @@ public class WakeMeSkiService extends Service {
 			RepeatDaySharedPreference repeatDay = new RepeatDaySharedPreference();
 			if (repeatDay.setFromPersistString(prefs.getString(
 					WakeMeSkiPreferences.REPEAT_DAYS_PREF_KEY, null))) {
-				TimeSettingsSharedPreference timeSettings = new TimeSettingsSharedPreference();
+				TimeSettingsSharedPreference timeSettings = new TimeSettingsSharedPreference(this.getApplicationContext());
 				if (timeSettings.setTimeFromPersistString(prefs.getString(
 						WakeMeSkiPreferences.ALARM_WAKEUP_TIME_PREF_KEY, null))) {
 					AlarmCalculator calculator = new AlarmCalculator(repeatDay,

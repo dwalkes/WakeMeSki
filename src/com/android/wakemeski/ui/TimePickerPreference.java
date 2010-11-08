@@ -16,14 +16,14 @@
  */
 package com.android.wakemeski.ui;
 
-import com.android.wakemeski.pref.TimeSettingsSharedPreference;
-
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TimePicker;
+
+import com.android.wakemeski.pref.TimeSettingsSharedPreference;
 
 /**
  * Configure a time (in this case the time for wakeup resort checks) and store
@@ -43,7 +43,7 @@ public class TimePickerPreference extends DialogPreference {
 		mContext = context;
 		mAttributes = attrs;
 		mTimePicker = null;
-		mPreference = new TimeSettingsSharedPreference();
+		mPreference = new TimeSettingsSharedPreference(context);
 	}
 
 	protected View onCreateDialogView() {
