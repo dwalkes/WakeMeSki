@@ -765,6 +765,8 @@ public class Report implements Parcelable {
 
 		// mix = snow and rain
 		_icons.put("mix", new Integer(R.drawable.mix));
+		
+		_icons.put("nwind", new Integer(R.drawable.night_wind));
 
 		// TODO fg = fog
 		// fzra = freeze
@@ -772,7 +774,6 @@ public class Report implements Parcelable {
 		// hurr = hurricane
 		// ntor = night tornado
 		// wind
-		// nwind = night wind
 		// ovc = overcast
 		// sctfg = scattered fog
 		// cold = cold, day
