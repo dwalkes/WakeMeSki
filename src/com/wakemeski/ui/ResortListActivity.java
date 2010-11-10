@@ -122,17 +122,18 @@ public class ResortListActivity extends ListActivity {
 	private void addResort(Resort r) {
 		Resort matchingLocation =
 			Resort.getResortWithLocation(r.getLocation(), mResortList);
-		ArrayList<Resort> rl =
-			new ArrayList<Resort>(Arrays.asList(mResortList));
-		if (matchingLocation != null) {
-			// remove the resort, and we'll add the latest one selected
-			rl.remove(matchingLocation);
+		/*
+		 * Ignore the add request if the location already exists
+		 */
+		if (matchingLocation == null) {
+			ArrayList<Resort> rl =
+				new ArrayList<Resort>(Arrays.asList(mResortList));
+			rl.add(r);
+			mResortList = rl.toArray(new Resort[rl.size()]);
+			Arrays.sort(mResortList);
+			mReportController.addResort(r);
+			mResortManager.update(mResortList);
 		}
-		rl.add(r);
-		mResortList = rl.toArray(new Resort[rl.size()]);
-		Arrays.sort(mResortList);
-		mReportController.addResort(r);
-		mResortManager.update(mResortList);
 	}
 
 	private void removeResort(Resort r) {
@@ -163,7 +164,10 @@ public class ResortListActivity extends ListActivity {
 			String url = data.getStringExtra("url");
 			String loc = data.getStringExtra("location");
 			Resort r = new Resort(loc, url);
-			r.setWakeupEnabled(true);
+			/*
+			 * Default to false when adding to the list.
+			 */
+			r.setWakeupEnabled(false);
 			addResort(r);
 		} else if (resultCode == RESULT_CANCELED) {
 			/* 
