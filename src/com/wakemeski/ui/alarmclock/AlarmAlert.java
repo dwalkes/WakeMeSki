@@ -230,7 +230,7 @@ public class AlarmAlert extends Activity {
 		}
 		mState = DISMISS;
 		mKlaxon.stop(this, false);
-		startActivity(new Intent(Intent.ACTION_MAIN, null, this,
+		startActivity(new Intent(this.getApplicationContext(),
 				WakeMeSkiDashboard.class));
 		releaseLocks();
 	}

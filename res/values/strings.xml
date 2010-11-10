@@ -36,6 +36,7 @@
 <string name="please_wait_for_service">Please wait while snow status is obtained for selected resorts.</string>
 <string name="alarm_updated">WakeMeSki alarm successfully updated</string>
 <string name="alarm_disabled">WakeMeSki alarm is currently disabled</string>
+<string name="alarm_disabled_no_days_selected">Please select at least one Wake-up day to enable the alarm.</string>
 <string name="resort_list_title">WakeMeSki Selected Resorts</string>
 <string name="wakeup">Wake Up</string>
 <string name="resort_name">Resort Name</string>

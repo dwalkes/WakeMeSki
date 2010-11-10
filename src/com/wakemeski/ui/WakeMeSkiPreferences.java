@@ -33,6 +33,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.wakemeski.R;
+import com.wakemeski.pref.RepeatDaySharedPreference;
+import com.wakemeski.pref.TimeSettingsSharedPreference;
 import com.wakemeski.ui.alarmclock.AlarmPreference;
 import com.wakemeski.ui.alarmclock.AlarmPreference.IRingtoneChangedListener;
 
@@ -65,36 +67,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private static final int TEST_ALARM_FIRE_ID = Menu.FIRST + 1;
 	private static final int TEST_SERVICE_FIRE_ID = Menu.FIRST + 2;
 
-	/**
-	 * Updates the alarm when preferences change.
-	 */
-	private void updateAlarm() {
-		if (mAlarmEnablePreference.isChecked()) {
-			AlarmCalculator calculator = new AlarmCalculator(mDayPreference
-					.getSharedPreference(), mWakeUpTimePreference
-					.getSharedPreference());
-			Calendar nextAlarm = calculator.getNextAlarm();
-			if (nextAlarm != null) {
-				if (mAlarmController.setAlarm(nextAlarm)) {
-					Toast toast = Toast.makeText(this, R.string.alarm_updated,
-							Toast.LENGTH_SHORT);
-					toast.show();
-				}
-			} else {
-				Log.d(TAG, "No days selected");
-				Toast toast = Toast.makeText(this, R.string.alarm_disabled,
-						Toast.LENGTH_SHORT);
-				toast.show();
-				mAlarmController.clearAlarm();
-			}
-		} else {
-			Log.d(TAG, "Alarm is not enabled");
-			Toast toast = Toast.makeText(this, R.string.alarm_disabled,
-					Toast.LENGTH_SHORT);
-			toast.show();
-			mAlarmController.clearAlarm();
-		}
-	}
 
 	private void updateToneSummary(Uri ringtoneUri) {
 		// this code doesn't work for some reason - I can't get the real name of
@@ -116,7 +88,60 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		updateAlarm();
+		
+		if (mAlarmEnablePreference.isChecked()) {
+			
+			RepeatDaySharedPreference dayPref = mDayPreference
+													.getSharedPreference();
+			TimeSettingsSharedPreference timePref=	mWakeUpTimePreference
+													.getSharedPreference();
+			
+			/**
+			 * I've found through testing that onSharedPreference() is fired multiple
+			 * times when preferences change and unfortunately in some cases at least
+			 * the second time the preferences value returned by .getSharedPreference()
+			 * returns a preference containing the previous values.
+			 * To work around this, check for keys with value REPEAT_DAYS_PREF_KEY or
+			 * ALARM_WAKEUP_TIME_PREF_KEY.  If we find this key, create a new 
+			 * preferences object with the value of the shared preference and use this
+			 * instead of the member.getSharedPreference() value.
+			 */
+			if(key.equals(REPEAT_DAYS_PREF_KEY) ||
+					key.equals(ALARM_WAKEUP_TIME_PREF_KEY)) {
+				String value = sharedPreferences.getString(key, "");
+				if(value.length() > 0) {
+					if (key.equals(REPEAT_DAYS_PREF_KEY)) {
+						dayPref = new RepeatDaySharedPreference();
+						dayPref.setFromPersistString(value);
+					} else if (key.equals(ALARM_WAKEUP_TIME_PREF_KEY)) {
+						timePref = new TimeSettingsSharedPreference(this.getApplicationContext());
+						timePref.setTimeFromPersistString(value);
+					}
+				}
+			} 
+			AlarmCalculator calculator = new AlarmCalculator(dayPref,timePref);
+			Calendar nextAlarm = calculator.getNextAlarm();
+			if (nextAlarm != null) {
+				if (mAlarmController.setAlarm(nextAlarm)) {
+					Toast toast = Toast.makeText(this, R.string.alarm_updated,
+							Toast.LENGTH_SHORT);
+					toast.show();
+				}
+			} else {
+				Log.d(TAG, "No days selected");
+				Toast toast = Toast.makeText(this, 
+						R.string.alarm_disabled_no_days_selected,
+						Toast.LENGTH_SHORT);
+				toast.show();
+				mAlarmController.clearAlarm();
+			}
+		} else {
+			Log.d(TAG, "Alarm is not enabled");
+			Toast toast = Toast.makeText(this, R.string.alarm_disabled,
+					Toast.LENGTH_SHORT);
+			toast.show();
+			mAlarmController.clearAlarm();
+		}
 	}
 
 	@Override
