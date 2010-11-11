@@ -96,6 +96,10 @@ public class WakeMeSkiService extends Service {
 				}
 			});
 		}
+		
+		public void onBusy(boolean busy) {
+			
+		}
 	};
 	
 	/**

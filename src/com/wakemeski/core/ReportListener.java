@@ -11,4 +11,11 @@ public interface ReportListener {
 	 * when the loading is completed
 	 */
 	void onLoading(boolean started);
+	
+	/**
+	 * Called when the report controller is busy with an action
+	 * or when the busy state clears for the controller
+	 * @param isBusy true when the controller is busy with an action
+	 */
+	void onBusy(boolean isBusy);
 }

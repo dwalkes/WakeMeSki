@@ -15,8 +15,10 @@
  */
 package com.wakemeski.core;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -52,6 +54,7 @@ public class ReportController implements Runnable {
 	private boolean mBusy;
 	private Context mContext;
 	private ResortManager mResortManager;
+	private int mResortCount = 0;
 
 	private ReportController(Context c, ResortManager rm) {
 		mContext = c;
@@ -79,12 +82,23 @@ public class ReportController implements Runnable {
 		while (true) {
 			try {
 				Action a = mActions.take();
+
 				mBusy = true;
+				synchronized (mListeners) {
+					for(ReportListener rl: mListeners) {					
+						rl.onBusy(mBusy);
+					}
+				}
 				a.run();
 			} catch (Exception e) {
 				Log.e(TAG, "error performing action", e);
 			}
 			mBusy = false;
+			synchronized (mListeners) {
+				for(ReportListener rl: mListeners) {					
+					rl.onBusy(mBusy);
+				}
+			}
 		}
 	}
 
@@ -109,6 +123,15 @@ public class ReportController implements Runnable {
 				loadReports();
 			return r;
 		}
+	}
+	
+	/**
+	 * @return The number of resorts currently managed by the controller,
+	 * including resorts which have been added or specified for load but with loads
+	 * not yet complete
+	 */
+	public int getNumberOfResorts() {
+		return mResortCount;
 	}
 
 	/**
@@ -170,12 +193,13 @@ public class ReportController implements Runnable {
 
 		@Override
 		public void run() {
+			mResortCount++;
 			Context c = ReportController.this.mContext;
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			WakeMeSkiServer srv = new WakeMeSkiServer(mContext);
-			Report r = Report.loadReport(c, cm, resort, srv);			
+			Report r = Report.loadReport(c, cm, resort, srv);
 			synchronized (mListeners) {
 				mReports.put(resort, r);
 				for(ReportListener rl: mListeners) {					
@@ -193,6 +217,7 @@ public class ReportController implements Runnable {
 
 		@Override
 		public void run() {			
+			mResortCount--;
 			synchronized (mListeners) {
 				Report removed = mReports.remove(r);
 				for(ReportListener l: mListeners) {
@@ -203,17 +228,44 @@ public class ReportController implements Runnable {
 	}
 
 	class LoadResortsAction extends Action {
-		Resort resorts[];
+		Resort[] resorts;
 
 		LoadResortsAction(Resort r[]) {
 			resorts = r;
 		}
 		@Override
 		void run() {
+			/*
+			 * The total number of resorts will match the number passed
+			 * into the LoadResortsAction()
+			 */
+			mResortCount = resorts.length;
+			
 			Context c = ReportController.this.mContext;
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+			/*
+			 * We might have a different list now than we did previously.
+			 * Remove any resorts in mReports that are not in the new resort array
+			 */
+			Set<Resort> removedResorts = new HashSet<Resort>(mReports.keySet());
+			removedResorts.removeAll(Arrays.asList(resorts));
+			
+			/*
+			 * Notify listners of removed resorts
+			 */
+			for(Resort res: removedResorts) {
+				Report r = mReports.get(res);
+				synchronized (mListeners) {
+					mReports.remove(res);
+					for(ReportListener l: mListeners)
+						l.onRemoved(r);
+				}	
+			}
+
+
+			
 			synchronized (mListeners) {
 				for(ReportListener l: mListeners)
 					l.onLoading(true);
@@ -224,6 +276,7 @@ public class ReportController implements Runnable {
 				Report r = Report.loadReport(c, cm, res, server);				
 				synchronized (mListeners) {
 					mReports.put(res, r);
+					mResortCount = mReports.size();
 					for(ReportListener l: mListeners)
 						l.onAdded(r);
 				}				

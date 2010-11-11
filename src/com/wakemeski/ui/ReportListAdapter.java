@@ -46,15 +46,18 @@ public class ReportListAdapter implements ListAdapter {
 	private DataSetObservable mDataSetObservable = new DataSetObservable();
 
 	private LayoutInflater mInflater;
+	
+	private ReportController mReportController;
 
 	public ReportListAdapter(Context c) {
 		mInflater = (LayoutInflater) c
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+		mReportController = WakeMeSkiFactory.getInstance(c).getReportController();
+
 		synchronized (mReports) {
-			ReportController reportController = WakeMeSkiFactory.getInstance(c).getReportController();
-			reportController.addListener(mListener);
-			Report reports[] = reportController.getLoadedReports();
+			mReportController.addListener(mListener);
+			Report reports[] = mReportController.getLoadedReports();
 			for(Report r: reports)
 				mReports.add(r);
 		}
@@ -76,8 +79,15 @@ public class ReportListAdapter implements ListAdapter {
 		// If size = 0 and we aren't loading, then no resorts have been
 		// configured by the user. We want to return a single item telling
 		// them to add a resort.
-		if( mLoading || (size ==0 && !mLoading) )
+		if( size < mReportController.getNumberOfResorts()
+				|| (size ==0 && !mLoading) ) {
+			/* 
+			 * If we're still loading reports or
+			 * we're done and we've got an empty list, increase the size by 1 to
+			 * include a single list item with status.
+			 */
 			size++;
+		}
 		return size;
 	}
 
@@ -123,10 +133,12 @@ public class ReportListAdapter implements ListAdapter {
 			iv.setImageResource(r.getWeatherIconResId());
 		}
 		else {
-			if( mLoading )
+			if( mReports.size() < mReportController.getNumberOfResorts() ) {
 				tv.setText(R.string.loading);
-			else
+			}
+			else if ( mReports.size() == 0 ) {
 				tv.setText(R.string.no_resorts_configured);
+			} 
 		}
 
 		return v;
@@ -206,6 +218,11 @@ public class ReportListAdapter implements ListAdapter {
 					mDataSetObservable.notifyChanged();
 				}
 			});
+		}
+		
+		@Override
+		public void onBusy( boolean busy ) {
+			
 		}
 	};
 }

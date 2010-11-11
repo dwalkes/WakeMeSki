@@ -20,14 +20,22 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+                  <!-- Use finishOnTaskLaunch to keep the alarm
+                  		from re-appearing after opening dashboard, then 
+                  		returning to the task.-->
         <activity android:name=".ui.alarmclock.AlarmAlert"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name"
+                  android:finishOnTaskLaunch="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+                          <!-- Use finishOnTaskLaunch to keep the alarm
+                  		from re-appearing after opening dashboard, then 
+                  		returning to the task.-->
         <activity android:name=".ui.alarmclock.AlarmAlertFullScreen"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name"
+                  android:finishOnTaskLaunch="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

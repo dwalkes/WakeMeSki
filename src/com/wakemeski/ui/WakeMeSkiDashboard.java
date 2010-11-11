@@ -96,6 +96,9 @@ public class WakeMeSkiDashboard extends Activity {
 		super.onResume();		
 
 		mReportController.addListener(mReportListener);
+		if( mReportController.isBusy() ) {
+			setProgressBarIndeterminateVisibility(true);
+		}
 	}
 
 	@Override
@@ -103,6 +106,19 @@ public class WakeMeSkiDashboard extends Activity {
 		super.onPause();
 
 		mReportController.removeListener(mReportListener);
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		boolean result = super.onPrepareOptionsMenu(menu);
+		MenuItem refresh = menu.findItem(REFRESH_ID);
+		if( refresh != null ) {
+			/*
+			 * Don't allow refresh while the report controller is busy with another request.
+			 */
+			refresh.setEnabled(!mReportController.isBusy());
+		}
+		return result;
 	}
 
 	@Override
@@ -175,9 +191,12 @@ public class WakeMeSkiDashboard extends Activity {
 
 		@Override
 		public void onLoading(final boolean started) {
+		}
+		
+		public void onBusy(final boolean isBusy) {
 			h.post(new Runnable() {
 				public void run() {
-					setProgressBarIndeterminateVisibility(started);
+					setProgressBarIndeterminateVisibility(isBusy);
 				}
 			});	
 		}
