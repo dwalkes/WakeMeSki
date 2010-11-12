@@ -25,25 +25,36 @@
 	android:layout_height="50dip"
 	android:layout_width="fill_parent"
 	>
+	        <!--  Attempt to match the pixel width of the icon -->
+
+			<View
+			android:layout_height="fill_parent"
+			android:layout_width="37px"></View>
+
+	        <!--  Fill container with layout_weight=1 -->
+
 	        <TextView
 	        android:layout_height="fill_parent"
 	        android:layout_width="wrap_content"
-	        android:text="@string/resort_name"
-	        android:layout_weight="70"
+	        android:text="@string/resort_title"
+	        android:layout_weight="1"
 	        android:textColor="#FF000000"
 	        android:textStyle="bold"
 	        android:textSize="15sp"
 	        android:gravity="center">
 	        </TextView>
+	        
+	        <!--  Align with snow total by using 75 dip width (1.5 times height) -->
+	        
 	        <TextView
 	        android:layout_height="fill_parent"
-	       	android:layout_width="wrap_content"
+	       	android:layout_width="75dip"
 	        android:text="@string/fresh_snow"
-	        android:layout_weight="30"
 	        android:textColor="#FF000000"
 	        android:textSize="15sp"
 	        android:textStyle="bold"
-	        android:gravity="center">
+	        android:gravity="center"
+	        android:paddingRight="3dip">
 	        </TextView>
 	</LinearLayout>
     <ImageView

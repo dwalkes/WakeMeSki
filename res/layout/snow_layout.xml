@@ -11,22 +11,25 @@
 		android:id="@+id/snow_layout_icon" 
 		android:layout_height="fill_parent"
 		android:layout_width="wrap_content" 
-		android:gravity="center" />
+		android:gravity="center"
+		android:paddingLeft="5px" />
 
+		<!--  Use available space left in container -->
 	<TextView
 		android:id="@+id/resort_name"
 		android:layout_height="fill_parent"
 		android:layout_width="0dp"
-		android:layout_weight="70"
+		android:layout_weight="1"
 		android:textStyle="bold"
 		android:textColor="#FF000000"
 		android:gravity="center" />
 
+		<!--  Set to 75 dip (1.5 times height) -->
+
 	<TextView
 		android:id="@+id/snow_value"
 		android:layout_height="fill_parent"
-		android:layout_width="0dp"
-		android:layout_weight="30"
+		android:layout_width="75dip"
 		android:textStyle="bold"
 		android:textColor="#FF000000"
 		android:gravity="center" />

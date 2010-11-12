@@ -39,6 +39,7 @@
 <string name="alarm_disabled_no_days_selected">Please select at least one Wake-up day to enable the alarm.</string>
 <string name="resort_list_title">WakeMeSki Selected Resorts</string>
 <string name="wakeup">Wake Up</string>
+<string name="resort_title">Resort</string>
 <string name="resort_name">Resort Name</string>
 <string name="set_preferences">Set Preferences</string>
 <string name="wakemeski_report">WakeMeSki Report</string>
