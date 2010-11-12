@@ -34,28 +34,50 @@ public class AlarmCalculator {
 
 	/**
 	 * @return a calendar object representing the next time the alarm should
-	 *         fire, or null if no day is selected for the next alarm
+	 *         fire, given a timeNow calendar object representing the current time
 	 */
-	public Calendar getNextAlarm() {
+	public Calendar getNextAlarm( Calendar timeNow ) {
+		Calendar nextAlarm = timeNow;
 		if (mDaySelect == null || mTimeSelect == null) {
 			return null;
 		}
 		int setHour = mTimeSelect.getCurrentHour();
 		int setMinute = mTimeSelect.getCurrentMinute();
 
-		// start with the time now
-		Calendar nextAlarm = Calendar.getInstance();
 		nextAlarm.set(Calendar.SECOND, 0);
-		// never set less than 1 minutes ahead - always go to the next day in
-		// this case
-		nextAlarm.add(Calendar.MINUTE, 1);
-		if (nextAlarm.get(Calendar.HOUR_OF_DAY) <= setHour
-				&& nextAlarm.get(Calendar.MINUTE) < setMinute
+		/*
+		 *  never set less than 2 minutes ahead - always go to the next day in
+		 *  this case.  Otherwise it would be possible for the second value to 
+		 *  roll from 59 to 00 and increment the minute value immediately after
+		 *  we obtained the time, meaning we would set an alarm for a time before
+		 *  the current time. This gives us a in the worst case a full minute
+		 *  to go from the .getInstance() call on calendar to the time we actually
+		 *  set the alarm to ensure we haven't already passed the time for the new alarm.
+		 */
+		nextAlarm.add(Calendar.MINUTE, 2);
+				/*
+				 * If the alarm hour is greater than the current hour of day,
+				 * we will consider setting the alarm today
+				 */
+		if (	nextAlarm.get(Calendar.HOUR_OF_DAY) < setHour ||
+				/*
+				 * If the alarm time specifies the same hour, compare minutes to
+				 * decide if we should set today or another day
+				 */
+				(nextAlarm.get(Calendar.HOUR_OF_DAY) == setHour && 
+						nextAlarm.get(Calendar.MINUTE) < setMinute)
+					
+					/*
+					 * If today is one of the days selected for wakeup we might
+					 * leave day of week at current value.
+					 */
 				&& mDaySelect
 						.isDaySelected(nextAlarm.get(Calendar.DAY_OF_WEEK))) {
-			// leave day of week at current value
 		} else {
-			// go to the next selected day of week
+			/*
+			 * One of the tests above failed, we need to go to a new day.
+			 * Find the next one in the day select preference.
+			 */
 			int i = 0;
 			for (; i < 7; i++) {
 				nextAlarm.add(Calendar.DAY_OF_MONTH, 1);
@@ -81,6 +103,16 @@ public class AlarmCalculator {
 			nextAlarm.set(Calendar.MINUTE, setMinute);
 		}
 		return nextAlarm;
+
+	}
+	
+	/**
+	 * @return a calendar object representing the next time the alarm should
+	 *         fire, or null if no day is selected for the next alarm
+	 */
+	public Calendar getNextAlarm() {
+
+		return getNextAlarm(Calendar.getInstance());
 	}
 
 }

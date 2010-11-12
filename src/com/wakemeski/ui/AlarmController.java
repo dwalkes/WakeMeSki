@@ -18,6 +18,7 @@
 package com.wakemeski.ui;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.AlarmManager;
 import android.app.KeyguardManager;
@@ -74,6 +75,7 @@ public class AlarmController {
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		if (mgr != null) {
+			Log.d(TAG,"Setting alarm for time " + new Date(timeInMilliseconds));
 			mgr.set(AlarmManager.RTC_WAKEUP, timeInMilliseconds,
 					getPendingIntent());
 			success = true;
@@ -91,7 +93,6 @@ public class AlarmController {
 	 * @return true if the alarm was set successfully
 	 */
 	public boolean setAlarm(Calendar nextAlarm) {
-		Log.i(TAG, "Setting alarm for " + nextAlarm);
 		return setAlarm(nextAlarm.getTimeInMillis());
 	}
 
