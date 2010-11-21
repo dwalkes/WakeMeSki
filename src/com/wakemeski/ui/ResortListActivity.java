@@ -201,6 +201,18 @@ public class ResortListActivity extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 		update();
+		/**
+		 * See issue 23 - add "press to add resort" view below the
+		 * list adapter rather than requiring use of the menu key.
+		 */
+		View pressToAdd = this.findViewById(R.id.press_to_add_resort);
+		pressToAdd.setOnClickListener( new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				launchFinder();
+			}
+		});
+
 	}
 
 	protected void onListItemClick(ListView l, View v, int position, long id) {

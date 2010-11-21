@@ -5,6 +5,15 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 android:orientation="vertical"
 android:layout_height="fill_parent"
 android:layout_width="fill_parent">
+  <!--  Add a View which the user can
+  	press to add a resort (in case they don't think to try the menu key -->
+<Button
+	android:id="@+id/press_to_add_resort"
+	android:text="@string/add_location"
+	android:layout_height="50dip"
+	android:layout_width="fill_parent"
+	android:textStyle="bold"
+	android:gravity="center" />    
 	<RelativeLayout
 	android:orientation="horizontal"
 	android:layout_height="wrap_content"
@@ -49,9 +58,10 @@ android:layout_width="fill_parent">
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     ></ImageView>	
+
 <ListView
   android:id="@android:id/list"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:drawSelectorOnTop="false"/>
- </LinearLayout>
+</LinearLayout>
