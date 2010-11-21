@@ -141,7 +141,10 @@ public class WakeMeSkiDashboard extends Activity {
 			startActivity(i);
 			return true;
 		} else if (item.getItemId() == REFRESH_ID) {
-			mReportController.loadReports();
+			/*
+			 * Start the report load as a background process
+			 */
+			mReportController.loadReports(true);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

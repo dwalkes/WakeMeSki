@@ -57,7 +57,10 @@ public class ReportListAdapter implements ListAdapter {
 
 		synchronized (mReports) {
 			mReportController.addListener(mListener);
-			Report reports[] = mReportController.getLoadedReports();
+			/**
+			 * Get the reports or start the report controller load as a background process
+			 */
+			Report reports[] = mReportController.getLoadedReports(true);
 			for(Report r: reports)
 				mReports.add(r);
 		}

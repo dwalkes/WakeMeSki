@@ -85,4 +85,7 @@
     <string name="eula_refuse">Don\'t Accept</string>
     <!-- Alarm dialog strings -->
     <string name="ski_wake_up">WakeMeSki Wake Up!</string>
+    <!-- Service notification strings -->
+    <string name="wakemeski_update">WakeMeSki update</string>
+    <string name="checking_notify_text">Checking snow totals</string>
 </resources>

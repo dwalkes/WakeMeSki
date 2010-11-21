@@ -17,7 +17,10 @@
 package com.wakemeski.core;
 
 import java.util.Calendar;
+import java.util.Date;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +30,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.wakemeski.WakeMeSki;
 import com.wakemeski.pref.RepeatDaySharedPreference;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.pref.TimeSettingsSharedPreference;
@@ -50,13 +54,15 @@ public class WakeMeSkiService extends Service {
 	public static final String ACTION_WAKE_CHECK = "com.wakemeski.core.ACTION_WAKE_CHECK";
 	public static final String ACTION_ALARM_SCHEDULE = "com.wakemeski.core.ACTION_ALARM_SCHEDULE";
 	public static final String ACTION_SHUTDOWN = "com.wakemeski.core.ACTION_SHUTDOWN";
+	public static final String EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME ="com.wakemeski.core.BCAST_RECEIVER_TIME_EXTRA";
 
 	private SnowSettingsSharedPreference	mSnowSettings = null;
 	private SharedPreferences			 	mSharedPreferences = null;
 	private AlarmController				 	mAlarmController=null;
 	private ReportController				mReportController;
 	private boolean							mAlarmFired=false;
-	private int 							mActiveStartId;
+	private ForegroundServiceCompat			mForegroundService;
+	private static final int				NOTIFY_CHECK_STATUS_ID=1;
 
 	/**
 	 * Handle events in the service thread
@@ -108,6 +114,7 @@ public class WakeMeSkiService extends Service {
 	 * @param r The report added to the list of reports
 	 */
 	private void onReportAdded(Report r) {
+		Log.d(TAG, "Report added " + r);
 		if( r.getResort().isWakeupEnabled() ) {
 			if (r.meetsPreference(getSnowSettings())) {
 				Log.i(TAG, "Resort " + r.getResort() + " met preference "
@@ -145,6 +152,7 @@ public class WakeMeSkiService extends Service {
 	 */
 	private void onReportLoading(final boolean started) {
 		if( started == true ) {
+			Log.d(TAG, "Report load started");
 			/**
 			 * Force a reload of snow settings when the report loading starts
 			 */
@@ -162,8 +170,8 @@ public class WakeMeSkiService extends Service {
 			mReportController.removeListener(mReportListener);
 			
 			if( !mAlarmFired ) {
-				Log.d(TAG, "Alarm did not fire, stopping service and removing wake lock");
-				stopSelf(mActiveStartId);
+				Log.d(TAG, "Alarm did not fire, stopping service");
+				stopSelf();
 			}
 			/**
 			 * Else if the alarm fired the Alarm class will shutdown the service when it
@@ -171,6 +179,10 @@ public class WakeMeSkiService extends Service {
 			 * lock acquire on the alarm application and shutdown of the service.
 			 */
 
+			/*
+			 * Remove foreground notification if present
+			 */
+			mForegroundService.stopForegroundCompat(NOTIFY_CHECK_STATUS_ID);
 		}
 	}
 	
@@ -210,22 +222,32 @@ public class WakeMeSkiService extends Service {
 		
 	@Override
 	public void onCreate() {
+		Log.d(TAG, "onCreate");
 		Context c = this.getApplicationContext();
 		// Maintain a lock during the checking of the alarm. This lock may have
 		// already been acquired in AlarmReceiver. If the process was killed,
 		// the global wake lock is gone. Acquire again just to be sure.
 		AlarmAlertWakeLock.acquireCpuWakeLock(c);
-		super.onCreate();
 		mReportController = WakeMeSkiFactory.getInstance(c).getReportController();
+		mForegroundService = new ForegroundServiceCompat(this);
+
+		super.onCreate();
 	}
+	
 
 	@Override
 	public void onDestroy() {
+		Log.d(TAG, "onDestroy");
 		/**
 		 * Make sure our listener is removed before destroy.  Should be safe to call
 		 * even if the listener is not currently in the list
 		 */
 		mReportController.removeListener(mReportListener);
+		AlarmAlertWakeLock.release();
+		/*
+		 * Remove foreground notification
+		 */
+		mForegroundService.stopForegroundCompat(NOTIFY_CHECK_STATUS_ID);
 		super.onDestroy();
 	}
 	/**
@@ -234,14 +256,45 @@ public class WakeMeSkiService extends Service {
 	 * take care of handling the cases where an alarm action is or is not needed
 	 */
 	private void checkAlarmAction() {
+		
+		/**
+		 * I noticed problems shortly after the 2.0 release running in the background.
+		 * In an attempt to resolve I added setForeground() to make it less likely that the
+		 * process will be killed.  I figured out ultimately that the problem was 
+		 * the process priority in ReportController (THREAD_PRIORITY_BAKGROUND.)  Setting this
+		 * priority on the process when the service was the only thing running in the process
+		 * caused the process to be killed immediately in low memory conditions regardless of
+		 * foreground notifications.
+		 * I had this code implemented by the time I figured it out, so I figured it didn't
+		 * hurt to keep it in.  However if we ever suspect trouble with the foreground 
+		 * setting or associated notification we should be able to kill this code below.
+		 */
+		Notification notification = new Notification(android.R.drawable.stat_notify_sync_noanim,
+												getString(com.wakemeski.R.string.wakemeski_update),
+												System.currentTimeMillis());
+		
+		Intent notificationIntent = new Intent(this,WakeMeSki.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(getApplicationContext(), 
+									getString(com.wakemeski.R.string.wakemeski_update),
+									getString(com.wakemeski.R.string.checking_notify_text), 
+									contentIntent);
+		
+		mForegroundService.startForegroundCompat(NOTIFY_CHECK_STATUS_ID, notification);
+		
+												
 		/**
 		 * Add our listener here - note in the odd case where we've already added a listener
-		 * and have not removed it (two checks in a row occuring before first load completed) it should
+		 * and have not removed it (two checks in a row occurring before first load completed) it should
 		 * still be safe to call addListener - the second add will be a no-op and the listener will
 		 * be removed when the first loadReports() completes
 		 */
 		mReportController.addListener(mReportListener);
-		mReportController.loadReports();
+		/**
+		 * Must load reports with default (non background) priority.  See <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
+		 * issue 20</a>
+		 */
+		mReportController.loadReports(false);
 	}
 
 	/**
@@ -289,63 +342,142 @@ public class WakeMeSkiService extends Service {
 		}
 	}
 
-	public void onHandleIntent(Intent intent, int startId) {
-		boolean releaseWakeLock = true;
+	/**
+	 * With API 5 and higher onStartCommand() is used to start the service.
+	 * We have the option to re-deliver an intent (with START_REDELIVER_INTENT) if
+	 * our service is killed when processing.  The problem with doing this indefinitely
+	 * would be if we can't run for 2 hours, then finally can run and this means we fire
+	 * the alarm 2 hours after we were supposed to (during a movie, church, etc.)
+	 * This function checks to make sure the intent we are looking at was created by the
+	 * broadcast receiver within a reasonable time that it's still worth trying to do something
+	 * about.  For now this threshold is hard coded to 5 minutes.
+	 * @param intent to check
+	 * @return true if this intent is stale
+	 */
+	boolean isStaleIntent( Intent intent ) {
+		boolean isStale = false;
+		
+		if( intent != null && intent.hasExtra(EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME) ) {
+			long bcReceiverTime = intent.getExtras().getLong(EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME);
+			if( bcReceiverTime != 0 ) {
+				Calendar bcReceiverCalPlus5Minutes = Calendar.getInstance();
+				bcReceiverCalPlus5Minutes.setTimeInMillis(bcReceiverTime);
+				/**
+				 * Consider the intent stale if it's currently 
+				 * greater than 5 minutes after the intent was created
+				 */
+				bcReceiverCalPlus5Minutes.add(Calendar.MINUTE, 5);
+				Calendar now = Calendar.getInstance();
+				isStale = now.after(bcReceiverCalPlus5Minutes);
+				Log.d(TAG, "isStaleIntent " + isStale + " now= " + new Date(now.getTimeInMillis()) +
+						" bcReceiverCalPlus5Minutes= " + new Date(bcReceiverCalPlus5Minutes.getTimeInMillis()));
+			}
+		}
+		return isStale;
+	}
+	
+	/**
+	 * Handles the intent from onStart or onStartCommand originally sent by a broadcast
+	 * reciever to do some background action.
+	 * @param intent to handle
+	 * @param startId ID of this started service instance
+	 * @return Value to return from onStartCommand for API level 5 and
+	 * above, determining whether a kill of this process requests a re-start
+	 * with the same intent or not to bother anymore.
+	 * 
+	 */
+	private int onHandleIntent(Intent intent, int startId) {
 		boolean stopService = true;
-		String 	currentAction;
-		currentAction = intent.getAction();
-
-		/**
-		 * Save the most recent start ID in case we need to stop the service
-		 * after the report loading completes
+		String 	currentAction = null;
+		boolean staleIntent = false;
+		/*
+		 * By default don't try to fire this intent again if we are killed after
+		 * onStart()
 		 */
-		mActiveStartId = startId;
+		int startedState = START_NOT_STICKY;
+
+			
+		if( intent != null ) {
+			currentAction = intent.getAction();
+		}
 		
 		if (currentAction == null) {
-			Log.e(TAG, "Error - null intent action passed");
+			Log.w(TAG, "onHandleIntent with null intent or action");
 		}
-		else if (currentAction.equals(ACTION_WAKE_CHECK)) {
-			checkAlarmAction();
-			/*
-			 * We will release wake lock when check completes
-			 */
-			releaseWakeLock = false;
-			/*
-			 * Don't stop the service, we will stop it after resorts are checked
-			 */
-			stopService = false;
-
-
-		} else if (currentAction.equals(ACTION_ALARM_SCHEDULE)) {
-			// alarm will be scheduled below
-		} else if (currentAction.equals(OnAlarmReceiver.ACTION_SNOOZE)) {
-			getAlarmController().fireAlarm();
-			// we will release wake lock in the alarm controller
-			releaseWakeLock = false;
-		}
+		else {
+			
+			staleIntent = isStaleIntent(intent);
+			
+			if (currentAction.equals(ACTION_WAKE_CHECK)) {
+				if( !staleIntent ) {
+					Log.d(TAG,"Starting new wake check");
+					checkAlarmAction();
+					/*
+					 * Don't stop the service, we will stop it after resorts are checked
+					 */
+					stopService = false;
+					/*
+					 * If for some reason we are killed before we complete processing,
+					 * re-start with the same intent.  We will figure out if it's
+					 * stale above.
+					 */
+					startedState = START_REDELIVER_INTENT;
+				} else {
+					Log.w(TAG,"Stale intent received with ACTION_WAKE_CHECK, ignoring");
+				}
+			} else if (currentAction.equals(ACTION_ALARM_SCHEDULE)) {
+				// alarm will be scheduled below, even on stale intents
+			} else if (currentAction.equals(OnAlarmReceiver.ACTION_SNOOZE)) {
+				if( !staleIntent ) {
+					getAlarmController().fireAlarm();
+					// we will release wake lock in the alarm controller
+					stopService = false;
+					/*
+					 * Don't bother with redeliver intent in this case.  Since
+					 * there's no background processing happening it shouldn't be an issue.
+					 */
+				} else {
+					Log.w(TAG,"Stale intent received with ACTION_SNOOZE, ignoring");
+				}
+			} else {
+				Log.d(TAG,"Unhandled action ");
+			}
 		
+		}
 		/*
 		 * We always need to schedule the next alarm after a check or snooze event
 		 * Otherwise we won't get a new wakeup on the next configured check day
 		 */
 		scheduleNextAlarm();
 		
-		if (releaseWakeLock) {
-			AlarmAlertWakeLock.release();
+		if (stopService) {
+			stopSelf(startId);
 		}
 		
-		if(stopService) {
-			stopSelfResult(startId);
-		}
+		return startedState;
 	}
 
+	/**
+	 * Start method for 2.0 and above
+	 */
 	@Override
-	public void onStart( final Intent intent, final int startId ) {
-		h.post(new Runnable() {
-			public void run() {
-				onHandleIntent(intent,startId);
-			}
-		});
+	public int onStartCommand(final Intent intent, int flags, final int startId) {
+		Log.d(TAG, "onStartCommand");
+		int startedState;
+		startedState = onHandleIntent(intent,startId);
+		return startedState;
+
 	}
 	
+	/**
+	 * Start method for 1.6 and below
+	 */
+	@Override
+	public void onStart( final Intent intent, final int startId ) {
+		Log.d(TAG, "onStart");
+		onHandleIntent(intent,startId);
+	}
+	
+
+
 }

@@ -24,8 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.os.Process;
 import android.util.Log;
+import android.os.Process;
 
 /**
  * Starts a long running thread that will check for updates to resorts and get
@@ -60,7 +60,7 @@ public class ReportController implements Runnable {
 		mContext = c;
 		mThread = new Thread(this);
 		mThread.start();
-		mResortManager = rm;		
+		mResortManager = rm;	
 	}
 	
 	
@@ -76,9 +76,10 @@ public class ReportController implements Runnable {
 		return inst;
 	}
 
+
+	
 	@Override
 	public void run() {
-		Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 		while (true) {
 			try {
 				Action a = mActions.take();
@@ -106,21 +107,45 @@ public class ReportController implements Runnable {
         return mBusy;
     }
 
-	public void loadReports() {
-		Action a = new LoadResortsAction(mResortManager.getResorts());
+	/**
+	 * Load all configured reports in the ReportController thread
+	 * 
+	 * Previously the default was to always set the ReportController thread as
+	 * a background thread.  I found out when testing 
+	 * (see <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
+	 * issue 20</a>) that this does not work in low memory conditions when 
+	 * the service is the only thing running in the process.  Therefore
+	 * the service needs to make sure the ReportController is not a a background
+	 * thread before starting resort loading.  
+	 * 
+	 * Once the UI thread is started it's 
+	 * fine to set isBackground = true to maximize responsiveness.
+	 * 
+	 * @param isBackground true when the report controller can be run as a background
+	 * thread.  False when it should be run as the primary thread for the application
+	 */
+	public void loadReports( boolean isBackground ) {
+		Action a = new LoadResortsAction(mResortManager.getResorts(),isBackground);
 		mActions.add(a);
 	}
 
 	/**
-	 * Returns the reports we have loaded (cached)
+	 * Returns the reports we have loaded (cached) or starts a report load
+	 * as a background process if we have not yet loaded any reports.
+	 * This method is only designed to be called by UI components as it will loa
+	 * @param isBackground If set and no reports have been loaded yet, will load reports
+	 * as a background process.  Only safe to set this from a UI component and not a 
+	 * WakeMeSkiService.  See <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
+	 * issue 20</a>
 	 * @return
 	 */
-	public Report[] getLoadedReports() {
+	public Report[] getLoadedReports( boolean isBackground ) {
 		synchronized (mListeners) {
 			Report r[] = mReports.values().toArray(new Report[mReports.size()]);
 			//check if there are no cached reports and reload
-			if( r.length == 0 )
-				loadReports();
+			if( r.length == 0 ) {
+				loadReports(isBackground);
+			}
 			return r;
 		}
 	}
@@ -229,12 +254,26 @@ public class ReportController implements Runnable {
 
 	class LoadResortsAction extends Action {
 		Resort[] resorts;
+		boolean mIsBackground;
 
-		LoadResortsAction(Resort r[]) {
+		LoadResortsAction(Resort r[], boolean isBackground ) {
 			resorts = r;
+			mIsBackground = isBackground;
 		}
 		@Override
 		void run() {
+			
+			/**
+			 * See <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
+			 * issue 20</a>
+			 */
+			if( mIsBackground ) {
+				Log.d(TAG, "Setting thread background priority");
+				Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+			} else {
+				Log.d(TAG, "Setting thread default priority");
+				Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);	
+			}
 			/*
 			 * The total number of resorts will match the number passed
 			 * into the LoadResortsAction()
@@ -288,4 +327,5 @@ public class ReportController implements Runnable {
 			}
 		}
 	}
+	
 }

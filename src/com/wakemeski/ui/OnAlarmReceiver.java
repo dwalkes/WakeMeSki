@@ -41,13 +41,19 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 		if (intent.getAction() != null) {
 			if (intent.getAction().equals(ACTION_SNOOZE)) {
 				AlarmAlertWakeLock.acquireCpuWakeLock(context);
-				context.startService(new Intent(ACTION_SNOOZE, null, context,
-						WakeMeSkiService.class));
+				Intent i = new Intent(ACTION_SNOOZE, null, context,
+						WakeMeSkiService.class);
+				i.putExtra(WakeMeSkiService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
+						System.currentTimeMillis());
+				context.startService(i);
 			} else if (intent.getAction().equals(ACTION_WAKE_CHECK)) {
 				AlarmAlertWakeLock.acquireCpuWakeLock(context);
-				context.startService(new Intent(
+				Intent i = new Intent(
 						WakeMeSkiService.ACTION_WAKE_CHECK, null, context,
-						WakeMeSkiService.class));
+						WakeMeSkiService.class);
+				i.putExtra(WakeMeSkiService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
+						System.currentTimeMillis());
+				context.startService(i);
 			} else {
 				Log.w(TAG, "Unknown wake action " + intent.getAction());
 			}
