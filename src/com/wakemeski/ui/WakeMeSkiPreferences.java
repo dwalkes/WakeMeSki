@@ -89,7 +89,16 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
-		if (mAlarmEnablePreference.isChecked()) {
+		boolean alarmEnabled = mAlarmEnablePreference.isChecked();
+		/**
+		 * If the enable key was the key changed, get the latest value
+		 * from the passed object.
+		 */
+		if( key.equals(ALARM_ENABLE_PREF_KEY) ) {
+			alarmEnabled = sharedPreferences.getBoolean(key, false);
+		}
+		
+		if ( alarmEnabled ) {
 			
 			RepeatDaySharedPreference dayPref = mDayPreference
 													.getSharedPreference();
