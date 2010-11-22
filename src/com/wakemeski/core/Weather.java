@@ -15,6 +15,9 @@
  */
 package com.wakemeski.core;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -25,15 +28,29 @@ import android.os.Parcelable;
 public class Weather implements Parcelable {
 	
 	private String mWhen;
+	private long mExact;
 	private String mDesc;
 
-	public Weather(String when, String desc) {
+	public Weather(String when, long exact, String desc) {
 		mWhen = when;
+		mExact = exact;
 		mDesc = desc;
 	}
-	
+
+	//TODO: make this a configurable threshold
+	public boolean hasSnowAlert() {
+		Pattern p = Pattern.compile("snow accumulation of (\\d+) to (\\d+)");
+		Matcher m = p.matcher(mDesc);
+		
+		return m.find();
+	}
+
 	public String getWhen() {
 		return mWhen;
+	}
+
+	public long getExact() {
+		return mExact;
 	}
 	
 	public String getDesc() {
@@ -44,9 +61,10 @@ public class Weather implements Parcelable {
 		@Override
 		public Weather createFromParcel(Parcel source) {
 			String when = source.readString();
+			long   exact = source.readLong();
 			String desc = source.readString();
 
-			return new Weather(when, desc);
+			return new Weather(when, exact, desc);
 		}
 		
 		@Override
@@ -63,6 +81,7 @@ public class Weather implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(mWhen);
+		dest.writeLong(mExact);
 		dest.writeString(mDesc);
 	}
 }

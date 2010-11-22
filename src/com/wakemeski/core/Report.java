@@ -427,6 +427,14 @@ public class Report implements Parcelable {
 		return _weather.toArray(new Weather[_weather.size()]);
 	}
 
+	public boolean hasSnowAlert() {
+		for( Weather w: _weather ) {
+			if(w.hasSnowAlert())
+				return true;
+		}
+		return false;
+	}
+
 	public String getWeatherIcon() {
 		return _weatherIcon;
 	}
@@ -588,6 +596,7 @@ public class Report implements Parcelable {
 		}
 
 		String when[] = new String[3];
+		long whenExact[] = new long[3];
 		String desc[] = new String[3];
 		for (String line : lines) {
 			String parts[] = line.split("=", 2);
@@ -624,6 +633,11 @@ public class Report implements Parcelable {
 					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
 					if(idx < when.length) {
 						when[idx] = parts[1];
+					}
+				} else if( parts[0].startsWith("weather.forecast.when-exact.")) {
+					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
+					if(idx < when.length) {
+						whenExact[idx] = Long.parseLong(parts[1]);
 					}
 				} else if( parts[0].startsWith("weather.forecast.desc.")) {
 					int idx = Integer.parseInt(parts[0].substring(parts[0].length()-1));
@@ -680,7 +694,7 @@ public class Report implements Parcelable {
 		for( int i = 0; i < when.length && i < desc.length ; i++ ) {
 			if( when[i] != null && when[i].length() > 0 &&
 					desc[i] != null && desc[i].length() > 0 )
-				r._weather.add(new Weather(when[i], desc[i]));
+				r._weather.add(new Weather(when[i], whenExact[i], desc[i]));
 		}
 
 		r._serverInfo = server.getServerInfo();
