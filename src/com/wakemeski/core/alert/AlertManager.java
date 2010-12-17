@@ -15,21 +15,25 @@
  */
 package com.wakemeski.core.alert;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
+import com.wakemeski.R;
 import com.wakemeski.core.Location;
 import com.wakemeski.core.Report;
 import com.wakemeski.core.Weather;
-
-//TODO's:
-//add an aknowledged function that will mark all current alerts
-//add a function to see if there's any alerts not acknowedged(for the notification bar)
-//fix the query command when a resort no longer has alerts
+import com.wakemeski.ui.AlertsActivity;
 
 /**
  * Keeps track of snow alerts for a given resort. Each resort can have a list of
@@ -38,15 +42,20 @@ import com.wakemeski.core.Weather;
  */
 public class AlertManager {
 
-	private static final long SIX_HOURS = 6 * 60 * 60 * 1000;
+	public static final int NOTIFICATION_ID = R.drawable.snow;
 
+	private static final long SIX_HOURS = 6 * 60 * 60;
+
+	private Context mContext;
 	private SQLiteDatabase mDB;
 
 	private SQLiteStatement mInsertResort;
 	private SQLiteStatement mInsertAlert;
 	private SQLiteStatement mRemoveOld;
+	private SQLiteStatement mAckAll;
 
 	public AlertManager(Context c) {
+		mContext = c;
 		DBHelper h = new DBHelper(c);
 		mDB = h.getWritableDatabase();
 
@@ -54,6 +63,8 @@ public class AlertManager {
 				.compileStatement("INSERT INTO resorts (label,url) values (?, ?)");
 		mInsertAlert = mDB
 				.compileStatement("INSERT INTO alerts (time,desc,acked,resort) values (?, ?, ?, ?)");
+		mAckAll = mDB
+				.compileStatement("UPDATE alerts SET acked=1 WHERE acked=0");
 		mRemoveOld = mDB.compileStatement("DELETE FROM alerts WHERE time<?");
 	}
 
@@ -104,7 +115,7 @@ public class AlertManager {
 
 	public void addAlerts(Report r) {
 		for (Weather w : r.getWeather()) {
-//			if (w.hasSnowAlert()) {
+			if (w.hasSnowAlert()) {
 				long rid = getResortID(r.getResort().getLocation());
 
 				long wid = findAlert(w.getExact(), rid);
@@ -113,16 +124,14 @@ public class AlertManager {
 				else
 					updateAlert(wid, w);
 			}
-//		}
+		}
 	}
 
 	/**
 	 * Returns all the resorts that have alerts
 	 */
 	public Cursor getAlertResorts() {
-		//TODO this should only return resorts that have alerts
-		//Cursor c = mDB.query("view_resorts", null, null, null, null, null, null);
-		return mDB.query("resorts", null, null, null, null, null, "label");
+		return mDB.query("view_resorts", null, null, null, null, null, null);
 	}
 
 	public Cursor getAlerts(long resortId) {
@@ -132,12 +141,83 @@ public class AlertManager {
 		c.moveToFirst();
 		return c;
 	}
+
+	public void acknowledgeAlerts() {
+		mAckAll.execute();
+
+		String ns = Context.NOTIFICATION_SERVICE;
+		NotificationManager nm = (NotificationManager)mContext.getSystemService(ns);
+		nm.cancel(NOTIFICATION_ID);
+	}
+
 	/**
 	 * Removes any alerts that are over a certain age
 	 */
 	public void removeOld() {
-		mRemoveOld.bindLong(1, System.currentTimeMillis() - SIX_HOURS);
+		//the timestamps are in seconds since epoch
+		long thresh = (System.currentTimeMillis()/1000) - SIX_HOURS;
+		mRemoveOld.bindLong(1, thresh);
 		mRemoveOld.execute();
+	}
+
+	/**
+	 * Returns a list of resort IDs for each alert not yet acked
+	 */
+	private List<Long> getUnacknowledgedIds() {
+		List<Long> l = new ArrayList<Long>();
+		Cursor c = mDB.query("alerts", new String[]{"resort"}, "acked=0", null, null, null, null);
+		c.moveToFirst();
+		while( !c.isAfterLast() ) {
+			l.add(c.getLong(0));
+			c.moveToNext();
+		}
+		c.close();
+		return l;
+	}
+
+	private String getResortLabel(long id) {
+		String label = "";
+		Cursor c = mDB.query("resorts", new String[]{"label"}, "_id="+id, null, null, null, null);
+		if( c.getCount() == 1 && c.moveToFirst())
+			label = c.getString(0);
+		c.close();
+		return label;
+	}
+
+	/**
+	 * Creates an alert in the status bar. If there are more than one reports
+	 * with snow, it gives a summary of the number otherwise it displays the
+	 * name of the resort
+	 */
+	public void handleNotifications() {
+		List<Long>ids = getUnacknowledgedIds();
+
+		if( ids.size() <= 0 )
+			return;
+
+		int icon = R.drawable.snow;
+		CharSequence tickerTitle = mContext.getString(R.string.ticker_title);
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerTitle, when);
+
+		Intent i;
+		CharSequence tickerMsg;
+
+		if( ids.size() == 1) {
+			String resort = getResortLabel(ids.get(0));
+			tickerMsg = mContext.getString(R.string.ticker_msg, resort);
+		} else {
+			tickerMsg = mContext.getString(R.string.ticker_msg_multi, ids.size());
+		}
+		i = new Intent(mContext, AlertsActivity.class);
+
+		PendingIntent pi = PendingIntent.getActivity(mContext, 0, i, 0);
+		notification.setLatestEventInfo(mContext, tickerTitle, tickerMsg, pi);
+
+		String ns = Context.NOTIFICATION_SERVICE;
+		NotificationManager nm = (NotificationManager)mContext.getSystemService(ns);
+		nm.notify(NOTIFICATION_ID, notification);
 	}
 
 	private class DBHelper extends SQLiteOpenHelper {
@@ -146,8 +226,6 @@ public class AlertManager {
 
 		DBHelper(Context c) {
 			super(c, DB_NAME, null, DB_VERSION);
-
-//			onUpgrade(getWritableDatabase(), 1, 2);
 		}
 
 		@Override
@@ -158,14 +236,15 @@ public class AlertManager {
 					+ "time INTEGER, " + "desc TEXT, " + "acked INTEGER, " + "resort INTEGER,"
 					+ "FOREIGN KEY(resort) REFERENCES resort(_id) )");
 
-//			db.execSQL("CREATE VIEW view_resorts AS " +
-//			   "SELECT _id, label, url FROM resorts INNER JOIN alerts ON resorts._id = alerts.resort GROUP BY resorts._id ORDER BY resorts.label;");
+			db.execSQL("CREATE VIEW view_resorts AS " +
+			   "SELECT resorts._id AS _id, resorts.label AS label FROM alerts INNER JOIN resorts ON alerts.resort=resorts._id GROUP BY resorts._id ORDER BY resorts.label");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("DROP TABLE IF EXISTS alerts");
 			db.execSQL("DROP TABLE IF EXISTS resorts");
+			db.execSQL("DROP VIEW  IF EXISTS view_resorts");
 			onCreate(db);
 		}
 	}

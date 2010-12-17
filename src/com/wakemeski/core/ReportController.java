@@ -235,6 +235,7 @@ public class ReportController implements Runnable {
 					rl.onAdded(r);
 				}
 			}
+			am.handleNotifications();
 		}
 	}
 
@@ -326,6 +327,7 @@ public class ReportController implements Runnable {
 						l.onAdded(r);
 				}				
 			}
+			am.handleNotifications();
 
 			synchronized (mListeners) {
 				for(ReportListener l: mListeners)

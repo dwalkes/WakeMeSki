@@ -56,6 +56,7 @@ public class WakeMeSkiDashboard extends Activity {
 	private ReportListAdapter mListAdapter;
 	private static final int PREFERENCES_ID = Menu.FIRST;
 	private static final int REFRESH_ID     = Menu.FIRST + 1;
+	private static final int ALERTS_ID     = Menu.FIRST + 2;
 	private static final String TAG = "WakeMeSkiDashboard";
 	private int mApVersion = 0;
 	private int mApLatestVersion = 0;
@@ -128,6 +129,9 @@ public class WakeMeSkiDashboard extends Activity {
 		MenuItem item = menu.add(0, REFRESH_ID, 0, R.string.refresh);
 		item.setIcon(R.drawable.ic_menu_refresh);
 
+		item = menu.add(0, ALERTS_ID, 0, R.string.show_alerts);
+		item.setIcon(R.drawable.ic_menu_notifications);
+
 		item = menu.add(0, PREFERENCES_ID, 0, R.string.set_preferences);
 		item.setIcon(android.R.drawable.ic_menu_preferences);		
 
@@ -145,6 +149,10 @@ public class WakeMeSkiDashboard extends Activity {
 			 * Start the report load as a background process
 			 */
 			mReportController.loadReports(true);
+			return true;
+		} else if( item.getItemId() == ALERTS_ID ) {
+			Intent i = new Intent(this, AlertsActivity.class);
+			startActivity(i);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

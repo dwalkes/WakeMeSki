@@ -42,6 +42,7 @@
 <string name="resort_title">Resort</string>
 <string name="resort_name">Resort Name</string>
 <string name="set_preferences">Set Preferences</string>
+<string name="show_alerts">Alerts</string>
 <string name="wakemeski_report">WakeMeSki Report</string>
 <string name="fresh_snow">New Snow</string>
     <string name="selection_activity">Mountain Selection</string>
@@ -88,4 +89,9 @@
     <!-- Service notification strings -->
     <string name="wakemeski_update">WakeMeSki update</string>
     <string name="checking_notify_text">Checking snow totals</string>
+    
+    <!-- Snow alert strings -->
+    <string name="ticker_title">Snow alert</string>
+    <string name="ticker_msg">Snow alert for %s</string>
+    <string name="ticker_msg_multi">%d snow alerts found</string>
 </resources>
