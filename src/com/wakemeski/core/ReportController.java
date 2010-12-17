@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.wakemeski.core.alert.AlertManager;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.util.Log;
@@ -225,6 +227,8 @@ public class ReportController implements Runnable {
 
 			WakeMeSkiServer srv = new WakeMeSkiServer(mContext);
 			Report r = Report.loadReport(c, cm, resort, srv);
+			AlertManager am = new AlertManager(mContext);
+			am.addAlerts(r);
 			synchronized (mListeners) {
 				mReports.put(resort, r);
 				for(ReportListener rl: mListeners) {					
@@ -311,8 +315,10 @@ public class ReportController implements Runnable {
 			}
 
 			WakeMeSkiServer server = new WakeMeSkiServer(mContext);
+			AlertManager am = new AlertManager(mContext);
 			for( Resort res: resorts ) {
-				Report r = Report.loadReport(c, cm, res, server);				
+				Report r = Report.loadReport(c, cm, res, server);
+				am.addAlerts(r);
 				synchronized (mListeners) {
 					mReports.put(res, r);
 					mResortCount = mReports.size();
