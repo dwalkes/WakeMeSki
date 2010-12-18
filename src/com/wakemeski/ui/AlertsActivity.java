@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.ResourceCursorTreeAdapter;
 import android.widget.TextView;
 
@@ -28,6 +29,15 @@ public class AlertsActivity extends ExpandableListActivity {
 
 		//the alerts can be considered "viewed" so mark them acknowledged
 		mAlerts.acknowledgeAlerts();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		ExpandableListView v = getExpandableListView();
+		int i = getExpandableListAdapter().getGroupCount();
+		while(i-- > 0)
+			v.expandGroup(i);
 	}
 
 	class AlertCursorAdapter extends ResourceCursorTreeAdapter {
