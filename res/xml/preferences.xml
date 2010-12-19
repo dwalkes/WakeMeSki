@@ -6,32 +6,45 @@
 		android:title="@string/resort_monitor_title"
 		android:summary="@string/resort_monitor_description"
 	/>	
-	<com.wakemeski.ui.SnowSettingsPreference android:key="snow_settings" 
-    android:title="@string/snow_settings"
-    android:summary="@string/snow_settings_detail"
-    android:dialogLayout="@layout/snow_settings"/>
 	<PreferenceScreen 
-	android:title="@string/alarm_settings"
+	android:title="@string/wakeup_settings"
 	android:key="alarm_prefs"
 	android:summary="@string/alarm_summary">
-	<CheckBoxPreference android:key="alarm_enable" 
-        android:title="@string/enable"/>
-    <com.wakemeski.ui.TimePickerPreference android:key="alarm_wakeup_time" 
-        android:title="@string/wakeup_time"
-        android:enabled="false"/>
-    <com.wakemeski.ui.RepeatDayPreference 
-        android:key="alarm_repeat_days" 
-        android:title="@string/alarm_repeat"
-        android:entries="@array/days_of_week"
-        android:entryValues="@array/days_of_week"
-        android:enabled="false"/>
-   <com.wakemeski.ui.alarmclock.AlarmPreference
-        android:key="alarm_tone" 
-        android:title="@string/alert"
-        android:ringtoneType="alarm"
-        android:showDefault="false"
-        android:showSilent="false" />
+		<CheckBoxPreference android:key="alarm_enable" 
+	        android:title="@string/enable"
+	        android:summary="@string/enable_wakeup"/>
+		<com.wakemeski.ui.WakeupSnowSettingsPreference android:key="snow_settings" 
+	    android:title="@string/snow_settings"
+	    android:summary="@string/snow_wakeup_settings_detail"
+	    android:dialogLayout="@layout/snow_settings"/>
+	    <com.wakemeski.ui.TimePickerPreference android:key="alarm_wakeup_time" 
+	        android:title="@string/wakeup_time"
+	        android:enabled="false"/>
+	    <com.wakemeski.ui.RepeatDayPreference 
+	        android:key="alarm_repeat_days" 
+	        android:title="@string/alarm_repeat"
+	        android:entries="@array/days_of_week"
+	        android:entryValues="@array/days_of_week"
+	        android:enabled="false"/>
+	   <com.wakemeski.ui.alarmclock.AlarmPreference
+	        android:key="alarm_tone" 
+	        android:title="@string/alert"
+	        android:ringtoneType="alarm"
+	        android:showDefault="false"
+	        android:showSilent="false" />
    </PreferenceScreen>
+   	<PreferenceScreen 
+	android:title="@string/notification_settings"
+	android:key="notification_prefs"
+	android:summary="@string/notification_summary">
+		<CheckBoxPreference android:key="notification_enable" 
+	        android:title="@string/enable"
+	        android:summary="@string/enable_notifications"/>
+		<com.wakemeski.ui.NotifySnowSettingsPreference android:key="snow_notify_settings" 
+	    android:title="@string/snow_settings"
+	    android:summary="@string/snow_notify_settings_detail"
+	    android:dialogLayout="@layout/notify_snow_settings"/>
+	</PreferenceScreen>
    	<PreferenceScreen 
 	android:title="@string/my_report"
 	android:key="dashboard"

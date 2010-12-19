@@ -55,14 +55,23 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private AlarmPreference mAlarmTonePreference;
 	private PreferenceScreen mDashboardPreference;
 	private PreferenceScreen mResortsPreference;
+	private SnowSettingsPreference mWakeupSnowSettings;
+	private CheckBoxPreference mNotifyEnablePreference;
+	private SnowSettingsPreference mNotifySnowSettings;
 	private String TAG = "WakeMeSkiPreferences";
 	private AlarmController mAlarmController;
 	public static final String ALARM_ENABLE_PREF_KEY = "alarm_enable";
 	public static final String ALARM_TONE_PREF_KEY = "alarm_tone";
 	public static final String REPEAT_DAYS_PREF_KEY = "alarm_repeat_days";
 	public static final String ALARM_WAKEUP_TIME_PREF_KEY = "alarm_wakeup_time";
-	public static final String SNOW_SETTINGS_PREF_KEY = "snow_settings";
 	public static final String SELECTED_RESORTS_PREF_KEY = "selected_resorts";
+	/*
+	 * Note: this was the name used before notifications were used.  Don't change it now
+	 * otherwise previous user settings will be lost.
+	 */
+	public static final String SNOW_WAKEUP_SETTINGS_KEY = "snow_settings";
+	public static final String SNOW_NOTIFY_SETTINGS_KEY = "snow_notify_settings";
+	public static final String NOTIFY_ENABLE_PREF_KEY	= "notification_enable";
 	public static final boolean DEBUG = false;
 	private static final int TEST_ALARM_FIRE_ID = Menu.FIRST + 1;
 	private static final int TEST_SERVICE_FIRE_ID = Menu.FIRST + 2;
@@ -86,9 +95,8 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		updateToneSummary(ringtoneUri);
 	}
 
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+	private void alarmSchedulingPreferenceUpdated(SharedPreferences sharedPreferences,
 			String key) {
-		
 		boolean alarmEnabled = mAlarmEnablePreference.isChecked();
 		/**
 		 * If the enable key was the key changed, get the latest value
@@ -153,6 +161,24 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		}
 	}
 
+	/**
+	 * @param key
+	 * @return true if this key value is a preference which relates to alarm scheduling.
+	 */
+	private boolean isAlarmSchedulingRelatedPreferenceKey(String key) {
+		return key.equals(ALARM_ENABLE_PREF_KEY) ||
+				key.equals(REPEAT_DAYS_PREF_KEY) ||
+				key.equals(ALARM_WAKEUP_TIME_PREF_KEY);
+	}
+	
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		
+		if( isAlarmSchedulingRelatedPreferenceKey(key) ) {
+			alarmSchedulingPreferenceUpdated(sharedPreferences,key);
+		}
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -164,6 +190,11 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		mAlarmTonePreference = (AlarmPreference) findPreference(ALARM_TONE_PREF_KEY);
 		mDashboardPreference = (PreferenceScreen) findPreference("dashboard");
 		mResortsPreference = (PreferenceScreen) findPreference("selected_resorts");
+		mWakeupSnowSettings = (SnowSettingsPreference) findPreference(SNOW_WAKEUP_SETTINGS_KEY);
+		
+		mNotifyEnablePreference = (CheckBoxPreference) findPreference(NOTIFY_ENABLE_PREF_KEY);
+		mNotifySnowSettings = (SnowSettingsPreference) findPreference(SNOW_NOTIFY_SETTINGS_KEY);
+		
 		mAlarmTonePreference.setRingtoneChangedListener(this);
 
 		Uri defaultAlarm = getDefaultAlarm();
@@ -174,6 +205,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		updateToneSummary(defaultAlarm);
 
 		updateAlarmPreferences();
+		updateNotifyPreferences();
 
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
@@ -193,17 +225,21 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	 * Syncs the enabled state of alarm related settings to the enable checkbox
 	 */
 	private void updateAlarmPreferences() {
-		if (mAlarmEnablePreference.isChecked()) {
-			mWakeUpTimePreference.setEnabled(true);
-			mDayPreference.setEnabled(true);
-			mAlarmTonePreference.setEnabled(true);
-		} else {
-			mWakeUpTimePreference.setEnabled(false);
-			mDayPreference.setEnabled(false);
-			mAlarmTonePreference.setEnabled(false);
-		}
+		boolean enabled = mAlarmEnablePreference.isChecked();
+		mWakeUpTimePreference.setEnabled(enabled);
+		mDayPreference.setEnabled(enabled);
+		mAlarmTonePreference.setEnabled(enabled);
+		mWakeupSnowSettings.setEnabled(enabled);
 	}
 
+	/**
+	 * Syncs the enabled state of the notification related settings to the enabled checkbox
+	 */
+	private void updateNotifyPreferences() {
+		boolean enabled = mNotifyEnablePreference.isChecked();	
+		mNotifySnowSettings.setEnabled(enabled);
+	}
+	
 	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
 			Preference preference) {
@@ -216,6 +252,8 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		} else if (preference == mResortsPreference) {
 			startActivity(new Intent(Intent.ACTION_MAIN, null, this,
 					ResortListActivity.class));
+		} else if (preference == mNotifyEnablePreference) {
+			updateNotifyPreferences();
 		}
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}

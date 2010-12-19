@@ -34,7 +34,7 @@ import android.widget.Spinner;
  * @author dan
  * 
  */
-public class SnowSettingsPreference extends DialogPreference {
+abstract class SnowSettingsPreference extends DialogPreference {
 
 	Spinner mDepthSpinner = null;
 	Spinner mUnitsSpinner = null;
@@ -44,9 +44,10 @@ public class SnowSettingsPreference extends DialogPreference {
 	final static int SNOW_DEPTH_CENTIMETERS_INDEX = 1;
 	SnowSettingsSharedPreference mPreference;
 
-	public SnowSettingsPreference(Context context, AttributeSet attrs) {
+	public SnowSettingsPreference(Context context, AttributeSet attrs,
+			SnowSettingsSharedPreference pref) {
 		super(context, attrs);
-		mPreference = new SnowSettingsSharedPreference();
+		mPreference = pref;
 	}
 
 	SnowUnits getMeasurementUnits() {
@@ -120,12 +121,27 @@ public class SnowSettingsPreference extends DialogPreference {
 	}
 
 	/**
+	 * Abstract method used to obtain a prefix string displayed in the summary
+	 * bar of the preference.  Describes the use of this snow settings preference object
+	 * @return a string to place before the value of the snow setting
+	 */
+	protected abstract String getUpdateSummaryPrefix();
+	
+	/**
+	 * Abstract method used to obtain a suffix string displayed in the summary
+	 * bar of the preference.  Describes the use of this snow settings preference object
+	 * @return a string to place after the value of the snow setting
+	 */
+	protected abstract String getUpdateSummarySuffix();
+	
+	
+	/**
 	 * Updates the summary text of this preference with the status stored in
 	 * this class
 	 */
 	private void updateSummary() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getContext().getString(R.string.wake_on));
+		builder.append(getUpdateSummaryPrefix());
 		builder.append(' ');
 		builder.append(Integer.toString(getSnowDepth()));
 		builder.append(' ');
@@ -137,7 +153,7 @@ public class SnowSettingsPreference extends DialogPreference {
 			builder.append(measurementUnits[SNOW_DEPTH_INCHES_INDEX]);
 		}
 		builder.append(' ');
-		builder.append(getContext().getString(R.string.wake_overnight));
+		builder.append(getUpdateSummarySuffix());
 		setSummary(builder.toString());
 	}
 

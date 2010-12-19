@@ -16,10 +16,10 @@
  */
 package com.wakemeski.pref;
 
+import android.content.SharedPreferences;
+
 import com.wakemeski.core.SnowUnits;
 import com.wakemeski.ui.WakeMeSkiPreferences;
-
-import android.content.SharedPreferences;
 
 /**
  * A POJO used to access snow settings from a shared preference. Shared by the
@@ -32,7 +32,12 @@ import android.content.SharedPreferences;
 public class SnowSettingsSharedPreference {
 	private int snowDepth = 1; // the default
 	private SnowUnits measurementUnits = SnowUnits.INCHES;
+	private String mPrefKey;
 
+	public SnowSettingsSharedPreference(String prefKey) {
+		mPrefKey = prefKey;
+	}
+	
 	public int getSnowDepth() {
 		return snowDepth;
 	}
@@ -48,10 +53,17 @@ public class SnowSettingsSharedPreference {
 	public void setMeasurementUnits(SnowUnits measurementUnits) {
 		this.measurementUnits = measurementUnits;
 	}
+	
+	/**
+	 * @return The key used to store this shared preference in persistent storage
+	 */
+	protected String getPreferenceKey() {
+		return mPrefKey;
+	}
 
 	public boolean setFromPreferences(SharedPreferences prefs) {
 		return setFromPersistedString(prefs.getString(
-				WakeMeSkiPreferences.SNOW_SETTINGS_PREF_KEY, null));
+				getPreferenceKey(), null));
 	}
 
 	/**
@@ -91,8 +103,21 @@ public class SnowSettingsSharedPreference {
 	public String toString() {
 		return snowDepth + " " + measurementUnits.getAbbreviation();
 	}
-
-	public String toLog() {
-		return toString() + " in 24 hours";
+	
+	/**
+	 * @return a new instance of the snow settings preference holding the value of the snow wakeup
+	 * preference key
+	 */
+	public static SnowSettingsSharedPreference newWakeupPreference() {
+		return new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_WAKEUP_SETTINGS_KEY);
 	}
+
+	/**
+	 * @return anew instance of the snow settings preference holding the value of the snow notify
+	 * preference key
+	 */
+	public static SnowSettingsSharedPreference newNotifyPreference() {
+		return new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_NOTIFY_SETTINGS_KEY);
+	}
+
 }

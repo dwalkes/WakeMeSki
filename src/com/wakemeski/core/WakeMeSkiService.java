@@ -210,7 +210,7 @@ public class WakeMeSkiService extends Service {
 	private SnowSettingsSharedPreference getSnowSettings() {
 
 		if( mSnowSettings == null ) {
-			mSnowSettings = new SnowSettingsSharedPreference();
+			mSnowSettings = SnowSettingsSharedPreference.newWakeupPreference();
 			// update snow settings based on current preferences
 			if( !mSnowSettings.setFromPreferences(getSharedPreferences()) ) {
 				Log.e(TAG, "snow settings not found");
