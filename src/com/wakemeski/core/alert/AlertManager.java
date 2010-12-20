@@ -34,6 +34,7 @@ import android.preference.PreferenceManager;
 import com.wakemeski.R;
 import com.wakemeski.core.Location;
 import com.wakemeski.core.Report;
+import com.wakemeski.core.WakeMeSkiServer;
 import com.wakemeski.core.Weather;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.ui.AlertsActivity;
@@ -147,9 +148,10 @@ public class AlertManager {
 		mInsertAlert.executeInsert();
 	}
 
-	public void addAlerts(Report r) {
+	public void addAlerts(Report r, WakeMeSkiServer server) {
+		SnowSettingsSharedPreference prefs = getNotifySnowSettings();
 		for (Weather w : r.getWeather()) {
-			if (w.hasSnowAlert(getNotifySnowSettings())) {
+			if (w.hasSnowAlert(prefs, server)) {
 				long rid = getResortID(r.getResort().getLocation());
 
 				long wid = findAlert(w.getExact(), rid);

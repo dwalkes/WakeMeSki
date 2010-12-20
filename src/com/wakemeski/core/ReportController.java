@@ -228,7 +228,7 @@ public class ReportController implements Runnable {
 			WakeMeSkiServer srv = new WakeMeSkiServer(mContext);
 			Report r = Report.loadReport(c, cm, resort, srv);
 			AlertManager am = new AlertManager(mContext);
-			am.addAlerts(r);
+			am.addAlerts(r, srv);
 			synchronized (mListeners) {
 				mReports.put(resort, r);
 				for(ReportListener rl: mListeners) {					
@@ -319,7 +319,7 @@ public class ReportController implements Runnable {
 			AlertManager am = new AlertManager(mContext);
 			for( Resort res: resorts ) {
 				Report r = Report.loadReport(c, cm, res, server);
-				am.addAlerts(r);
+				am.addAlerts(r, server);
 				synchronized (mListeners) {
 					mReports.put(res, r);
 					mResortCount = mReports.size();
