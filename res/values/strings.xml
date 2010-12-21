@@ -37,9 +37,6 @@
 	<string name="alarm_alert_dismiss_text">Dismiss</string>
 	<string name="alarm_alert_alert_silenced">Alarm silenced after <xliff:g id="minutes">%d</xliff:g> minutes</string>
 	<string name="alarm_alert_snooze_set">Snoozing for <xliff:g id="minutes">%d</xliff:g> minutes.</string>
-	<string name="alert">Wake-up Tone</string>
-	<string name="ok">OK</string>
-	<string name="wakeup_value">Wakeup Value:</string>
 	<string name="resort_snow_detail">Resort snow detail:</string>
 	<string name="does_not_exceed_wakeup_value">Does not exceed wakeup value</string>
 	<string name="exceeds_wakeup_value">Exceeds wakeup value</string>
@@ -79,7 +76,10 @@
 	<string name="report_date">Date: %s</string>
 	<string name="report_snow">Snowfall</string>
 	<string name="report_base">Base Depths: %s</string>
-	<string name="report_trails_lifts">Trails: %s Lifts: %s</string>
+	<string name="report_trails_lifts">Trails: <xliff:g id="trails">%s</xliff:g> Lifts: <xliff:g id="lifts">%s</xliff:g> minutes.</string>
+	<string name="alert">Wake-up Tone</string>
+	<string name="ok">OK</string>
+	<string name="wakeup_value">Wakeup Value:</string>
 	<string name="report_weather">Forecast</string>
 	<string name="report_weather_link">Weather Details</string>
 	<string name="report_details_link">Report Info</string>
