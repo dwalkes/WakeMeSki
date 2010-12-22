@@ -52,6 +52,7 @@ public class WakeMeSkiService extends Service {
 
 	private static final String TAG = "WakeMeSkiService";
 	public static final String ACTION_WAKE_CHECK = "com.wakemeski.core.ACTION_WAKE_CHECK";
+	public static final String ACTION_ALERT_CHECK = "com.wakemeski.core.ACTION_ALERT_CHECK";
 	public static final String ACTION_ALARM_SCHEDULE = "com.wakemeski.core.ACTION_ALARM_SCHEDULE";
 	public static final String ACTION_SHUTDOWN = "com.wakemeski.core.ACTION_SHUTDOWN";
 	public static final String EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME ="com.wakemeski.core.BCAST_RECEIVER_TIME_EXTRA";
@@ -210,7 +211,7 @@ public class WakeMeSkiService extends Service {
 	private SnowSettingsSharedPreference getSnowSettings() {
 
 		if( mSnowSettings == null ) {
-			mSnowSettings = SnowSettingsSharedPreference.newWakeupPreference();
+			mSnowSettings = SnowSettingsSharedPreference.getWakeupPreference();
 			// update snow settings based on current preferences
 			if( !mSnowSettings.setFromPreferences(getSharedPreferences()) ) {
 				Log.e(TAG, "snow settings not found");
@@ -407,7 +408,6 @@ public class WakeMeSkiService extends Service {
 		else {
 			
 			staleIntent = isStaleIntent(intent);
-			
 			if (currentAction.equals(ACTION_WAKE_CHECK)) {
 				if( !staleIntent ) {
 					Log.d(TAG,"Starting new wake check");

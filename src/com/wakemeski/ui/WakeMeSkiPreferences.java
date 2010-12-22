@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.wakemeski.R;
+import com.wakemeski.core.alert.AlertManager;
 import com.wakemeski.pref.RepeatDaySharedPreference;
 import com.wakemeski.pref.TimeSettingsSharedPreference;
 import com.wakemeski.ui.alarmclock.AlarmPreference;
@@ -70,7 +71,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	 * otherwise previous user settings will be lost.
 	 */
 	public static final String SNOW_WAKEUP_SETTINGS_KEY = "snow_settings";
-	public static final String SNOW_NOTIFY_SETTINGS_KEY = "snow_notify_settings";
+	public static final String SNOW_ALERT_SETTINGS_KEY = "snow_alert_settings";
 	public static final String NOTIFY_ENABLE_PREF_KEY	= "notification_enable";
 	public static final boolean DEBUG = false;
 	private static final int TEST_ALARM_FIRE_ID = Menu.FIRST + 1;
@@ -176,7 +177,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		
 		if( isAlarmSchedulingRelatedPreferenceKey(key) ) {
 			alarmSchedulingPreferenceUpdated(sharedPreferences,key);
-		}
+		} 
 	}
 
 	@Override
@@ -193,7 +194,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		mWakeupSnowSettings = (SnowSettingsPreference) findPreference(SNOW_WAKEUP_SETTINGS_KEY);
 		
 		mNotifyEnablePreference = (CheckBoxPreference) findPreference(NOTIFY_ENABLE_PREF_KEY);
-		mNotifySnowSettings = (SnowSettingsPreference) findPreference(SNOW_NOTIFY_SETTINGS_KEY);
+		mNotifySnowSettings = (SnowSettingsPreference) findPreference(SNOW_ALERT_SETTINGS_KEY);
 		
 		mAlarmTonePreference.setRingtoneChangedListener(this);
 
@@ -205,7 +206,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		updateToneSummary(defaultAlarm);
 
 		updateAlarmPreferences();
-		updateNotifyPreferences();
 
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
@@ -232,14 +232,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		mWakeupSnowSettings.setEnabled(enabled);
 	}
 
-	/**
-	 * Syncs the enabled state of the notification related settings to the enabled checkbox
-	 */
-	private void updateNotifyPreferences() {
-		boolean enabled = mNotifyEnablePreference.isChecked();	
-		mNotifySnowSettings.setEnabled(enabled);
-	}
-	
 	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
 			Preference preference) {
@@ -252,9 +244,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		} else if (preference == mResortsPreference) {
 			startActivity(new Intent(Intent.ACTION_MAIN, null, this,
 					ResortListActivity.class));
-		} else if (preference == mNotifyEnablePreference) {
-			updateNotifyPreferences();
-		}
+		} 
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}
 

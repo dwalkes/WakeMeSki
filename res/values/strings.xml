@@ -21,11 +21,11 @@
 	<string name="wake_overnight">or more in 24 hours</string>
 	<string name="set_preferences">Set Preferences</string>
 	<string name="wakeup_settings">Wakeup Settings</string>
-	<string name="notification_settings">Notification Settings</string>
-	<string name="notification_summary">Configure notifications on snow forecast updates</string>
-	<string name="enable_notifications">Enable Notifications</string>
-	<string name="snow_notify_settings_detail">Snow totals for notification</string>
-	<string name="notify_when">Notify when</string>
+	<string name="alert_settings">Alert Settings</string>
+	<string name="alert_summary">Configure alerts on snow forecast updates</string>
+	<string name="enable_alert_notify">Enable alert notifications</string>
+	<string name="snow_alert_settings_detail">Snow totals for snow alerts</string>
+	<string name="alert_when">Add snow alert when</string>
 	<string name="is_forecasted_for_resort">of snow or more is forecasted for a selected resort.</string>
 	<string name="notify_me_when_snow_settings">Notify me when a snow forecast for a resort indicates</string>
 	<string name="notify_fresh_snow_predicted">or more of fresh snow predicted</string>

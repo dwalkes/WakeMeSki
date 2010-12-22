@@ -33,8 +33,20 @@ public class SnowSettingsSharedPreference {
 	private int snowDepth = 1; // the default
 	private SnowUnits measurementUnits = SnowUnits.INCHES;
 	private String mPrefKey;
+	
+	/**
+	 * A singleton reference to the snow settings shared preference
+	 * for wakeup snow threshold
+	 */
+	private static SnowSettingsSharedPreference mWakeupPreference = null;
+	
+	/**
+	 * A singleton reference to the snow settings shared preference for
+	 * notify snow threshold
+	 */
+	private static SnowSettingsSharedPreference mNotifyPreference = null;
 
-	public SnowSettingsSharedPreference(String prefKey) {
+	private SnowSettingsSharedPreference(String prefKey) {
 		mPrefKey = prefKey;
 	}
 	
@@ -105,19 +117,44 @@ public class SnowSettingsSharedPreference {
 	}
 	
 	/**
-	 * @return a new instance of the snow settings preference holding the value of the snow wakeup
+	 * @return reference to the snow settings preference holding the value of the snow wakeup
 	 * preference key
 	 */
-	public static SnowSettingsSharedPreference newWakeupPreference() {
-		return new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_WAKEUP_SETTINGS_KEY);
+	public static synchronized SnowSettingsSharedPreference getWakeupPreference() {
+		if( mWakeupPreference == null ) {
+			mWakeupPreference = new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_WAKEUP_SETTINGS_KEY);
+		}
+		return mWakeupPreference;
 	}
 
 	/**
-	 * @return anew instance of the snow settings preference holding the value of the snow notify
+	 * @return a reference to the snow settings preference holding the value of the snow notify
 	 * preference key
 	 */
-	public static SnowSettingsSharedPreference newNotifyPreference() {
-		return new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_NOTIFY_SETTINGS_KEY);
+	public static synchronized SnowSettingsSharedPreference getNotifyPreference() {
+		if( mNotifyPreference == null ) {
+			mNotifyPreference = new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_ALERT_SETTINGS_KEY);
+		} 
+		return mNotifyPreference;
 	}
 
+	/**
+	 * Checks to see if the passed snow depth meets or exceeds the value
+	 * stored in the preference
+	 * @param snowDepth value to check
+	 * @param units the units of the passed snowfall value
+	 * @return true if this snow total meets or exceeds the value stored in the preference
+	 */
+	public boolean meetsPreference( int snowCheck, SnowUnits checkUnits ) {
+		double depth = getSnowDepth();
+		double reported = snowCheck;
+
+		if (checkUnits == SnowUnits.CENTIMETERS)
+			reported *= 2.54;
+
+		if (getMeasurementUnits() == SnowUnits.CENTIMETERS)
+			depth *= 2.54;
+
+		return (reported >= depth);
+	}
 }

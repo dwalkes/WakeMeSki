@@ -138,16 +138,7 @@ public class Report implements Parcelable {
 	};
 
 	public boolean meetsPreference(SnowSettingsSharedPreference s) {
-		double depth = s.getSnowDepth();
-		double reported = getFreshSnowTotal();
-
-		if (getSnowUnits() == SnowUnits.CENTIMETERS)
-			reported *= 2.54;
-
-		if (s.getMeasurementUnits() == SnowUnits.CENTIMETERS)
-			depth *= 2.54;
-
-		return (reported >= depth);
+		return s.meetsPreference(getFreshSnowTotal(),getSnowUnits());
 	}
 
 	/**
@@ -427,14 +418,6 @@ public class Report implements Parcelable {
 		return _weather.toArray(new Weather[_weather.size()]);
 	}
 
-	public boolean hasSnowAlert() {
-		for( Weather w: _weather ) {
-			if(w.hasSnowAlert())
-				return true;
-		}
-		return false;
-	}
-
 	public String getWeatherIcon() {
 		return _weatherIcon;
 	}
@@ -694,7 +677,7 @@ public class Report implements Parcelable {
 		for( int i = 0; i < when.length && i < desc.length ; i++ ) {
 			if( when[i] != null && when[i].length() > 0 &&
 					desc[i] != null && desc[i].length() > 0 )
-				r._weather.add(new Weather(when[i], whenExact[i], desc[i]));
+				r._weather.add(new Weather(when[i], whenExact[i], desc[i],r.getSnowUnits()));
 		}
 
 		r._serverInfo = server.getServerInfo();

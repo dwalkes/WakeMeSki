@@ -24,16 +24,20 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.preference.PreferenceManager;
 
 import com.wakemeski.R;
 import com.wakemeski.core.Location;
 import com.wakemeski.core.Report;
 import com.wakemeski.core.Weather;
+import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.ui.AlertsActivity;
+import com.wakemeski.ui.WakeMeSkiPreferences;
 
 /**
  * Keeps track of snow alerts for a given resort. Each resort can have a list of
@@ -53,6 +57,36 @@ public class AlertManager {
 	private SQLiteStatement mInsertAlert;
 	private SQLiteStatement mRemoveOld;
 	private SQLiteStatement mAckAll;
+	
+	private SnowSettingsSharedPreference mNotifySnowSettings = null;
+	
+	private SharedPreferences mSharedPreferences = null;
+
+	private SharedPreferences getSharedPreferences() {
+		if( mSharedPreferences == null ) {
+			mSharedPreferences = PreferenceManager
+					.getDefaultSharedPreferences(mContext);
+		}
+		return mSharedPreferences;
+	}
+	
+	/**
+	 * @return the snow settings shared preference for alert notifications
+	 */
+	private SnowSettingsSharedPreference getNotifySnowSettings() {
+		if( mNotifySnowSettings == null ) {
+			mNotifySnowSettings = SnowSettingsSharedPreference.getNotifyPreference();
+			mNotifySnowSettings.setFromPreferences(getSharedPreferences());
+		}
+		return mNotifySnowSettings;
+	}
+	
+	/**
+	 * @return true when user has enabled notification in preferences
+	 */
+	private boolean isNotificationEnabled() {
+		return getSharedPreferences().getBoolean(WakeMeSkiPreferences.NOTIFY_ENABLE_PREF_KEY, false);
+	}
 
 	public AlertManager(Context c) {
 		mContext = c;
@@ -115,7 +149,7 @@ public class AlertManager {
 
 	public void addAlerts(Report r) {
 		for (Weather w : r.getWeather()) {
-			if (w.hasSnowAlert()) {
+			if (w.hasSnowAlert(getNotifySnowSettings())) {
 				long rid = getResortID(r.getResort().getLocation());
 
 				long wid = findAlert(w.getExact(), rid);
@@ -172,7 +206,7 @@ public class AlertManager {
 			c.moveToNext();
 		}
 		c.close();
-		return l;
+		return l; 
 	}
 
 	private String getResortLabel(long id) {
@@ -184,6 +218,7 @@ public class AlertManager {
 		return label;
 	}
 
+	
 	/**
 	 * Creates an alert in the status bar. If there are more than one reports
 	 * with snow, it gives a summary of the number otherwise it displays the
@@ -194,7 +229,14 @@ public class AlertManager {
 
 		if( ids.size() <= 0 )
 			return;
-
+		
+		/*
+		 * Don't do anything if notifications are disabled
+		 */
+		if( !isNotificationEnabled() ) {
+			return;
+		}
+		
 		int icon = R.drawable.snow;
 		CharSequence tickerTitle = mContext.getString(R.string.ticker_title);
 		long when = System.currentTimeMillis();

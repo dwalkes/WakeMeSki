@@ -12,7 +12,7 @@ import com.wakemeski.pref.SnowSettingsSharedPreference;
 public class WakeupSnowSettingsPreference extends SnowSettingsPreference {
 
 	public WakeupSnowSettingsPreference(Context context, AttributeSet attrs) {
-		super(context,attrs,SnowSettingsSharedPreference.newWakeupPreference());
+		super(context,attrs,SnowSettingsSharedPreference.getWakeupPreference());
 	}
 	
 	@Override

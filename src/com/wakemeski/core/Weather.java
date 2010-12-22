@@ -18,8 +18,11 @@ package com.wakemeski.core;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.wakemeski.pref.SnowSettingsSharedPreference;
+
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 /**
  * A child of a Report object. It helps the report describe the upcoming weather
@@ -30,19 +33,42 @@ public class Weather implements Parcelable {
 	private String mWhen;
 	private long mExact;
 	private String mDesc;
+	private SnowUnits mUnits;
+	private static String TAG = "Weather";
 
-	public Weather(String when, long exact, String desc) {
+	public Weather(String when, long exact, String desc, SnowUnits units) {
 		mWhen = when;
 		mExact = exact;
 		mDesc = desc;
+		mUnits = units;
 	}
 
-	//TODO: make this a configurable threshold
-	public boolean hasSnowAlert() {
+	/**
+	 * @param snowPreference the users preference about when to notify on a new
+	 * expected snowfall predicted for a particular resort
+	 * @return true if 
+	 */
+	public boolean hasSnowAlert(SnowSettingsSharedPreference snowPreference) {
+		boolean hasAlert = false;
 		Pattern p = Pattern.compile("snow accumulation of (\\d+) to (\\d+)");
 		Matcher m = p.matcher(mDesc);
-		
-		return m.find();
+
+		if( m.find() ) {
+			/*
+			 * Look for the upper accumulation value
+			 */
+			String snowTotalString = m.group(2);
+			int snowTotal =0;
+			if( snowTotalString != null ) {
+				try {
+					snowTotal = Integer.parseInt(snowTotalString);
+				} catch (Throwable t) {
+					Log.e(TAG, "Unable to parse snow total to int: " + snowTotalString);
+				}
+			}
+			hasAlert= snowPreference.meetsPreference(snowTotal, mUnits);
+		}
+		return hasAlert;
 	}
 
 	public String getWhen() {
@@ -63,8 +89,13 @@ public class Weather implements Parcelable {
 			String when = source.readString();
 			long   exact = source.readLong();
 			String desc = source.readString();
+			int inches = source.readInt();
+			SnowUnits units = SnowUnits.CENTIMETERS;
+			if( inches != 0 ) {
+				units = SnowUnits.INCHES;
+			}
 
-			return new Weather(when, exact, desc);
+			return new Weather(when, exact, desc, units);
 		}
 		
 		@Override
@@ -83,5 +114,6 @@ public class Weather implements Parcelable {
 		dest.writeString(mWhen);
 		dest.writeLong(mExact);
 		dest.writeString(mDesc);
+		dest.writeInt(mUnits.equals(SnowUnits.INCHES) ? 1 : 0);
 	}
 }

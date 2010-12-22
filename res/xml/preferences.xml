@@ -34,16 +34,17 @@
 	        android:showSilent="false" />
    </PreferenceScreen>
    	<PreferenceScreen 
-	android:title="@string/notification_settings"
+	android:title="@string/alert_settings"
 	android:key="notification_prefs"
-	android:summary="@string/notification_summary">
+	android:summary="@string/alert_summary">
 		<CheckBoxPreference android:key="notification_enable" 
 	        android:title="@string/enable"
-	        android:summary="@string/enable_notifications"/>
-		<com.wakemeski.ui.NotifySnowSettingsPreference android:key="snow_notify_settings" 
+	        android:summary="@string/enable_alert_notify"
+	        android:defaultValue="true"/>
+		<com.wakemeski.ui.AlertSnowSettingsPreference android:key="snow_alert_settings" 
 	    android:title="@string/snow_settings"
-	    android:summary="@string/snow_notify_settings_detail"
-	    android:dialogLayout="@layout/notify_snow_settings"/>
+	    android:summary="@string/snow_alert_settings_detail"
+	    android:dialogLayout="@layout/alert_snow_settings"/>
 	</PreferenceScreen>
    	<PreferenceScreen 
 	android:title="@string/my_report"

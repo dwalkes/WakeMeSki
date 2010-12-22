@@ -27,21 +27,19 @@ import com.wakemeski.pref.SnowSettingsSharedPreference;
  * of notifications (ie forecasted snow)
  *
  */
-public class NotifySnowSettingsPreference extends SnowSettingsPreference {
+public class AlertSnowSettingsPreference extends SnowSettingsPreference {
 
-	public NotifySnowSettingsPreference(Context context, AttributeSet attrs) {
-		super(context,attrs,SnowSettingsSharedPreference.newWakeupPreference());
+	public AlertSnowSettingsPreference(Context context, AttributeSet attrs) {
+		super(context,attrs,SnowSettingsSharedPreference.getNotifyPreference());
 	}
-	
+
 	@Override
 	protected String getUpdateSummaryPrefix() {
-		// TODO Auto-generated method stub
-		return getContext().getString(R.string.notify_when);
+		return getContext().getString(R.string.alert_when);
 	}
 
 	@Override
 	protected String getUpdateSummarySuffix() {
-		// TODO Auto-generated method stub
 		return getContext().getString(R.string.is_forecasted_for_resort);
 	}
 
