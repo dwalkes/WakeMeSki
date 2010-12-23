@@ -21,7 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.wakemeski.core.WakeMeSkiService;
+import com.wakemeski.core.WakeMeSkiAlertService;
+import com.wakemeski.core.WakeMeSkiWakeupService;
 import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
@@ -32,26 +33,29 @@ import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
  * 
  */
 public class OnAlarmReceiver extends BroadcastReceiver {
-	public static final String ACTION_WAKE_CHECK = WakeMeSkiService.ACTION_WAKE_CHECK;
+	public static final String ACTION_WAKE_CHECK = WakeMeSkiWakeupService.ACTION_WAKE_CHECK;
+	public static final String ACTION_ALERT_CHECK = WakeMeSkiWakeupService.ACTION_ALERT_CHECK;
 	public static final String ACTION_SNOOZE = AlarmController.ACTION_FIRE_ALARM;
 	private static final String TAG = "OnAlarmReceiver";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction() != null) {
-			if (intent.getAction().equals(ACTION_SNOOZE)) {
+			if (intent.getAction().equals(ACTION_SNOOZE) ||
+						intent.getAction().equals(ACTION_WAKE_CHECK) ||
+						intent.getAction().equals(ACTION_ALERT_CHECK)) {
 				AlarmAlertWakeLock.acquireCpuWakeLock(context);
-				Intent i = new Intent(ACTION_SNOOZE, null, context,
-						WakeMeSkiService.class);
-				i.putExtra(WakeMeSkiService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
-						System.currentTimeMillis());
-				context.startService(i);
-			} else if (intent.getAction().equals(ACTION_WAKE_CHECK)) {
-				AlarmAlertWakeLock.acquireCpuWakeLock(context);
+				/*
+				 * Create an intent for this action.  If the action is alert check use
+				 * the alert service, otherwise use the wakeup service
+				 */
 				Intent i = new Intent(
-						WakeMeSkiService.ACTION_WAKE_CHECK, null, context,
-						WakeMeSkiService.class);
-				i.putExtra(WakeMeSkiService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
+						intent.getAction(), null, context,
+						intent.getAction().equals(ACTION_ALERT_CHECK) ? 
+									WakeMeSkiAlertService.class :
+									WakeMeSkiWakeupService.class
+								);
+				i.putExtra(WakeMeSkiWakeupService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
 						System.currentTimeMillis());
 				context.startService(i);
 			} else {

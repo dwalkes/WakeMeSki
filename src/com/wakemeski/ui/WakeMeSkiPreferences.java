@@ -33,7 +33,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.wakemeski.R;
-import com.wakemeski.core.alert.AlertManager;
+import com.wakemeski.core.alert.AlertPollingController;
 import com.wakemeski.pref.RepeatDaySharedPreference;
 import com.wakemeski.pref.TimeSettingsSharedPreference;
 import com.wakemeski.ui.alarmclock.AlarmPreference;
@@ -57,8 +57,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private PreferenceScreen mDashboardPreference;
 	private PreferenceScreen mResortsPreference;
 	private SnowSettingsPreference mWakeupSnowSettings;
-	private CheckBoxPreference mNotifyEnablePreference;
-	private SnowSettingsPreference mNotifySnowSettings;
 	private String TAG = "WakeMeSkiPreferences";
 	private AlarmController mAlarmController;
 	public static final String ALARM_ENABLE_PREF_KEY = "alarm_enable";
@@ -172,12 +170,31 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 				key.equals(ALARM_WAKEUP_TIME_PREF_KEY);
 	}
 	
+	/**
+	 * @param sharedPreferences the preferences object containing shared preferences
+	 * for the application
+	 * @return true if alert notification is enabled in this preference object
+	 */
+	public static boolean isAlertNotificationEnabled(SharedPreferences sharedPreferences) {
+		return sharedPreferences.getBoolean(NOTIFY_ENABLE_PREF_KEY, false);
+	}
+	
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
 		if( isAlarmSchedulingRelatedPreferenceKey(key) ) {
 			alarmSchedulingPreferenceUpdated(sharedPreferences,key);
-		} 
+		} else if (key.equals(NOTIFY_ENABLE_PREF_KEY)) {
+			/*
+			 * Turn on/off alert wakeup service funtionality based on the new
+			 * settings of the notify enable preference.
+			 */
+			if( isAlertNotificationEnabled(sharedPreferences) ) {
+				AlertPollingController.getInstance(getApplicationContext()).enableAlertPolling();
+			} else {
+				AlertPollingController.getInstance(getApplicationContext()).disableAlertPolling();
+			}
+		}
 	}
 
 	@Override
@@ -192,9 +209,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		mDashboardPreference = (PreferenceScreen) findPreference("dashboard");
 		mResortsPreference = (PreferenceScreen) findPreference("selected_resorts");
 		mWakeupSnowSettings = (SnowSettingsPreference) findPreference(SNOW_WAKEUP_SETTINGS_KEY);
-		
-		mNotifyEnablePreference = (CheckBoxPreference) findPreference(NOTIFY_ENABLE_PREF_KEY);
-		mNotifySnowSettings = (SnowSettingsPreference) findPreference(SNOW_ALERT_SETTINGS_KEY);
 		
 		mAlarmTonePreference.setRingtoneChangedListener(this);
 

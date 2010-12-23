@@ -31,7 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wakemeski.R;
-import com.wakemeski.core.WakeMeSkiService;
+import com.wakemeski.core.WakeMeSkiWakeupService;
 import com.wakemeski.ui.AlarmSnoozeController;
 import com.wakemeski.ui.WakeMeSkiDashboard;
 import com.wakemeski.ui.WakeMeSkiPreferences;
@@ -336,7 +336,7 @@ public class AlarmAlert extends Activity {
 		 * Done with the service now, stop it.
 		 */
 		stopService(new Intent(this.getApplicationContext(),
-				WakeMeSkiService.class));
+				WakeMeSkiWakeupService.class));
 
 		AlarmAlertWakeLock.release();
 	}

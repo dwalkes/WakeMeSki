@@ -17,13 +17,13 @@
 
 package com.wakemeski.ui;
 
-import com.wakemeski.core.WakeMeSkiService;
-import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.wakemeski.core.WakeMeSkiWakeupService;
+import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
  * Catch an upgrade message for our ap... otherwise our alarm will be removed and never
@@ -51,8 +51,8 @@ public class OnUpgradeReceiver extends BroadcastReceiver {
 		if( arg1.getDataString().contains("com.wakemeski")) {
 			Log.d(TAG,"Rescheduling alarm after upgrade" );
 			AlarmAlertWakeLock.acquireCpuWakeLock(context);
-			context.startService(new Intent(WakeMeSkiService.ACTION_ALARM_SCHEDULE,
-					null, context, WakeMeSkiService.class));
+			context.startService(new Intent(WakeMeSkiWakeupService.ACTION_ALARM_SCHEDULE,
+					null, context, WakeMeSkiWakeupService.class));
 		}
 	}
 

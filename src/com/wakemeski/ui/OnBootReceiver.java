@@ -16,12 +16,12 @@
  */
 package com.wakemeski.ui;
 
-import com.wakemeski.core.WakeMeSkiService;
-import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.wakemeski.core.WakeMeSkiWakeupService;
+import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
  * This class catches a boot message. We need to reschedule our alarms on boot
@@ -35,8 +35,8 @@ public class OnBootReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		AlarmAlertWakeLock.acquireCpuWakeLock(context);
-		context.startService(new Intent(WakeMeSkiService.ACTION_ALARM_SCHEDULE,
-				null, context, WakeMeSkiService.class));
+		context.startService(new Intent(WakeMeSkiWakeupService.ACTION_ALARM_SCHEDULE,
+				null, context, WakeMeSkiWakeupService.class));
 	}
 
 }

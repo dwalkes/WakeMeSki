@@ -79,11 +79,15 @@
         <receiver android:name=".ui.OnAlarmReceiver"></receiver>
         <receiver android:name=".ui.OnUpgradeReceiver">
         	<intent-filter>
+        		<!-- see http://groups.google.com/group/android-developers/browse_thread/thread/697e7e7cc6dd3d1f/f1bb447b4d38ee57?#f1bb447b4d38ee57 
+        		I can't figure out a way to notify of my own package install.
+        		-->
         		<action android:name="android.intent.action.PACKAGE_REPLACED"/>
         		<data android:scheme="package" />
         	</intent-filter>
         </receiver>
-        <service android:name=".core.WakeMeSkiService"></service>
+        <service android:name=".core.WakeMeSkiAlertService"></service>
+        <service android:name=".core.WakeMeSkiWakeupService"></service>
     </application>
     <uses-sdk android:minSdkVersion="3"
     		 	android:targetSdkVersion="8"/>
