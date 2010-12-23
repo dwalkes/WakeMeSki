@@ -328,6 +328,7 @@ public class ReportController implements Runnable {
 				}				
 			}
 			am.handleNotifications();
+			am.close();
 
 			synchronized (mListeners) {
 				for(ReportListener l: mListeners)

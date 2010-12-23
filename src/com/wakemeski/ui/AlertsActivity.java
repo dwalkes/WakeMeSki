@@ -25,6 +25,7 @@ public class AlertsActivity extends ExpandableListActivity {
 		mAlerts = new AlertManager(getApplication());
 		mAlerts.removeOld();
 		Cursor c = mAlerts.getAlertResorts();
+		startManagingCursor(c);
 		setListAdapter(new AlertCursorAdapter(getApplicationContext(), c));
 
 		//the alerts can be considered "viewed" so mark them acknowledged
@@ -38,6 +39,12 @@ public class AlertsActivity extends ExpandableListActivity {
 		int i = getExpandableListAdapter().getGroupCount();
 		while(i-- > 0)
 			v.expandGroup(i);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mAlerts.close();
 	}
 
 	class AlertCursorAdapter extends ResourceCursorTreeAdapter {
@@ -68,7 +75,9 @@ public class AlertsActivity extends ExpandableListActivity {
 		@Override
 		protected Cursor getChildrenCursor(Cursor groupCursor) {
 			long id = groupCursor.getLong(0);
-			return mAlerts.getAlerts(id);
+			Cursor c = mAlerts.getAlerts(id);
+			startManagingCursor(c);
+			return c;
 		}
 	}
 }
