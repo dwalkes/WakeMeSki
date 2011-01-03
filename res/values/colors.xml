@@ -21,4 +21,7 @@
     <color name="white">#ffffffff</color>
     <color name="red">#ffee0000</color>
     <color name="ltgrey">#ffe0e0e0</color>
+
+	<color name="list_color">#ffc0c0c0</color>
+	<color name="list_color_selected">#ffffff00</color>
 </resources>

@@ -5,7 +5,8 @@
 	android:id="@+id/resort_snow_layout"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
-	android:layout_height="50dip">
+	android:layout_height="50dip"
+	android:background="@drawable/list_selector">
    	
 	<ImageView
 		android:id="@+id/snow_layout_icon" 
