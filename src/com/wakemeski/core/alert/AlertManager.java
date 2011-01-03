@@ -30,6 +30,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 
 import com.wakemeski.R;
 import com.wakemeski.core.Location;
@@ -105,6 +106,29 @@ public class AlertManager {
 
 	public void close() {
 		mDB.close();
+	}
+
+	/**
+	 * Returns the alert description column from a cursor coming from the
+	 * alerts table.
+	 */
+	public static String getAlertDesc(Cursor alertCursor) {
+		return alertCursor.getString(2);
+	}
+
+	/**
+	 * Returns a string representation of an alert's time column.
+	 */
+	public static CharSequence getAlertTime(Cursor alertCursor) {
+		long epochMS = alertCursor.getLong(1) * 1000;
+		return DateFormat.format("EEE ha", epochMS);
+	}
+
+	/**
+	 * Returns a string representation of the resort's label column.
+	 */
+	public static String getResortLabel(Cursor resortCursor) {
+		return resortCursor.getString(1);
 	}
 
 	/**
@@ -228,7 +252,6 @@ public class AlertManager {
 		c.close();
 		return label;
 	}
-
 
 	/**
 	 * Creates an alert in the status bar. If there are more than one reports
