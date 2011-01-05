@@ -22,6 +22,10 @@ public class AlertsActivity extends ExpandableListActivity {
 	private static final int SHARE_ID = Menu.FIRST;
 
 	private AlertManager mAlerts;
+	
+	private static final int PREFERENCES_ID = Menu.FIRST;
+	private static final int REPORT_ID     = Menu.FIRST+1;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -132,5 +136,32 @@ public class AlertsActivity extends ExpandableListActivity {
 			startManagingCursor(c);
 			return c;
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+
+		MenuItem item = menu.add(0, REPORT_ID, 0, R.string.show_report);
+		item.setIcon(R.drawable.ic_menu_home);
+
+		item = menu.add(0, PREFERENCES_ID, 0, R.string.set_preferences);
+		item.setIcon(android.R.drawable.ic_menu_preferences);		
+
+		return result;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == PREFERENCES_ID) {
+			Intent i = new Intent(this, WakeMeSkiPreferences.class);
+			startActivity(i);
+			return true;
+		} else if( item.getItemId() == REPORT_ID ) {
+			Intent i = new Intent(this, WakeMeSkiDashboard.class);
+			startActivity(i);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

@@ -110,4 +110,5 @@
     <string name="ticker_title">Snow alert</string>
     <string name="ticker_msg">Snow alert for %s</string>
     <string name="ticker_msg_multi">%d snow alerts found</string>
+	<string name="show_report">Show Report</string>
 </resources>
