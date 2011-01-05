@@ -11,25 +11,25 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package com.wakemeski.core;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.wakemeski.pref.SnowSettingsSharedPreference;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+
+import com.wakemeski.pref.SnowSettingsSharedPreference;
 
 /**
  * A child of a Report object. It helps the report describe the upcoming weather
  * conditions
  */
 public class Weather implements Parcelable {
-	
+
 	private String mWhen;
 	private long mExact;
 	private String mDesc;
@@ -43,32 +43,40 @@ public class Weather implements Parcelable {
 		mUnits = units;
 	}
 
-	/**
-	 * @param snowPreference the users preference about when to notify on a new
-	 * expected snowfall predicted for a particular resort
-	 * @return true if 
-	 */
-	public boolean hasSnowAlert(SnowSettingsSharedPreference snowPreference) {
-		boolean hasAlert = false;
-		Pattern p = Pattern.compile("snow accumulation of (\\d+) to (\\d+)");
-		Matcher m = p.matcher(mDesc);
-
-		if( m.find() ) {
-			/*
-			 * Look for the upper accumulation value
-			 */
-			String snowTotalString = m.group(2);
-			int snowTotal =0;
-			if( snowTotalString != null ) {
-				try {
-					snowTotal = Integer.parseInt(snowTotalString);
-				} catch (Throwable t) {
-					Log.e(TAG, "Unable to parse snow total to int: " + snowTotalString);
-				}
+	private boolean meetsThreshold(SnowSettingsSharedPreference pref, Matcher m) {
+		/*
+		 * Look for the upper accumulation value
+		 */
+		String snowTotalString = m.group(2);
+		int snowTotal =0;
+		if( snowTotalString != null ) {
+			try {
+				snowTotal = Integer.parseInt(snowTotalString);
+			} catch (Throwable t) {
+				Log.e(TAG, "Unable to parse snow total to int: " + snowTotalString);
 			}
-			hasAlert= snowPreference.meetsPreference(snowTotal, mUnits);
 		}
-		return hasAlert;
+		return pref.meetsPreference(snowTotal, mUnits);
+	}
+
+	/**
+	 * @param pref the users preference about when to notify on a new
+	 * expected snowfall predicted for a particular resort
+	 * @param server contains regular expressions used to detect snow alerts
+	 * @return true if
+	 */
+	public boolean hasSnowAlert(SnowSettingsSharedPreference pref, WakeMeSkiServer server) {
+		String expressions[] = server.getServerInfo().getAlertExpressions();
+
+		for( String expression: expressions ) {
+			Pattern p = Pattern.compile(expression);
+			Matcher m = p.matcher(mDesc);
+			if( m.find() && meetsThreshold(pref, m) )
+				return true;
+		}
+
+		return false;
+
 	}
 
 	public String getWhen() {
@@ -78,11 +86,11 @@ public class Weather implements Parcelable {
 	public long getExact() {
 		return mExact;
 	}
-	
+
 	public String getDesc() {
 		return mDesc;
 	}
-	
+
 	public static final Parcelable.Creator<Weather> CREATOR = new Parcelable.Creator<Weather>() {
 		@Override
 		public Weather createFromParcel(Parcel source) {
@@ -97,13 +105,13 @@ public class Weather implements Parcelable {
 
 			return new Weather(when, exact, desc, units);
 		}
-		
+
 		@Override
 		public Weather[] newArray(int size) {
 			return new Weather[size];
 		}
 	};
-	
+
 	@Override
 	public int describeContents() {
 		return 0;

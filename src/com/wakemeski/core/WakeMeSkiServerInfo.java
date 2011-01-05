@@ -1,4 +1,4 @@
- /* 
+ /*
  * Copyright (c) 2010 Dan Walkes, Andy Doan
  * All rights reserved.
  *
@@ -35,29 +35,39 @@ public class WakeMeSkiServerInfo {
 	private int mApMinSupportedVersion = -1;
 	private int mApLatestVersion = -1;
 	private int mServerVersion = -1;
-	
-	
+
+	private String[] mRegEx;
+
+
 	public int getApMinSupportedVersion() {
 		return mApMinSupportedVersion;
 	}
-	
+
 	public int getApLatestVersion() {
 		return mApLatestVersion;
 	}
-	
+
 	public int getServerVersion() {
 		return mServerVersion;
 	}
-	
+
+	public String[] getAlertExpressions() {
+		return mRegEx;
+	}
+
 	public void setApMinSupportedVersion( int version ) {
 		mApMinSupportedVersion = version;
 	}
-	
+
 	public void setApLatestVersion( int version ) {
 		mApLatestVersion = version;
 	}
-	
+
 	public void setServerVersion( int version ) {
 		mServerVersion = version;
+	}
+
+	public void setAlertExpressions(String[] regex) {
+		mRegEx = regex;
 	}
 }

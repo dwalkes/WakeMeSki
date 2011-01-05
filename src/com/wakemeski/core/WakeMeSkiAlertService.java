@@ -25,7 +25,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.wakemeski.core.alert.AlertManager;
 import com.wakemeski.core.alert.AlertPollingController;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.ui.WakeMeSkiPreferences;
@@ -45,7 +44,7 @@ public class WakeMeSkiAlertService extends Service {
 	private SnowSettingsSharedPreference	mSnowSettings = null;
 	private SharedPreferences			 	mSharedPreferences = null;
 	private ReportController				mReportController;
-	private AlertManager					mAlertManager;
+
 	/*
 	 * Use this action to schedule alarms for both wakeup and alerts
 	 */
@@ -133,10 +132,8 @@ public class WakeMeSkiAlertService extends Service {
 	 * @param r The report added to the list of reports
 	 */
 	protected void onReportAdded(Report r) {
-		Log.d(TAG, "Report added " + r);
-		mAlertManager.addAlerts(r);
 	}
-	
+
 	/**
 	 * Called when report loading starts
 	 */
@@ -172,9 +169,6 @@ public class WakeMeSkiAlertService extends Service {
 		 * be safe to ignore it.
 		 */
 		mReportController.removeListener(mReportListener);
-		
-		mAlertManager.handleNotifications();
-		
 		if( shouldStopOnReportLoadComplete() ) {
 			stopSelf();
 		}
@@ -223,8 +217,6 @@ public class WakeMeSkiAlertService extends Service {
 		// the global wake lock is gone. Acquire again just to be sure.
 		AlarmAlertWakeLock.acquireCpuWakeLock(c);
 		mReportController = WakeMeSkiFactory.getInstance(c).getReportController();
-
-		mAlertManager = new AlertManager(c);
 		super.onCreate();
 	}
 	

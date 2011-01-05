@@ -103,6 +103,10 @@
     <string name="checking_notify_text">Checking snow totals</string>
     
     <!-- Snow alert strings -->
+    <string name="alert_share">Share</string>
+    <string name="alert_share_intent">Share snow alert using</string>
+    <string name="alert_share_subject">WakeMeSki Snow Alert for <xliff:g id="resort">%s</xliff:g></string>
+    <string name="alert_share_heading">Snow has been forecasted at <xliff:g id="resort">%s</xliff:g>!</string>
     <string name="ticker_title">Snow alert</string>
     <string name="ticker_msg">Snow alert for %s</string>
     <string name="ticker_msg_multi">%d snow alerts found</string>

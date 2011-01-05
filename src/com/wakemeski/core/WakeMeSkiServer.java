@@ -28,6 +28,7 @@
 package com.wakemeski.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -84,6 +85,7 @@ public class WakeMeSkiServer {
 		return mServerUrl;
 	}
 	
+	@Override
 	public String toString() {
 		return getServerUrl();
 	}
@@ -145,6 +147,7 @@ public class WakeMeSkiServer {
 	 */
 	private WakeMeSkiServerInfo getServerInfo(String serverUrl) {
 		String url = serverUrl + "/server_info.php";
+		ArrayList<String> exp = new ArrayList<String>();
 		WakeMeSkiServerInfo serverInfo = new WakeMeSkiServerInfo();
 		try
 		{
@@ -160,9 +163,12 @@ public class WakeMeSkiServer {
 						serverInfo.setApMinSupportedVersion(getInt(vals[1]));
 					} else if(vals[0].equals("ap.latest.version")) {
 						serverInfo.setApLatestVersion(getInt(vals[1]));
+					} else if(vals[0].equals("alert.regex")) {
+						exp.add(vals[1]);
 					}
 				}
 			}
+			serverInfo.setAlertExpressions(exp.toArray(new String[exp.size()]));
 		}
 		catch ( ClientProtocolException ce ) {
 			Log.i(TAG,"Exception getting server info for server " + serverUrl + ce.getMessage());

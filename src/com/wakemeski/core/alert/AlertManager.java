@@ -30,10 +30,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 
 import com.wakemeski.R;
 import com.wakemeski.core.Location;
 import com.wakemeski.core.Report;
+import com.wakemeski.core.WakeMeSkiServer;
 import com.wakemeski.core.Weather;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.ui.AlertsActivity;
@@ -57,9 +59,9 @@ public class AlertManager {
 	private SQLiteStatement mInsertAlert;
 	private SQLiteStatement mRemoveOld;
 	private SQLiteStatement mAckAll;
-	
+
 	private SnowSettingsSharedPreference mNotifySnowSettings = null;
-	
+
 	private SharedPreferences mSharedPreferences = null;
 
 	private SharedPreferences getSharedPreferences() {
@@ -69,7 +71,7 @@ public class AlertManager {
 		}
 		return mSharedPreferences;
 	}
-	
+
 	/**
 	 * @return the snow settings shared preference for alert notifications
 	 */
@@ -80,7 +82,7 @@ public class AlertManager {
 		}
 		return mNotifySnowSettings;
 	}
-	
+
 	/**
 	 * @return true when user has enabled notification in preferences
 	 */
@@ -102,6 +104,33 @@ public class AlertManager {
 		mRemoveOld = mDB.compileStatement("DELETE FROM alerts WHERE time<?");
 	}
 
+	public void close() {
+		mDB.close();
+	}
+
+	/**
+	 * Returns the alert description column from a cursor coming from the
+	 * alerts table.
+	 */
+	public static String getAlertDesc(Cursor alertCursor) {
+		return alertCursor.getString(2);
+	}
+
+	/**
+	 * Returns a string representation of an alert's time column.
+	 */
+	public static CharSequence getAlertTime(Cursor alertCursor) {
+		long epochMS = alertCursor.getLong(1) * 1000;
+		return DateFormat.format("EEE ha", epochMS);
+	}
+
+	/**
+	 * Returns a string representation of the resort's label column.
+	 */
+	public static String getResortLabel(Cursor resortCursor) {
+		return resortCursor.getString(1);
+	}
+
 	/**
 	 * Returns the resort ID or creates a entry
 	 */
@@ -118,7 +147,9 @@ public class AlertManager {
 
 		mInsertResort.bindString(1, l.getLabel());
 		mInsertResort.bindString(2, l.getReportUrlPath());
-		return mInsertResort.executeInsert();
+		long id = mInsertResort.executeInsert();
+		mInsertResort.close();
+		return id;
 	}
 
 	private long findAlert(long time, long resortId) {
@@ -145,11 +176,13 @@ public class AlertManager {
 		mInsertAlert.bindLong(3, 0);
 		mInsertAlert.bindLong(4, resortId);
 		mInsertAlert.executeInsert();
+		mInsertAlert.close();
 	}
 
-	public void addAlerts(Report r) {
+	public void addAlerts(Report r, WakeMeSkiServer server) {
+		SnowSettingsSharedPreference prefs = getNotifySnowSettings();
 		for (Weather w : r.getWeather()) {
-			if (w.hasSnowAlert(getNotifySnowSettings())) {
+			if (w.hasSnowAlert(prefs, server)) {
 				long rid = getResortID(r.getResort().getLocation());
 
 				long wid = findAlert(w.getExact(), rid);
@@ -178,6 +211,7 @@ public class AlertManager {
 
 	public void acknowledgeAlerts() {
 		mAckAll.execute();
+		mAckAll.close();
 
 		String ns = Context.NOTIFICATION_SERVICE;
 		NotificationManager nm = (NotificationManager)mContext.getSystemService(ns);
@@ -192,6 +226,7 @@ public class AlertManager {
 		long thresh = (System.currentTimeMillis()/1000) - SIX_HOURS;
 		mRemoveOld.bindLong(1, thresh);
 		mRemoveOld.execute();
+		mRemoveOld.close();
 	}
 
 	/**
@@ -206,7 +241,7 @@ public class AlertManager {
 			c.moveToNext();
 		}
 		c.close();
-		return l; 
+		return l;
 	}
 
 	private String getResortLabel(long id) {
@@ -218,7 +253,6 @@ public class AlertManager {
 		return label;
 	}
 
-	
 	/**
 	 * Creates an alert in the status bar. If there are more than one reports
 	 * with snow, it gives a summary of the number otherwise it displays the
@@ -229,14 +263,14 @@ public class AlertManager {
 
 		if( ids.size() <= 0 )
 			return;
-		
+
 		/*
 		 * Don't do anything if notifications are disabled
 		 */
 		if( !isNotificationEnabled() ) {
 			return;
 		}
-		
+
 		int icon = R.drawable.snow;
 		CharSequence tickerTitle = mContext.getString(R.string.ticker_title);
 		long when = System.currentTimeMillis();
