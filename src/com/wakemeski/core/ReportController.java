@@ -16,6 +16,8 @@
 package com.wakemeski.core;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
@@ -57,6 +59,19 @@ public class ReportController implements Runnable {
 	private Context mContext;
 	private ResortManager mResortManager;
 	private int mResortCount = 0;
+	private boolean mLoadInProgress=false;
+	
+	/*
+	 * Make sure only one thread forces a load to start from listner register
+	 */
+	private Object mSychronizeForceLoad= new Object();
+	/*
+	 * The last time we loaded a resort, or 0 if a resort has never been loaded.
+	 * Using object Long to allow synchronization
+	 */
+	private Long   mLastResortLoadTimeMs= new Long(0);
+	
+	boolean mForceLoadInProgress = false;
 
 	private ReportController(Context c, ResortManager rm) {
 		mContext = c;
@@ -110,7 +125,9 @@ public class ReportController implements Runnable {
     }
 
 	/**
-	 * Load all configured reports in the ReportController thread
+	 * Force Re-Loads all configured reports in the ReportController thread in 
+	 * response to a specific request from a user.  Typically you will want to use
+	 * addListerAndUpdateReports() instead.
 	 * 
 	 * Previously the default was to always set the ReportController thread as
 	 * a background thread.  I found out when testing 
@@ -126,32 +143,12 @@ public class ReportController implements Runnable {
 	 * @param isBackground true when the report controller can be run as a background
 	 * thread.  False when it should be run as the primary thread for the application
 	 */
-	public void loadReports( boolean isBackground ) {
+	public void forceLoadReports( boolean isBackground ) {
+		mForceLoadInProgress = true;
 		Action a = new LoadResortsAction(mResortManager.getResorts(),isBackground);
 		mActions.add(a);
 	}
 
-	/**
-	 * Returns the reports we have loaded (cached) or starts a report load
-	 * as a background process if we have not yet loaded any reports.
-	 * This method is only designed to be called by UI components as it will loa
-	 * @param isBackground If set and no reports have been loaded yet, will load reports
-	 * as a background process.  Only safe to set this from a UI component and not a 
-	 * WakeMeSkiService.  See <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
-	 * issue 20</a>
-	 * @return
-	 */
-	public Report[] getLoadedReports( boolean isBackground ) {
-		synchronized (mListeners) {
-			Report r[] = mReports.values().toArray(new Report[mReports.size()]);
-			//check if there are no cached reports and reload
-			if( r.length == 0 ) {
-				loadReports(isBackground);
-			}
-			return r;
-		}
-	}
-	
 	/**
 	 * @return The number of resorts currently managed by the controller,
 	 * including resorts which have been added or specified for load but with loads
@@ -185,7 +182,9 @@ public class ReportController implements Runnable {
 	}
 
 	/**
-	 * Adds a listener if not already present
+	 * Adds a listener if not already present.  You may miss report notifications
+	 * when using this method.  If you care about receiving all reports including those
+	 * cached by the controller use addListenerAndUpdateReports() instead.
 	 * @param listener
 	 */
 	public void addListener(ReportListener listener) {
@@ -193,7 +192,73 @@ public class ReportController implements Runnable {
 			mListeners.add(listener);
 		}
 	}
+	
+	/**
+	 * @return true if the report data currently cached in the controller is stale and
+	 * should be re-loaded.  This could be because a load never completed or because it's been
+	 * too long since a load has completed (current threshold is 1 hour)
+	 */
+	private boolean reportDataCacheInvalid() {
+		boolean cacheInvalid = true;
+		Date lastLoad = null;
+		synchronized (mLastResortLoadTimeMs) {
+			if( mLastResortLoadTimeMs != 0 ) {
+				lastLoad = new Date(mLastResortLoadTimeMs);
+			}
+		}
+		
+		if(lastLoad != null) {
+			Calendar oneHourAgo =Calendar.getInstance();
+			oneHourAgo.add(Calendar.HOUR,-1);
+			/*
+			 * Consider the cache invalid if the last load was more than one hour ago
+			 */
+			cacheInvalid = lastLoad.before(oneHourAgo.getTime());
+		}
+		return cacheInvalid;
+	}
 
+	/**
+	 * Adds a listener (if not already present) and updates the reports.  Updates the listener with the currently
+	 * loaded reports.  If no report load has been started yet OR if the data cached in this
+	 * object is stale re-load the reports in the controller
+	 * @param listener to update with report values
+	 * @param isBackground true if the controller thread can be run background.  false if it
+	 * must be run in foreground (ie if this is a service listener)
+	 */
+	public void addListenerAndUpdateReports(ReportListener listener, boolean isBackground) {
+		synchronized (mListeners) {
+			/*
+			 * Get this listener up to date with the current status of the report load
+			 */
+			if( !reportDataCacheInvalid() ) {
+				/*
+				 * Simulate loading status
+				 */
+				listener.onLoading(true);
+				for(Report r : mReports.values()) {
+					listener.onAdded(r);
+				}
+				if( !mLoadInProgress ) {
+					listener.onLoading(false);
+				}
+			} 
+			mListeners.add(listener);
+		}
+		
+		/*
+		 * Make sure only one thread can check for cache invalid and force report load
+		 * at a time, that way we won't ever end up with two threads requesting report
+		 * load at the same time.
+		 */
+		synchronized (mSychronizeForceLoad) {
+			if(reportDataCacheInvalid() && !mForceLoadInProgress) {
+				forceLoadReports(isBackground);
+			}
+		}
+		
+	}
+	
 	/**
 	 * Removes a listener if present
 	 * @param listener
@@ -227,6 +292,10 @@ public class ReportController implements Runnable {
 
 			WakeMeSkiServer srv = new WakeMeSkiServer(mContext);
 			Report r = Report.loadReport(c, cm, resort, srv);
+			long time = Calendar.getInstance().getTimeInMillis();
+			synchronized (mLastResortLoadTimeMs) {
+				mLastResortLoadTimeMs = time;
+			}
 			AlertManager am = new AlertManager(mContext);
 			am.addAlerts(r, srv);
 			synchronized (mListeners) {
@@ -313,12 +382,17 @@ public class ReportController implements Runnable {
 			synchronized (mListeners) {
 				for(ReportListener l: mListeners)
 					l.onLoading(true);
+				mLoadInProgress=true;
 			}
 
 			WakeMeSkiServer server = new WakeMeSkiServer(mContext);
 			AlertManager am = new AlertManager(mContext);
 			for( Resort res: resorts ) {
 				Report r = Report.loadReport(c, cm, res, server);
+				long time = Calendar.getInstance().getTimeInMillis();
+				synchronized (mLastResortLoadTimeMs) {
+					mLastResortLoadTimeMs = time;
+				}
 				am.addAlerts(r, server);
 				synchronized (mListeners) {
 					mReports.put(res, r);
@@ -331,6 +405,8 @@ public class ReportController implements Runnable {
 			am.close();
 
 			synchronized (mListeners) {
+				mLoadInProgress=false;
+				mForceLoadInProgress=false;
 				for(ReportListener l: mListeners)
 					l.onLoading(false);
 			}

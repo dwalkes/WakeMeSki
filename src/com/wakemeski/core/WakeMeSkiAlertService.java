@@ -128,7 +128,6 @@ public class WakeMeSkiAlertService extends Service {
 	
 	/**
 	 * Called in the service thread when the ReportListener onAdded() callback occurs
-	 * and mDoAlarmActionCheck is true
 	 * @param r The report added to the list of reports
 	 */
 	protected void onReportAdded(Report r) {
@@ -245,13 +244,12 @@ public class WakeMeSkiAlertService extends Service {
 		 * and have not removed it (two checks in a row occurring before first load completed) it should
 		 * still be safe to call addListener - the second add will be a no-op and the listener will
 		 * be removed when the first loadReports() completes
-		 */
-		mReportController.addListener(mReportListener);
-		/**
+		 *
 		 * Must load reports with default (non background) priority.  See <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
 		 * issue 20</a>
+		 *
 		 */
-		mReportController.loadReports(false);
+		mReportController.addListenerAndUpdateReports(mReportListener,false);
 	}
 	
 
@@ -279,6 +277,10 @@ public class WakeMeSkiAlertService extends Service {
 				}
 			} else if( currentAction.equals(ACTION_ALERT_CHECK) ) {
 				startReportLoad();
+				/*
+				 * We will stop the service when report load completes
+				 */
+				result.setStopService(false);
 			}
 		} else {
 			Log.w(TAG, "onHandleIntent with null intent or action");

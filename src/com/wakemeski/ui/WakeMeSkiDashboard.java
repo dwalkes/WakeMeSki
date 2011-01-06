@@ -148,7 +148,7 @@ public class WakeMeSkiDashboard extends Activity {
 			/*
 			 * Start the report load as a background process
 			 */
-			mReportController.loadReports(true);
+			mReportController.forceLoadReports(true);
 			return true;
 		} else if( item.getItemId() == ALERTS_ID ) {
 			Intent i = new Intent(this, AlertsActivity.class);
