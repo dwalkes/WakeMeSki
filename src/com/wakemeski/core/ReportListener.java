@@ -2,8 +2,18 @@ package com.wakemeski.core;
 
 public interface ReportListener {
 
-	void onRemoved(Report r);
+	/**
+	 * Called when an action on the report controller completes (report
+	 * for a resort is added or removed)
+	 */
+	void onUpdated();
 	
+	/**
+	 * Called when a report is added to the list of reports held by the
+	 * report controller.  Classes which do not need to handle lists of reports
+	 * but rather handle each report individually can implement this method
+	 * @param r
+	 */
 	void onAdded(Report r);
 
 	/**

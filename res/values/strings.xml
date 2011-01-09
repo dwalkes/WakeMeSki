@@ -40,7 +40,6 @@
 	<string name="resort_snow_detail">Resort snow detail:</string>
 	<string name="does_not_exceed_wakeup_value">Does not exceed wakeup value</string>
 	<string name="exceeds_wakeup_value">Exceeds wakeup value</string>
-	<string name="no_resorts_configured">Please configure a resort.</string>
 	<string name="my_report">My Report</string>
 	<string name="show_report_summary">Check status for selected resorts</string>
 	<string name="please_wait_for_service">Please wait while snow status is obtained for selected resorts.</string>
@@ -69,8 +68,6 @@
 	<string name="report_error_localized_detail">An error occurred while attempting to retrieve the report for this resort: %s</string>
 	<string name="error_title">Error Finding Location Data</string>
 	<string name="error_no_connection">No data connection. Please try again later.</string>
-	
-	<string name="loading">Loading...</string>
 	
 	<!-- ReportActivity (report.xml) strings -->
 	<string name="report_date">Date: %s</string>

@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.content.Context;
@@ -124,17 +123,4 @@ public class ResortManagerFile implements ResortManager {
 		return mResorts;
 	}
 
-	/**
-	 * @return The list of resorts from persistent storage with wakeup enable
-	 *         configured
-	 */
-	public Resort[] getWakeupEnabledResorts() {
-		ArrayList<Resort> wakeupEnabled = new ArrayList<Resort>();
-		for (Resort resort : getResorts()) {
-			if (resort.isWakeupEnabled()) {
-				wakeupEnabled.add(resort);
-			}
-		}
-		return wakeupEnabled.toArray(new Resort[wakeupEnabled.size()]);
-	}
 }

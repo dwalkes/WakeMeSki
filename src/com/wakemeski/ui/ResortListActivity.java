@@ -152,6 +152,7 @@ public class ResortListActivity extends ListActivity {
 	private void clearAllResorts() {
 		mResortList = new Resort[0];
 		mResortManager.update(mResortList);
+		mReportController.removeAllReports();
 	}
 	/**
 	 * Handle results from LocationFinderActivity

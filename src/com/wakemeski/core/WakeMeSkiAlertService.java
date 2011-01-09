@@ -98,7 +98,10 @@ public class WakeMeSkiAlertService extends Service {
 	 */
 	private ReportListener mReportListener = new ReportListener() {
 
-
+		@Override
+		public void onUpdated() {
+			
+		}
 		@Override
 		public void onAdded(final Report r) {
 			h.post(new Runnable() {
@@ -106,10 +109,6 @@ public class WakeMeSkiAlertService extends Service {
 					onReportAdded(r);
 				}
 			});
-		}
-
-		@Override
-		public void onRemoved(Report r) {	
 		}
 
 		@Override

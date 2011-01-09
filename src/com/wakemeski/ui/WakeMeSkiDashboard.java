@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -41,6 +42,7 @@ import com.wakemeski.R;
 import com.wakemeski.core.Report;
 import com.wakemeski.core.ReportController;
 import com.wakemeski.core.ReportListener;
+import com.wakemeski.core.ResortManager;
 import com.wakemeski.core.WakeMeSkiFactory;
 
 /**
@@ -61,9 +63,11 @@ public class WakeMeSkiDashboard extends Activity {
 	private int mApVersion = 0;
 	private int mApLatestVersion = 0;
 	private ReportController mReportController;
+	private ResortManager	 mResortManager;
 	private static final int DIALOG_ID_LESS_THAN_MIN_VERSION = 0;
 	private static final int DIALOG_ID_LESS_THAN_LATEST_VERSION = 1;
 	private static final String UPDATE_IGNORE_PREF_KEY = "updateIgnoredVersion";
+	private Button mAddResortsButton;
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -72,7 +76,8 @@ public class WakeMeSkiDashboard extends Activity {
 		Eula.show(this);
 		
 		mReportController = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getReportController();
-
+		mResortManager = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager();
+		
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.dashboard);
 
@@ -86,6 +91,21 @@ public class WakeMeSkiDashboard extends Activity {
 		}
 		
 		mReportsList = (ListView)findViewById(R.id.dashboard_list);
+		mAddResortsButton = (Button)findViewById(R.id.add_resort_button_dashboard);
+		
+		/*
+		 * If the user hasn't configured a resort we will turn this button on with
+		 * setVisibility() to allow them to select a resort.  
+		 * By default it will be invisible
+		 */
+		mAddResortsButton.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(WakeMeSkiDashboard.this,
+						ResortListActivity.class));
+			}
+		});
+		
 		mListAdapter = new ReportListAdapter(getApplicationContext());
 		mReportsList.setAdapter(mListAdapter);
 
@@ -96,6 +116,12 @@ public class WakeMeSkiDashboard extends Activity {
 	protected void onResume() {
 		super.onResume();		
 
+		/*
+		 * Update visibility of the add resorts button based on number of 
+		 * configured resorts
+		 */
+		updateAddResortsButton();
+		
 		mReportController.addListener(mReportListener);
 		if( mReportController.isBusy() ) {
 			setProgressBarIndeterminateVisibility(true);
@@ -107,6 +133,18 @@ public class WakeMeSkiDashboard extends Activity {
 		super.onPause();
 
 		mReportController.removeListener(mReportListener);
+	}
+	
+	/**
+	 * Update visibility of the mAddResortsButton button based on number 
+	 * of configured resorts.  When resorts are configured, remove from the view.
+	 */
+	private void updateAddResortsButton() {
+		if( mResortManager.getResorts().length != 0 ) {
+			mAddResortsButton.setVisibility(View.GONE);
+		} else {
+			mAddResortsButton.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	@Override
@@ -164,6 +202,14 @@ public class WakeMeSkiDashboard extends Activity {
 		Handler h = new Handler();
 
 		@Override
+		public void onUpdated() {
+			h.post(new Runnable() {
+				public void run() {
+					updateAddResortsButton();
+				}
+			});
+		}
+		@Override
 		public void onAdded(Report r) {
 			if( r.getServerInfo().getApMinSupportedVersion() > mApVersion ) {
 				h.post(new Runnable() {
@@ -194,10 +240,6 @@ public class WakeMeSkiDashboard extends Activity {
 
 
 			}
-		}
-
-		@Override
-		public void onRemoved(Report r) {	
 		}
 
 		@Override
@@ -279,12 +321,6 @@ public class WakeMeSkiDashboard extends Activity {
 				Intent i = new Intent(WakeMeSkiDashboard.this, ReportActivity.class);
 				i.putExtra("report", r);
 				startActivityForResult(i, 0);
-			}
-			else {
-				//there are no reports and the user pressed the
-				// "please configure" item
-				Intent i = new Intent(WakeMeSkiDashboard.this, WakeMeSkiPreferences.class);
-				startActivity(i);
 			}
 		}
 	};

@@ -15,21 +15,22 @@
  */
 package com.wakemeski.core;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.wakemeski.core.alert.AlertManager;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.util.Log;
 import android.os.Process;
+import android.util.Log;
+
+import com.wakemeski.core.alert.AlertManager;
 
 /**
  * Starts a long running thread that will check for updates to resorts and get
@@ -58,7 +59,6 @@ public class ReportController implements Runnable {
 	private boolean mBusy;
 	private Context mContext;
 	private ResortManager mResortManager;
-	private int mResortCount = 0;
 	private boolean mLoadInProgress=false;
 	
 	/*
@@ -145,18 +145,11 @@ public class ReportController implements Runnable {
 	 */
 	public void forceLoadReports( boolean isBackground ) {
 		mForceLoadInProgress = true;
+		Log.d(TAG,"Start forceLoadReports isBackground=" +isBackground);
 		Action a = new LoadResortsAction(mResortManager.getResorts(),isBackground);
 		mActions.add(a);
 	}
 
-	/**
-	 * @return The number of resorts currently managed by the controller,
-	 * including resorts which have been added or specified for load but with loads
-	 * not yet complete
-	 */
-	public int getNumberOfResorts() {
-		return mResortCount;
-	}
 
 	/**
 	 * Returns a mapping of Resort->Report
@@ -170,6 +163,7 @@ public class ReportController implements Runnable {
 	 */
 	public void addResort(Resort r) {
 		Action a = new AddResortAction(r);
+		Log.d(TAG,"add resort request");
 		mActions.add(a);
 	}
 
@@ -178,9 +172,22 @@ public class ReportController implements Runnable {
 	 */
 	public void removeResort(Resort r) {
 		Action a = new RemoveResortAction(r);
+		Log.d(TAG,"remove resort request");
 		mActions.add(a);
 	}
 
+	/**
+	 * Removes all reports from the list in preparation for re-load
+	 */
+	public void removeAllReports() {
+		synchronized (mListeners) {
+			mReports.clear();
+		}
+
+		for(ReportListener rl: mListeners) {					
+			rl.onUpdated();
+		}
+	}
 	/**
 	 * Adds a listener if not already present.  You may miss report notifications
 	 * when using this method.  If you care about receiving all reports including those
@@ -228,6 +235,7 @@ public class ReportController implements Runnable {
 	 */
 	public void addListenerAndUpdateReports(ReportListener listener, boolean isBackground) {
 		synchronized (mListeners) {
+			Log.d(TAG,"addListenerAndUpdateReports isBackground=" + isBackground);
 			/*
 			 * Get this listener up to date with the current status of the report load
 			 */
@@ -242,6 +250,7 @@ public class ReportController implements Runnable {
 				if( !mLoadInProgress ) {
 					listener.onLoading(false);
 				}
+				listener.onUpdated();
 			} 
 			mListeners.add(listener);
 		}
@@ -272,6 +281,31 @@ public class ReportController implements Runnable {
 		}
 		return containedElement;
 	}
+	
+	/**
+	 * This function represents a query we could return from ReportController as a content
+	 * provider which would return a sorted list of reports
+	 * @return a sorted list of reports obtained by the controller.
+	 */
+	public ArrayList<Report> getSortedReportList() {
+		ArrayList<Report> reportList;
+		synchronized (mListeners) {
+			reportList = new ArrayList<Report>(mReports.values());
+		}
+		//this report was just added, we need to make sure we keep
+		//the list sorted alphabetically
+		Collections.sort(reportList, new Comparator<Report>() {
+			public int compare(Report r1, Report r2) {
+				String n1 = r1.getResort().getResortName();
+				String n2 = r2.getResort().getResortName();
+				return n1.compareTo(n2);
+			}
+		}
+		);
+		
+		return reportList;
+	}
+	
 
 	abstract class Action {
 		abstract void run();
@@ -285,7 +319,6 @@ public class ReportController implements Runnable {
 
 		@Override
 		public void run() {
-			mResortCount++;
 			Context c = ReportController.this.mContext;
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -300,11 +333,15 @@ public class ReportController implements Runnable {
 			am.addAlerts(r, srv);
 			synchronized (mListeners) {
 				mReports.put(resort, r);
+				Log.d(TAG,"AddResortAction added resort " + resort + " notifying listners");
+
 				for(ReportListener rl: mListeners) {					
 					rl.onAdded(r);
+					rl.onUpdated();
 				}
 			}
 			am.handleNotifications();
+			am.close();
 		}
 	}
 
@@ -316,11 +353,11 @@ public class ReportController implements Runnable {
 
 		@Override
 		public void run() {			
-			mResortCount--;
 			synchronized (mListeners) {
-				Report removed = mReports.remove(r);
+				mReports.remove(r);
+				Log.d(TAG,"RemoveResortAction removed resort " + r + " notifying listners");
 				for(ReportListener l: mListeners) {
-					l.onRemoved(removed);
+					l.onUpdated();
 				}
 			}
 		}
@@ -348,43 +385,33 @@ public class ReportController implements Runnable {
 				Log.d(TAG, "Setting thread default priority");
 				Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);	
 			}
-			/*
-			 * The total number of resorts will match the number passed
-			 * into the LoadResortsAction()
-			 */
-			mResortCount = resorts.length;
 			
 			Context c = ReportController.this.mContext;
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			/*
-			 * We might have a different list now than we did previously.
-			 * Remove any resorts in mReports that are not in the new resort array
+			 * Remove all reports in preparation for reload
 			 */
-			Set<Resort> removedResorts = new HashSet<Resort>(mReports.keySet());
-			removedResorts.removeAll(Arrays.asList(resorts));
-			
+			mReports.clear();
+
 			/*
-			 * Notify listners of removed resorts
+			 * Notify listeners we are now loading
 			 */
-			for(Resort res: removedResorts) {
-				Report r = mReports.get(res);
-				synchronized (mListeners) {
-					mReports.remove(res);
-					for(ReportListener l: mListeners)
-						l.onRemoved(r);
-				}	
-			}
-
-
-			
 			synchronized (mListeners) {
-				for(ReportListener l: mListeners)
+				for(ReportListener l: mListeners) {
+					/*
+					 * Send an updated message to show the reports list was cleared
+					 */
+					l.onUpdated();
 					l.onLoading(true);
+				}
 				mLoadInProgress=true;
 			}
 
+			/*
+			 * Load each report and notify listners
+			 */
 			WakeMeSkiServer server = new WakeMeSkiServer(mContext);
 			AlertManager am = new AlertManager(mContext);
 			for( Resort res: resorts ) {
@@ -396,14 +423,21 @@ public class ReportController implements Runnable {
 				am.addAlerts(r, server);
 				synchronized (mListeners) {
 					mReports.put(res, r);
-					mResortCount = mReports.size();
-					for(ReportListener l: mListeners)
+					for(ReportListener l: mListeners) {
 						l.onAdded(r);
+						l.onUpdated();
+					}
 				}				
 			}
+			/*
+			 * Update alerts
+			 */
 			am.handleNotifications();
 			am.close();
 
+			/*
+			 * Notify listeners that loading is complete
+			 */
 			synchronized (mListeners) {
 				mLoadInProgress=false;
 				mForceLoadInProgress=false;

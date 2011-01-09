@@ -55,11 +55,6 @@ public class AlertManager {
 	private Context mContext;
 	private SQLiteDatabase mDB;
 
-	private SQLiteStatement mInsertResort;
-	private SQLiteStatement mInsertAlert;
-	private SQLiteStatement mRemoveOld;
-	private SQLiteStatement mAckAll;
-
 	private SnowSettingsSharedPreference mNotifySnowSettings = null;
 
 	private SharedPreferences mSharedPreferences = null;
@@ -95,15 +90,8 @@ public class AlertManager {
 		DBHelper h = new DBHelper(c);
 		mDB = h.getWritableDatabase();
 
-		mInsertResort = mDB
-				.compileStatement("INSERT INTO resorts (label,url) values (?, ?)");
-		mInsertAlert = mDB
-				.compileStatement("INSERT INTO alerts (time,desc,acked,resort) values (?, ?, ?, ?)");
-		mAckAll = mDB
-				.compileStatement("UPDATE alerts SET acked=1 WHERE acked=0");
-		mRemoveOld = mDB.compileStatement("DELETE FROM alerts WHERE time<?");
 	}
-
+	
 	public void close() {
 		mDB.close();
 	}
@@ -145,10 +133,13 @@ public class AlertManager {
 		}
 		c.close();
 
-		mInsertResort.bindString(1, l.getLabel());
-		mInsertResort.bindString(2, l.getReportUrlPath());
-		long id = mInsertResort.executeInsert();
-		mInsertResort.close();
+		SQLiteStatement insertResort = mDB
+					.compileStatement("INSERT INTO resorts (label,url) values (?, ?)");
+		
+		insertResort.bindString(1, l.getLabel());
+		insertResort.bindString(2, l.getReportUrlPath());
+		long id = insertResort.executeInsert();
+		insertResort.close();
 		return id;
 	}
 
@@ -171,12 +162,16 @@ public class AlertManager {
 	}
 
 	private void insertAlert(Weather w, long resortId) {
-		mInsertAlert.bindLong(1, w.getExact());
-		mInsertAlert.bindString(2, w.getDesc());
-		mInsertAlert.bindLong(3, 0);
-		mInsertAlert.bindLong(4, resortId);
-		mInsertAlert.executeInsert();
-		mInsertAlert.close();
+		SQLiteStatement insertAlert = mDB
+			.compileStatement("INSERT INTO alerts (time,desc,acked,resort) values (?, ?, ?, ?)");
+
+		
+		insertAlert.bindLong(1, w.getExact());
+		insertAlert.bindString(2, w.getDesc());
+		insertAlert.bindLong(3, 0);
+		insertAlert.bindLong(4, resortId);
+		insertAlert.executeInsert();
+		insertAlert.close();
 	}
 
 	public void addAlerts(Report r, WakeMeSkiServer server) {
@@ -210,8 +205,11 @@ public class AlertManager {
 	}
 
 	public void acknowledgeAlerts() {
-		mAckAll.execute();
-		mAckAll.close();
+		SQLiteStatement ackAll = mDB
+		.compileStatement("UPDATE alerts SET acked=1 WHERE acked=0");
+		
+		ackAll.execute();
+		ackAll.close();
 
 		String ns = Context.NOTIFICATION_SERVICE;
 		NotificationManager nm = (NotificationManager)mContext.getSystemService(ns);
@@ -224,9 +222,11 @@ public class AlertManager {
 	public void removeOld() {
 		//the timestamps are in seconds since epoch
 		long thresh = (System.currentTimeMillis()/1000) - SIX_HOURS;
-		mRemoveOld.bindLong(1, thresh);
-		mRemoveOld.execute();
-		mRemoveOld.close();
+		SQLiteStatement removeOld = mDB.compileStatement("DELETE FROM alerts WHERE time<?");
+
+		removeOld.bindLong(1, thresh);
+		removeOld.execute();
+		removeOld.close();
 	}
 
 	/**

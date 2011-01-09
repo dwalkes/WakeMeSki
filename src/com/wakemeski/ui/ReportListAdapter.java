@@ -16,8 +16,6 @@
 package com.wakemeski.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import android.content.Context;
 import android.database.DataSetObservable;
@@ -41,7 +39,6 @@ public class ReportListAdapter implements ListAdapter {
 	Handler mHandler = new Handler();
 
 	private ArrayList<Report> mReports = new ArrayList<Report>();
-	private boolean mLoading = false;
 
 	private DataSetObservable mDataSetObservable = new DataSetObservable();
 
@@ -70,28 +67,28 @@ public class ReportListAdapter implements ListAdapter {
 
 	@Override
 	public synchronized int getCount() {
-		int size = mReports.size();
-		// If size = 0 and we aren't loading, then no resorts have been
-		// configured by the user. We want to return a single item telling
-		// them to add a resort.
-		if( size < mReportController.getNumberOfResorts()
-				|| (size ==0 && !mLoading) ) {
-			/* 
-			 * If we're still loading reports or
-			 * we're done and we've got an empty list, increase the size by 1 to
-			 * include a single list item with status.
-			 */
-			size++;
+		synchronized (mReports) {
+			return mReports.size();
 		}
-		return size;
 	}
 
+	/**
+	 * @param position index into the summary list
+	 * @return a Report at this position in mReportList or
+	 * null if the report does not exist at this position.
+	 */
+	private Report getReportAtPosition(int position) {
+		Report atPosition = null;
+		synchronized (mReports) {
+			if( position < mReports.size() )
+				atPosition = mReports.get(position);
+		}
+		return atPosition;
+	}
+	
 	@Override
 	public synchronized Object getItem(int position) {
-		if( position >= mReports.size() )
-			return null; //This would be the "loading" or "not configured" item
-
-		return mReports.get(position);
+		return getReportAtPosition(position);
 	}
 
 	@Override
@@ -107,11 +104,7 @@ public class ReportListAdapter implements ListAdapter {
 	@Override
 	public synchronized View getView(int position, View convertView,
 			ViewGroup parent) {
-		Report r = null;
-		
-		//make sure its not the loading item
-		if( position < mReports.size() )
-			r = mReports.get(position);
+		Report r = getReportAtPosition(position);
 
 		View v = mInflater.inflate(R.layout.snow_layout, parent, false);
 
@@ -126,14 +119,6 @@ public class ReportListAdapter implements ListAdapter {
 
 			ImageView iv = (ImageView)v.findViewById(R.id.snow_layout_icon);
 			iv.setImageResource(r.getWeatherIconResId());
-		}
-		else {
-			if( mReports.size() < mReportController.getNumberOfResorts() ) {
-				tv.setText(R.string.loading);
-			}
-			else if ( mReports.size() == 0 ) {
-				tv.setText(R.string.no_resorts_configured);
-			} 
 		}
 
 		return v;
@@ -165,11 +150,20 @@ public class ReportListAdapter implements ListAdapter {
 	}
 
 	ReportListener mListener = new ReportListener() {
-		
+		/**
+		 * This method represents the content observer handler 
+		 * we would use on notify changed
+		 * from the report controller if it were a content provider.
+		 */
 		@Override
-		public void onRemoved(Report r) {
+		public void onUpdated() {
 			synchronized (mReports) {
-				mReports.remove(r);
+				/*
+				 *  This represents the query we would issue to the report controller
+				 *  if it was implemented as a content provider, mReportList simulates
+				 *  the cursor
+				 */
+				mReports = mReportController.getSortedReportList();
 			}
 			mHandler.post(new Runnable() {
 				public void run() {
@@ -180,39 +174,10 @@ public class ReportListAdapter implements ListAdapter {
 
 		@Override
 		public void onLoading(boolean started) {
-			synchronized (mReports) {
-				mLoading = started;
-				if( mLoading )
-					mReports.clear();
-			}			
-			mHandler.post(new Runnable() {
-				public void run() {
-					mDataSetObservable.notifyChanged();
-				}
-			});
 		}
 
 		@Override
 		public void onAdded(Report r) {
-			synchronized (mReports) {
-				mReports.add(r);
-				if( !mLoading ) {
-					//this report was just added, we need to make sure we keep
-					//the list sorted alphabetically
-					Collections.sort(mReports, new Comparator<Report>() {
-						public int compare(Report r1, Report r2){
-							String n1 = r1.getResort().getResortName();
-							String n2 = r2.getResort().getResortName();
-							return n1.compareTo(n2);
-						}
-					});
-				}
-			}
-			mHandler.post(new Runnable() {
-				public void run() {
-					mDataSetObservable.notifyChanged();
-				}
-			});
 		}
 		
 		@Override
