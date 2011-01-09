@@ -31,10 +31,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 
 import com.wakemeski.R;
 import com.wakemeski.core.Location;
 import com.wakemeski.core.Report;
+import com.wakemeski.core.Resort;
 import com.wakemeski.core.WakeMeSkiServer;
 import com.wakemeski.core.Weather;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
@@ -51,6 +53,8 @@ public class AlertManager {
 	public static final int NOTIFICATION_ID = R.drawable.snow;
 
 	private static final long SIX_HOURS = 6 * 60 * 60;
+	
+	private static final String TAG = "AlertManager";
 
 	private Context mContext;
 	private SQLiteDatabase mDB;
@@ -120,26 +124,36 @@ public class AlertManager {
 	}
 
 	/**
+	 * @param l
+	 * @return the existing resort ID for this location, or NULL if it does not exist
+	 */
+	private Long getExistingResortId(Location l) {
+		Long resortId=null;
+		String query = "label = \"" + l.getLabel() +"\" AND url = \"" + l.getReportUrlPath() +"\"";
+		Cursor c = mDB.query("resorts", new String[] {"_id"}, query, null, null, null, null);
+		if( c.getCount() == 1 && c.moveToFirst() ) {
+			resortId = c.getLong(0);
+		}
+		c.close();
+		return resortId;
+	}
+	
+	/**
 	 * Returns the resort ID or creates a entry
 	 */
 	private long getResortID(Location l) {
 
-		String query = "label = \"" + l.getLabel() +"\" AND url = \"" + l.getReportUrlPath() +"\"";
-		Cursor c = mDB.query("resorts", new String[] {"_id"}, query, null, null, null, null);
-		if( c.getCount() == 1 && c.moveToFirst() ) {
-			long id = c.getLong(0);
-			c.close();
-			return id;
-		}
-		c.close();
+		Long id = getExistingResortId(l);
 
-		SQLiteStatement insertResort = mDB
-					.compileStatement("INSERT INTO resorts (label,url) values (?, ?)");
-		
-		insertResort.bindString(1, l.getLabel());
-		insertResort.bindString(2, l.getReportUrlPath());
-		long id = insertResort.executeInsert();
-		insertResort.close();
+		if( id == null ) {
+			SQLiteStatement insertResort = mDB
+						.compileStatement("INSERT INTO resorts (label,url) values (?, ?)");
+			
+			insertResort.bindString(1, l.getLabel());
+			insertResort.bindString(2, l.getReportUrlPath());
+			id = insertResort.executeInsert();
+			insertResort.close();
+		} 
 		return id;
 	}
 
@@ -230,6 +244,40 @@ public class AlertManager {
 	}
 
 	/**
+	 * Removes all alerts and resorts from the database
+	 */
+	public void removeAll() {
+		Log.d(TAG,"Removing all resorts & alerts");
+		SQLiteStatement removeAllAlerts= mDB.compileStatement("DELETE FROM alerts");
+		removeAllAlerts.execute();
+		removeAllAlerts.close();
+		
+		SQLiteStatement removeAllResorts= mDB.compileStatement("DELETE FROM resorts");
+		removeAllResorts.execute();
+		removeAllResorts.close();
+		
+	}
+	
+	/**
+	 * Removes all resorts for a particular resort from the database
+	 * @param r
+	 */
+	public void removeResort(Resort r) {
+		Long resId = getExistingResortId(r.getLocation());
+		if( resId != null ) {
+			Log.d(TAG,"Removing resort " + r);
+			SQLiteStatement removeResortAlerts = mDB.compileStatement("DELETE FROM alerts WHERE resort=?");
+			removeResortAlerts.bindLong(1, resId);
+			removeResortAlerts.execute();
+
+			SQLiteStatement removeResorts = mDB.compileStatement("DELETE FROM resorts WHERE _id=?");
+			removeResorts.bindLong(1, resId);
+			removeResorts.execute();
+		} else {
+			Log.d(TAG,"Attempt to remove not present resort " +r);
+		}
+	}
+	/**
 	 * Returns a list of resort IDs for each alert not yet acked
 	 */
 	private List<Long> getUnacknowledgedIds() {
@@ -271,7 +319,7 @@ public class AlertManager {
 			return;
 		}
 
-		int icon = R.drawable.snow;
+		int icon = R.drawable.snow_alert;
 		CharSequence tickerTitle = mContext.getString(R.string.ticker_title);
 		long when = System.currentTimeMillis();
 

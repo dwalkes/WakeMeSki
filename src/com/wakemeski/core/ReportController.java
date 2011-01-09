@@ -172,18 +172,22 @@ public class ReportController implements Runnable {
 	 */
 	public void removeResort(Resort r) {
 		Action a = new RemoveResortAction(r);
-		Log.d(TAG,"remove resort request");
+		Log.d(TAG,"remove resort request resort" + r);
 		mActions.add(a);
 	}
 
 	/**
 	 * Removes all reports from the list in preparation for re-load
+	 * also clears alerts from the alert manager
 	 */
-	public void removeAllReports() {
+	public void removeAllReportsAndAlerts() {
+		Log.d(TAG,"remove all reports and alerts");
 		synchronized (mListeners) {
 			mReports.clear();
 		}
-
+		AlertManager am = new AlertManager(mContext);
+		am.removeAll();
+		am.close();
 		for(ReportListener rl: mListeners) {					
 			rl.onUpdated();
 		}
@@ -355,6 +359,11 @@ public class ReportController implements Runnable {
 		public void run() {			
 			synchronized (mListeners) {
 				mReports.remove(r);
+				
+				AlertManager am = new AlertManager(mContext);
+				am.removeResort(r);
+				am.close();
+				
 				Log.d(TAG,"RemoveResortAction removed resort " + r + " notifying listners");
 				for(ReportListener l: mListeners) {
 					l.onUpdated();
