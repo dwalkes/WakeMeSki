@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2010 Dan Walkes - All Rights Reserved-->
+<LinearLayout 
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
+android:layout_height="fill_parent"
+android:layout_width="fill_parent"
+android:background="#ffC0C0C0">
+<Button
+	android:id="@+id/btn_alert_configure_notify"
+	android:text="@string/configure_notifications"
+	android:layout_height="50dip"
+	android:layout_width="fill_parent"
+	android:textStyle="bold"
+	android:gravity="center" />    
+<ExpandableListView
+  android:id="@android:id/list"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:drawSelectorOnTop="false"/>
+</LinearLayout>

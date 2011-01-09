@@ -9,6 +9,7 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CursorTreeAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ResourceCursorTreeAdapter;
@@ -25,13 +26,38 @@ public class AlertsActivity extends ExpandableListActivity {
 	
 	private static final int PREFERENCES_ID = Menu.FIRST;
 	private static final int REPORT_ID     = Menu.FIRST+1;
+	private Button mConfigureNotifyButton;
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		getExpandableListView().setBackgroundColor(0xffC0C0C0);
+		
+		setContentView(R.layout.alert_list_activity);
+		
+		mConfigureNotifyButton = (Button)findViewById(R.id.btn_alert_configure_notify);
+		
+		/**
+		 * If the user hasn't configured a resort we will turn this button on with
+		 * setVisibility() to allow them to select a resort.  
+		 * By default it will be invisible
+		 */
+		mConfigureNotifyButton.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				/**
+				 * Start the prefernces application at the notify preferences
+				 * PreferenceScreen when AlertsActivity#mConfigureNotifyButton 
+				 * is clicked
+				 */
+				Intent i = new Intent(AlertsActivity.this,
+						WakeMeSkiPreferences.class);
+				i.putExtra(WakeMeSkiPreferences.EXTRA_START_PREF_SCREEN_WITH_KEY, 
+						WakeMeSkiPreferences.NOTIFY_PREFS_SCREEN_KEY);
+				startActivity(i);
+			}
+		});
+		
 		mAlerts = new AlertManager(getApplication());
 		mAlerts.removeOld();
 		Cursor c = mAlerts.getAlertResorts();

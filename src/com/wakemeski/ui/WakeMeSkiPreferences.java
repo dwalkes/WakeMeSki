@@ -75,7 +75,13 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private static final int TEST_ALARM_FIRE_ID = Menu.FIRST + 1;
 	private static final int TEST_SERVICE_FIRE_ID = Menu.FIRST + 2;
 
-
+	/**
+	 * Use the intent extra EXTRA_START_PREF_SCREEN_WITH_KEY to start a specific
+	 * preference within the preferences application
+	 */
+	public static final String EXTRA_START_PREF_SCREEN_WITH_KEY = "start_pref_with_key";
+	public static final String NOTIFY_PREFS_SCREEN_KEY = "notification_prefs";
+	
 	private void updateToneSummary(Uri ringtoneUri) {
 		// this code doesn't work for some reason - I can't get the real name of
 		// the ringtone
@@ -224,8 +230,24 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
 
+
+
+		
 	}
 
+	public void onResume() { 
+		super.onResume();
+		Intent i = getIntent();
+		/**
+		 * If we specified starting at a specific preference screen, 
+		 * start it based on the value in the intent extra.
+		 */
+		if( i != null && i.hasExtra(EXTRA_START_PREF_SCREEN_WITH_KEY) ) {
+			String startPrefScreen = i.getExtras().getString(EXTRA_START_PREF_SCREEN_WITH_KEY);
+			setPreferenceScreen((PreferenceScreen) findPreference(startPrefScreen));
+		}
+	}
+	
 	/**
 	 * picks the first alarm available
 	 */

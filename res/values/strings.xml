@@ -23,7 +23,7 @@
 	<string name="wakeup_settings">Wakeup Settings</string>
 	<string name="alert_settings">Alert Settings</string>
 	<string name="alert_summary">Configure alerts on snow forecast updates</string>
-	<string name="enable_alert_notify">Enable alert notifications</string>
+	<string name="enable_alert_notify">Enable snow alert status bar notifications</string>
 	<string name="snow_alert_settings_detail">Snow totals for snow alerts</string>
 	<string name="alert_when">Add snow alert when</string>
 	<string name="is_forecasted_for_resort">of snow or more is forecasted for a selected resort.</string>
@@ -108,4 +108,5 @@
     <string name="ticker_msg">Snow alert for %s</string>
     <string name="ticker_msg_multi">%d snow alerts found</string>
 	<string name="show_report">Show Report</string>
+	<string name="configure_notifications">Configure Notifications</string>
 </resources>
