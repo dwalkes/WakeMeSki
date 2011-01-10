@@ -1,6 +1,9 @@
 package com.wakemeski.core;
 
+import com.wakemeski.Log;
+
 import android.content.Context;
+
 
 public class WakeMeSkiFactory {
 
@@ -11,6 +14,7 @@ public class WakeMeSkiFactory {
 	private WakeMeSkiFactory(Context c) {
 		mResortManager = ResortManagerFile.getInstance(c);
 		mReportController = ReportController.getInstance(c, mResortManager);
+		Log.getInstance().setContext(c);
 	}
 	
 	public ReportController getReportController() {

@@ -1,0 +1,82 @@
+From ce182219b0270228aa515fb62ef6f347945543d3 Mon Sep 17 00:00:00 2001
+From: Dan Walkes <danwalkes@gmail.com>
+Date: Thu, 23 Dec 2010 16:34:05 -0700
+Subject: [PATCH 1/2] Search for android.jar in 1.5 platform subdir
+
+In my case the 1.5 platform files were under an android-1.5
+folder instead of an android-3 platform folder.  Also add runtime
+error if one of the two android-jar files is not found under an
+expected path folder.
+
+Update README to note fix for @Override errors by setting compiler
+compliance level
+---
+ README.txt               |    5 +++--
+ build-android_lib.gradle |   25 +++++++++++++++++++++++--
+ 2 files changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/README.txt b/README.txt
+index b2ab77d..714c1ce 100644
+--- a/README.txt
++++ b/README.txt
+@@ -9,7 +9,8 @@ The microlog4android project brings the microlog logging library to Android. Thi
+ 3. Run "gradle -b build-android_lib.gradle". This will generate modified version of the android.jar file in the lib-folder.
+    This task can get an OutOfMemory exception. To fix this simply add set: JAVA_OPTS -Xmx512m
+ 4. Run "gradle eclipse", still from the root project. This will generate the Eclipse project files.
+-5. Import the other modules into Eclipse as existing projects.
++5. Import the other modules into Eclipse as existing projects.  If you see compile errors at @Override tags please set your
++Java compiler compliance level to 1.6 (Project->Properties->Java Compiler->Compiler compliance level:)
+ 6. To run a complete build of the microlog4android project simply run "gradle" in the root project.
+ 7. Integration tests are executed in the emulator. Simply run the microlog4android-integration-tests as an Android application from Eclipse.
+    Remember to run the "gradle" command in the root project before starting the integration tests.
+@@ -34,4 +35,4 @@ Eclipse:
+ - Android plugin: http://developer.android.com/guide/developing/eclipse-adt.html
+ 
+ Git:
+-- git-osx-installer: http://code.google.com/p/git-osx-installer/
+\ No newline at end of file
++- git-osx-installer: http://code.google.com/p/git-osx-installer/
+diff --git a/build-android_lib.gradle b/build-android_lib.gradle
+index 15cb731..360cd19 100644
+--- a/build-android_lib.gradle
++++ b/build-android_lib.gradle
+@@ -22,7 +22,28 @@ task initAndroidFiles(type: Copy) {
+ 		print 'ANDROID SDK: ' + androidSdkPath
+ 	}
+ 	
+-	from zipTree(androidSdkPath + '/platforms/android-3/android.jar')
++	/*
++	* I believe Android SDK files for 1.5 may exist under platforms/andriod-3 or under platforms/android-1.5 depending on
++	* which version of sdk manager was used to download the platform files.
++	*/
++	androidJar1 = androidSdkPath + '/platforms/android-3/android.jar';
++	androidJar2 = androidSdkPath + '/platforms/android-1.5/android.jar';
++
++	jar1Exists = new File(androidJar1).exists();
++
++	jar2Exists = new File(androidJar2).exists();
++	
++	if( jar1Exists ) {
++		androidJar = androidJar1;
++	} else if ( jar2Exists ) {
++		androidJar = androidJar2;
++	} else {
++		throw new RuntimeException("Android jar file not found at " + androidJar1 + "\n" +
++						" or " + androidJar2 + " please make sure you've installed SDK platform 1.5 using\n"+
++						" the android SDK and AVD Manager");
++	}
++	
++	from zipTree(androidJar)
+ 	include '**/*.class'
+ 	exclude 'java*/**'
+ 	exclude 'junit/**'
+@@ -55,4 +76,4 @@ task createModifiedJarFile(dependsOn: initAndroidFiles, type: Zip) {
+ //
+ //	ant.echo(file: 'microlog4android-integration-tests/gradle.properties', 'append': 'false', message: ('androidSdkPath = ' + androidSdkPath))
+ //	ant.echo(file: 'microlog4android-integration-tests/gradle.properties', 'append': 'true', message: ('\nandroidVirtualDeviceName = ' + androidVirtualDeviceName))
+-//}
+\ No newline at end of file
++//}
+-- 
+1.7.0.4
+

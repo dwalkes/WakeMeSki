@@ -28,7 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import com.wakemeski.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;

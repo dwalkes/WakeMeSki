@@ -19,7 +19,7 @@ package com.wakemeski.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.core.WakeMeSkiAlertService;
 import com.wakemeski.core.WakeMeSkiWakeupService;

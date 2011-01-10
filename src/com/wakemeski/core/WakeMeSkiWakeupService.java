@@ -23,7 +23,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.WakeMeSki;
 import com.wakemeski.pref.RepeatDaySharedPreference;

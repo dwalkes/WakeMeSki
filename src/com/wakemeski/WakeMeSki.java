@@ -25,6 +25,11 @@ import com.wakemeski.ui.WakeMeSkiPreferences;
 
 public class WakeMeSki extends Application {
 
+	/**
+	 * Global control of all debug applications including logging to logcat
+	 */
+	public static final boolean DEBUG = false;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();

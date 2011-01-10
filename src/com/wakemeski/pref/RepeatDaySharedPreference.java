@@ -20,7 +20,7 @@ import java.util.Calendar;
 
 import com.wakemeski.ui.ListPreferenceMultiSelect;
 
-import android.util.Log;
+import com.wakemeski.Log;
 
 /**
  * A POJO used to access repeat day information shared in an android preference.

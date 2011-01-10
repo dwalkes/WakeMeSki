@@ -35,7 +35,7 @@ import org.apache.http.client.ClientProtocolException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.Settings;
-import android.util.Log;
+import com.wakemeski.Log;
 
 /**
  * Wrapper around HttpUtils.getLocationServer() that allows caching a 

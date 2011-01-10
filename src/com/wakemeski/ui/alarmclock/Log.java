@@ -33,14 +33,14 @@ class Log {
 			: Config.LOGV;
 
 	static void v(String logMe) {
-		android.util.Log.v(LOGTAG, logMe);
+		com.wakemeski.Log.d(LOGTAG, logMe);
 	}
 
 	static void e(String logMe) {
-		android.util.Log.e(LOGTAG, logMe);
+		com.wakemeski.Log.e(LOGTAG, logMe);
 	}
 
 	static void e(String logMe, Exception ex) {
-		android.util.Log.e(LOGTAG, logMe, ex);
+		com.wakemeski.Log.e(LOGTAG, logMe, ex);
 	}
 }

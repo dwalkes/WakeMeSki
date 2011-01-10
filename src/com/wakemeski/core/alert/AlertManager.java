@@ -31,7 +31,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.R;
 import com.wakemeski.core.Location;

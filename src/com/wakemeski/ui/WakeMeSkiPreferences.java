@@ -16,6 +16,7 @@
  */
 package com.wakemeski.ui;
 
+import java.io.File;
 import java.util.Calendar;
 
 import android.content.Intent;
@@ -27,12 +28,15 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-import android.util.Log;
+import com.wakemeski.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.wakemeski.R;
+import com.wakemeski.WakeMeSki;
+import com.wakemeski.core.Resort;
+import com.wakemeski.core.WakeMeSkiFactory;
 import com.wakemeski.core.alert.AlertPollingController;
 import com.wakemeski.pref.RepeatDaySharedPreference;
 import com.wakemeski.pref.TimeSettingsSharedPreference;
@@ -56,6 +60,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private AlarmPreference mAlarmTonePreference;
 	private PreferenceScreen mDashboardPreference;
 	private PreferenceScreen mResortsPreference;
+	private PreferenceScreen mSendLogsPreference;
 	private SnowSettingsPreference mWakeupSnowSettings;
 	private String TAG = "WakeMeSkiPreferences";
 	private AlarmController mAlarmController;
@@ -71,7 +76,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	public static final String SNOW_WAKEUP_SETTINGS_KEY = "snow_settings";
 	public static final String SNOW_ALERT_SETTINGS_KEY = "snow_alert_settings";
 	public static final String NOTIFY_ENABLE_PREF_KEY	= "notification_enable";
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = WakeMeSki.DEBUG;
 	private static final int TEST_ALARM_FIRE_ID = Menu.FIRST + 1;
 	private static final int TEST_SERVICE_FIRE_ID = Menu.FIRST + 2;
 
@@ -215,7 +220,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		mDashboardPreference = (PreferenceScreen) findPreference("dashboard");
 		mResortsPreference = (PreferenceScreen) findPreference("selected_resorts");
 		mWakeupSnowSettings = (SnowSettingsPreference) findPreference(SNOW_WAKEUP_SETTINGS_KEY);
-		
+		mSendLogsPreference = (PreferenceScreen) findPreference("send_logs");
 		mAlarmTonePreference.setRingtoneChangedListener(this);
 
 		Uri defaultAlarm = getDefaultAlarm();
@@ -280,7 +285,31 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		} else if (preference == mResortsPreference) {
 			startActivity(new Intent(Intent.ACTION_MAIN, null, this,
 					ResortListActivity.class));
-		} 
+		} else if (preference == mSendLogsPreference) {
+			File logFile = Log.getInstance().getLogFile();
+			if( logFile == null ) {
+				Toast toast = Toast.makeText(this,
+						R.string.log_file_not_available_insert_sdcard,
+						Toast.LENGTH_SHORT);
+				toast.show();
+			} else {
+				Resort[] resorts =WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager().getResorts();
+				Log.d(TAG, "Configured resorts:");
+				for( Resort resort : resorts ) {
+					Log.d(TAG, resort + " isWakeupEnabled= " + resort.isWakeupEnabled());
+				}
+				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND); 
+			    emailIntent.setType("plain/text");
+			    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] 
+			    {"wakemeski@ddubtech.com"}); 
+			    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, 
+			    "WakeMeSki debug log"); 
+			    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, 
+			    "Description of problem:"); 
+			    emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+ logFile.getAbsolutePath()));
+			    startActivity(Intent.createChooser(emailIntent,this.getString(R.string.send_mail)));
+			}
+		}
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}
 

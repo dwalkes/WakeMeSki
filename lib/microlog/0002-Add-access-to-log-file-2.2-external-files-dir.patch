@@ -1,0 +1,249 @@
+From 67d66d6419cb365f270fec313f11157875a634c9 Mon Sep 17 00:00:00 2001
+From: Dan Walkes <danwalkes@gmail.com>
+Date: Mon, 10 Jan 2011 00:45:04 -0700
+Subject: [PATCH 2/2] Add access to log file, 2.2 external files dir
+
+Android 2.2 provides context.getExternalFilesDir which provides
+external file storage automatically removed when an application
+is removed.
+
+Added comments about use of required permissions.
+
+Made getFile() method public on FileAppender to allow send of
+log file over e-mail and monitoring of size.
+---
+ android-sdk-path.properties                        |    2 +-
+ .../google/code/microlog4android/LoggerTest.java   |   20 ++--
+ .../microlog4android/appender/FileAppender.java    |  111 +++++++++++++++++---
+ 3 files changed, 109 insertions(+), 24 deletions(-)
+
+diff --git a/android-sdk-path.properties b/android-sdk-path.properties
+index 38b4732..97e95db 100644
+--- a/android-sdk-path.properties
++++ b/android-sdk-path.properties
+@@ -1,2 +1,2 @@
+ # PATH TO THE ROOT FOLDER OF THE ANDROID SDK, THIS MUST BE SET BEFORE YOU CAN SETUP THE PROJECT
+-androidSdkPath = 
+\ No newline at end of file
++androidSdkPath = /home/dan/android/android-sdk-linux_x86-1.5_r2
+diff --git a/microlog4android-core-tests/src/test/java/com/google/code/microlog4android/LoggerTest.java b/microlog4android-core-tests/src/test/java/com/google/code/microlog4android/LoggerTest.java
+index 4762351..e002778 100644
+--- a/microlog4android-core-tests/src/test/java/com/google/code/microlog4android/LoggerTest.java
++++ b/microlog4android-core-tests/src/test/java/com/google/code/microlog4android/LoggerTest.java
+@@ -9,8 +9,10 @@ import org.junit.After;
+ import org.junit.Before;
+ import org.junit.Test;
+ 
++import android.test.AndroidTestCase;
++
+ import com.google.code.microlog4android.appender.Appender;
+-import com.google.code.microlog4android.appender.FileAppender;
++import com.google.code.microlog4android.appender.LogCatAppender;
+ import com.google.code.microlog4android.repository.DefaultLoggerRepository;
+ 
+ public class LoggerTest {
+@@ -44,17 +46,17 @@ public class LoggerTest {
+ 
+ 	@Test
+ 	public void testAddAppender() {
+-		logger.addAppender(new FileAppender());
++		logger.addAppender(new LogCatAppender());
+ 
+ 		assertEquals(1, logger.getNumberOfAppenders());
+ 	}
+ 
+ 	@Test
+ 	public void testAddAppenderDuplicateValue() {
+-		FileAppender fileAppender = new FileAppender();
++		LogCatAppender lcAppender = new LogCatAppender();
+ 
+-		logger.addAppender(fileAppender);
+-		logger.addAppender(fileAppender);
++		logger.addAppender(lcAppender);
++		logger.addAppender(lcAppender);
+ 
+ 		assertEquals(1, logger.getNumberOfAppenders());
+ 	}
+@@ -90,11 +92,11 @@ public class LoggerTest {
+ 
+ 	@Test
+ 	public void testRemoveAllAppenders() {
+-		FileAppender fileAppender1 = new FileAppender();
+-		FileAppender fileAppender2 = new FileAppender();
++		LogCatAppender lcAppender1 = new LogCatAppender();
++		LogCatAppender lcAppender2 = new LogCatAppender();
+ 
+-		logger.addAppender(fileAppender1);
+-		logger.addAppender(fileAppender2);
++		logger.addAppender(lcAppender1);
++		logger.addAppender(lcAppender2);
+ 
+ 		logger.removeAllAppenders();
+ 
+diff --git a/microlog4android-core/src/main/java/com/google/code/microlog4android/appender/FileAppender.java b/microlog4android-core/src/main/java/com/google/code/microlog4android/appender/FileAppender.java
+index 0a2c8d5..c50fcb7 100644
+--- a/microlog4android-core/src/main/java/com/google/code/microlog4android/appender/FileAppender.java
++++ b/microlog4android-core/src/main/java/com/google/code/microlog4android/appender/FileAppender.java
+@@ -18,7 +18,10 @@ import java.io.File;
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.PrintWriter;
++import java.lang.reflect.Method;
+ 
++import android.content.Context;
++import android.os.Build;
+ import android.os.Environment;
+ import android.util.Log;
+ 
+@@ -28,25 +31,51 @@ import com.google.code.microlog4android.Level;
+  * An appender to log to a file in on the SDCard.
+  * 
+  * @author Johan Karlsson
++ * @author Dan Walkes
+  * 
+  */
+ public class FileAppender extends AbstractAppender {
+ 	private static final String TAG = "Microlog.FileAppender";
+ 	
+ 	public static final String DEFAULT_FILENAME = "microlog.txt";
+-
++	
+ 	private String fileName = DEFAULT_FILENAME;
+ 
+ 	private PrintWriter writer;
+ 
+ 	private boolean append = false;
++	
++	private File mSdCardLogFile = null;
++	
++	Context mContext = null;
++	
++	/**
++	 * Create a file appender using the specified application context.
++	 * Note: your application must hold android.permission.WRITE_EXTERNAL_STORAGE
++	 * to be able to access the SDCard.
++	 * @param c
++	 */
++	public FileAppender(Context c) {
++		mContext = c;
++	}
++
++	/**
++	 * Create a file appender without application context.  The logging file will
++	 * be placed in the root folder and will not be removed when your application is
++	 * removed.  Use FileAppender(Context) to create a log that is automatically removed
++	 * when your application is removed
++	 * Note: your application must hold android.permission.WRITE_EXTERNAL_STORAGE
++	 * to be able to access the SDCard.
++	 */
++	public FileAppender() {
++	}
+ 
+ 	/**
+ 	 * @see com.google.code.microlog4android.appender.AbstractAppender#open()
+ 	 */
+ 	@Override
+ 	public void open() throws IOException {
+-		File logFile = getSDCardFile();
++		File logFile = getLogFile();
+ 		logOpen = false;
+ 
+ 		if (logFile != null) {
+@@ -134,28 +163,82 @@ public class FileAppender extends AbstractAppender {
+ 	 * all again when starting a new session.
+ 	 * 
+ 	 * @param append
+-	 *            the append to set
++	 *            the append to set (default = false)
+ 	 */
+ 	public void setAppend(boolean append) {
+ 		this.append = append;
+ 	}
+ 
+-	private File getSDCardFile() {
+-		String externalStorageState = Environment.getExternalStorageState();
+-		File externalStorageDirectory = Environment
+-				.getExternalStorageDirectory();
+-		File file = null;
++	/**
++	 * Android 1.6-2.1 used {@link Environment#getExternalStorageDirectory()} 
++	 *  to return the (root)
++	 * external storage directory.  Folders in this subdir were shared by all applications
++	 * and were not removed when the application was deleted.
++	 * Starting with andriod 2.2, Context.getExternalFilesDir() is available.  
++	 * This is an external directory available to the application which is removed when the application
++	 * is removed.
++	 * 
++	 * This implementation uses Context.getExternalFilesDir() if available, if not available uses 
++	 * {@link Environment#getExternalStorageDirectory()}. 
++	 * 
++	 * @return a File object representing the external storage directory
++	 * used by this device or null if the subdir could not be created or proven to exist
++	 */
++	protected File getExternalStorageDirectory() {
+ 
+-		if (externalStorageState.equals(Environment.MEDIA_MOUNTED)
+-				&& externalStorageDirectory != null) {
+-			file = new File(externalStorageDirectory, fileName);
++		File externalStorageDirectory = Environment
++			.getExternalStorageDirectory();
++		
++		int sdk = new Integer(Build.VERSION.SDK);
++		if(sdk>=8 && mContext!= null) {
++			Method getExtFilesDir;
++			try {
++				/*
++				 * Use indirection to invoke getExternalFilesDir(), this allows us to
++				 * support platforms less than 8.
++				 */
++				getExtFilesDir = Context.class.getMethod("getExternalFilesDir",new Class[] {String.class});
++				/*
++				 * Invoke getExtFilesDir with null argument
++				 */
++				externalStorageDirectory = (File) getExtFilesDir.invoke(mContext,new Object[] {null});
++			}
++			catch (Throwable t) {
++				Log.e(TAG, "Could not execute method getExternalFilesDir() on sdk >=8",t);
++			}
+ 		}
++		if( externalStorageDirectory != null) {
++			if(!externalStorageDirectory.exists()) {
++				if(!externalStorageDirectory.mkdirs()) {
++					externalStorageDirectory = null;
++					Log.e(TAG, "mkdirs failed on externalStorageDirectory " + externalStorageDirectory);
++				}
++			}
++		}
++		return externalStorageDirectory;
++	}
++	
++	/**
++	 * @return the log file used to log to external storage
++	 */
++	public File getLogFile() {
++		
++		if( mSdCardLogFile == null ) {
++			String externalStorageState = Environment.getExternalStorageState();
++			if(externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
++				File externalStorageDirectory = getExternalStorageDirectory();
+ 		
+-		if(file == null) {
+-			Log.e(TAG, "Unable to open log file from external storage");
++				if (externalStorageDirectory != null) {
++					mSdCardLogFile = new File(externalStorageDirectory, fileName);
++				}
++			}
++			
++			if(mSdCardLogFile == null) {
++				Log.e(TAG, "Unable to open log file from external storage");
++			}
+ 		}
+ 
+-		return file;
++		return mSdCardLogFile;
+ 	}
+ 
+ }
+-- 
+1.7.0.4
+

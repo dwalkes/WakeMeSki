@@ -23,7 +23,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
-import android.util.Log;
+import com.wakemeski.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;

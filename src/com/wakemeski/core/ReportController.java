@@ -28,7 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.Process;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.core.alert.AlertManager;
 

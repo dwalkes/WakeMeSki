@@ -37,7 +37,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.R;
 import com.wakemeski.pref.SnowSettingsSharedPreference;

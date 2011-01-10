@@ -28,7 +28,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.pref.AlarmToneSharedPreference;
 import com.wakemeski.ui.alarmclock.AlarmAlert;

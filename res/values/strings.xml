@@ -29,7 +29,10 @@
 	<string name="is_forecasted_for_resort">of snow or more is forecasted for a selected resort.</string>
 	<string name="notify_me_when_snow_settings">Notify me when a snow forecast for a resort indicates</string>
 	<string name="notify_fresh_snow_predicted">or more of fresh snow predicted</string>
-	
+	<string name="send_logs">Send Log Files</string>
+	<string name="send_logs_to_developers">Send log files to developers to help debug issues.</string>
+	<string name="log_file_not_available_insert_sdcard">Log file not available.  Please insert SDCard or unplug USB cable from computer</string>
+	<string name="send_mail">Send Mail...</string>
  	 <!-- Unsorted strings-->
 	<string name="none">None</string>
 	<string name="alert_title">Alarm</string>

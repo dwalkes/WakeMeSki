@@ -7,7 +7,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
-import android.util.Log;
+import com.wakemeski.Log;
 
 /**
  * A wrapper around setForeground() and startForeground() methods

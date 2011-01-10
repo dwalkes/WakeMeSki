@@ -22,7 +22,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import com.wakemeski.Log;
 
 /**
  * A class to control the turn on/off of polling for snow alerts using

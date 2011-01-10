@@ -25,7 +25,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import android.content.Context;
-import android.util.Log;
+import com.wakemeski.Log;
 
 /**
  * Manages a list of resorts to/from persistent storage

@@ -51,6 +51,11 @@
 	android:key="dashboard"
 	android:summary="@string/show_report_summary">
 	</PreferenceScreen>
+   	<PreferenceScreen 
+	android:title="@string/send_logs"
+	android:key="send_logs"
+	android:summary="@string/send_logs_to_developers">
+	</PreferenceScreen>	
 </PreferenceCategory>
     
 </PreferenceScreen>

@@ -32,7 +32,7 @@ import java.util.Arrays;
 
 import org.apache.http.client.ClientProtocolException;
 
-import android.util.Log;
+import com.wakemeski.Log;
 
 /**
  * This class helps find a location and its corresponding URL from which it can

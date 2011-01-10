@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+import com.wakemeski.Log;
 
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 
