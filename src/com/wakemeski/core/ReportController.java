@@ -184,13 +184,14 @@ public class ReportController implements Runnable {
 		Log.d(TAG,"remove all reports and alerts");
 		synchronized (mListeners) {
 			mReports.clear();
+			for(ReportListener rl: mListeners) {					
+				rl.onUpdated();
+			}
 		}
 		AlertManager am = new AlertManager(mContext);
 		am.removeAll();
 		am.close();
-		for(ReportListener rl: mListeners) {					
-			rl.onUpdated();
-		}
+
 	}
 	/**
 	 * Adds a listener if not already present.  You may miss report notifications
@@ -399,15 +400,17 @@ public class ReportController implements Runnable {
 			ConnectivityManager cm = 
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-			/*
-			 * Remove all reports in preparation for reload
-			 */
-			mReports.clear();
+
 
 			/*
 			 * Notify listeners we are now loading
 			 */
 			synchronized (mListeners) {
+				/*
+				 * Remove all reports in preparation for reload
+				 */
+				mReports.clear();
+				
 				for(ReportListener l: mListeners) {
 					/*
 					 * Send an updated message to show the reports list was cleared
