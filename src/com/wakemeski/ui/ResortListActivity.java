@@ -167,8 +167,10 @@ public class ResortListActivity extends ListActivity {
 			Resort r = new Resort(loc, url);
 			/*
 			 * Default to false when adding to the list.
+			 * I'm guessing people aren't figuring out that they need to specifically enable
+			 * this based on feedback about resort wakeups not working
 			 */
-			r.setWakeupEnabled(false);
+			r.setWakeupEnabled(true);
 			addResort(r);
 		} else if (resultCode == RESULT_CANCELED) {
 			/* 

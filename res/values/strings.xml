@@ -33,6 +33,7 @@
 	<string name="send_logs_to_developers">Send log files to developers to help debug issues.</string>
 	<string name="log_file_not_available_insert_sdcard">Log file not available.  Please insert SDCard or unplug USB cable from computer</string>
 	<string name="send_mail">Send Mail...</string>
+	<string name="please_enable_wakeup_on_resort">Please enable wake-up for at least one resort in the Resorts page to finish alarm configuration.</string>
  	 <!-- Unsorted strings-->
 	<string name="none">None</string>
 	<string name="alert_title">Alarm</string>

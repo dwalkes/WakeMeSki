@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.wakemeski.R;
 import com.wakemeski.WakeMeSki;
 import com.wakemeski.core.Resort;
+import com.wakemeski.core.ResortManager;
 import com.wakemeski.core.WakeMeSkiFactory;
 import com.wakemeski.core.alert.AlertPollingController;
 import com.wakemeski.pref.RepeatDaySharedPreference;
@@ -64,6 +65,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private SnowSettingsPreference mWakeupSnowSettings;
 	private String TAG = "WakeMeSkiPreferences";
 	private AlarmController mAlarmController;
+	private ResortManager	mResortManager;
 	public static final String ALARM_ENABLE_PREF_KEY = "alarm_enable";
 	public static final String ALARM_TONE_PREF_KEY = "alarm_tone";
 	public static final String REPEAT_DAYS_PREF_KEY = "alarm_repeat_days";
@@ -150,8 +152,20 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 			Calendar nextAlarm = calculator.getNextAlarm();
 			if (nextAlarm != null) {
 				if (mAlarmController.setAlarm(nextAlarm)) {
-					Toast toast = Toast.makeText(this, R.string.alarm_updated,
-							Toast.LENGTH_SHORT);
+					int wakeupEnabledResorts = 0;
+					for( Resort r: mResortManager.getResorts()) {
+						if( r.isWakeupEnabled() ) {
+							wakeupEnabledResorts ++;
+						}
+					}
+					Toast toast ;
+					if( wakeupEnabledResorts != 0 ) {
+						toast = Toast.makeText(this, R.string.alarm_updated,
+								Toast.LENGTH_SHORT);
+					} else {
+						toast = Toast.makeText(this, R.string.please_enable_wakeup_on_resort,
+								Toast.LENGTH_SHORT);
+					}
 					toast.show();
 				}
 			} else {
@@ -221,6 +235,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		mResortsPreference = (PreferenceScreen) findPreference("selected_resorts");
 		mWakeupSnowSettings = (SnowSettingsPreference) findPreference(SNOW_WAKEUP_SETTINGS_KEY);
 		mSendLogsPreference = (PreferenceScreen) findPreference("send_logs");
+		mResortManager = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager();
 		mAlarmTonePreference.setRingtoneChangedListener(this);
 
 		Uri defaultAlarm = getDefaultAlarm();
