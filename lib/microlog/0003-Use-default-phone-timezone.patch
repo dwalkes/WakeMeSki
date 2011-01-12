@@ -1,0 +1,28 @@
+From 400f6e27cc44526cdb59271cff719fcaa1249837 Mon Sep 17 00:00:00 2001
+From: Dan Walkes <danwalkes@gmail.com>
+Date: Tue, 11 Jan 2011 22:28:22 -0700
+Subject: [PATCH 3/3] Use default phone timezone
+
+In order to troubleshoot more easily, use the timezone default
+on the phone rather than forcing GMT.
+---
+ .../format/command/DateFormatCommand.java          |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/microlog4android-core/src/main/java/com/google/code/microlog4android/format/command/DateFormatCommand.java b/microlog4android-core/src/main/java/com/google/code/microlog4android/format/command/DateFormatCommand.java
+index 2bad1c9..254d4f8 100644
+--- a/microlog4android-core/src/main/java/com/google/code/microlog4android/format/command/DateFormatCommand.java
++++ b/microlog4android-core/src/main/java/com/google/code/microlog4android/format/command/DateFormatCommand.java
+@@ -51,8 +51,7 @@ public class DateFormatCommand implements FormatCommandInterface {
+ 	final static String[] MONTH_ARRAY = { "JAN", "FEB", "MAR", "APR",
+ 			"MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+ 
+-	private final Calendar calendar = Calendar.getInstance(TimeZone
+-			.getTimeZone("GMT"));
++	private final Calendar calendar = Calendar.getInstance();
+ 
+ 	int format = ABSOLUTE_FORMAT;
+ 
+-- 
+1.7.0.4
+

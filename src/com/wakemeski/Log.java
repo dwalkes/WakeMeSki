@@ -58,7 +58,7 @@ public class Log {
 			/*
 			 * Format date message throwable
 			 */
-			formatter.setPattern("%d %m %T");
+			formatter.setPattern("%d{ISO8601} %m %T");
 			/*
 			 * Always write logs to file
 			 */
