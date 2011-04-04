@@ -47,7 +47,7 @@ public class Weather implements Parcelable {
 		/*
 		 * Look for the upper accumulation value
 		 */
-		String snowTotalString = m.group(2);
+		String snowTotalString = m.group(m.groupCount());
 		int snowTotal =0;
 		if( snowTotalString != null ) {
 			try {
