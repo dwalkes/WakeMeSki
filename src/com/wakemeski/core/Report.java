@@ -578,9 +578,9 @@ public class Report implements Parcelable {
 			return r;
 		}
 
-		String when[] = new String[3];
-		long whenExact[] = new long[3];
-		String desc[] = new String[3];
+		String when[] = new String[4];
+		long whenExact[] = new long[4];
+		String desc[] = new String[4];
 		for (String line : lines) {
 			String parts[] = line.split("=", 2);
 			if (parts.length == 2) {
