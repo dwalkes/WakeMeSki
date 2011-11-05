@@ -15,12 +15,10 @@ import com.wakemeski.Log;
  * http://developer.android.com/reference/android/app/Service.html
  */
 public class ForegroundServiceCompat {
-	@SuppressWarnings("unchecked")
-	private static final Class[] mStartForegroundSignature = new Class[] {
+	private static final Class<?>[] mStartForegroundSignature = new Class<?>[] {
 	    int.class, Notification.class};
-	
-	@SuppressWarnings("unchecked")
-	private static final Class[] mStopForegroundSignature = new Class[] {
+
+	private static final Class<?>[] mStopForegroundSignature = new Class<?>[] {
 	    boolean.class};
 
 	private NotificationManager mNM;
