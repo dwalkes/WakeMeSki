@@ -63,7 +63,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private PreferenceScreen mResortsPreference;
 	private PreferenceScreen mSendLogsPreference;
 	private SnowSettingsPreference mWakeupSnowSettings;
-	private final String TAG = "WakeMeSkiPreferences";
 	private AlarmController mAlarmController;
 	private ResortManager	mResortManager;
 	public static final String ALARM_ENABLE_PREF_KEY = "alarm_enable";
@@ -242,7 +241,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 
 		Uri defaultAlarm = getDefaultAlarm();
 		if (defaultAlarm != null) {
-			Log.i(TAG, "Setting default alarm tone " + defaultAlarm);
+			Log.i("Setting default alarm tone " + defaultAlarm);
 			mAlarmTonePreference.setDefaultValue(defaultAlarm);
 		}
 		updateToneSummary(defaultAlarm);

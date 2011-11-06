@@ -106,8 +106,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		super.onReportAdded(r);
 		if( r.getResort().isWakeupEnabled() ) {
 			if (r.meetsPreference(getSnowSettings())) {
-				Log.i(TAG, "Resort " + r.getResort() + " met preference "
-						+ getSnowSettings());
+				Log.i("Resort " + r.getResort() + " met preference " + getSnowSettings());
 				/**
 				 * Done listening now that we've fired the alarm
 				 */

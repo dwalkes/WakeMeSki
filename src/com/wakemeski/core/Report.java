@@ -87,8 +87,6 @@ public class Report implements Parcelable {
 	// The error message from the server, will not be localized
 	private String _errMsgServer = "";
 
-	private static final String TAG = "com.wakemeski.core.Report";
-
 	public static final Parcelable.Creator<Report> CREATOR = new Parcelable.Creator<Report>() {
 		@Override
 		public Report createFromParcel(Parcel source) {
@@ -664,7 +662,7 @@ public class Report implements Parcelable {
 					else if (parts[0].equals("temp.readings")) {
 						r._tempReadings = vals;
 					} else {
-						Log.i(TAG, "Unknown key-value from from report URL("
+						Log.i("Unknown key-value from from report URL("
 								+ l.getReportUrlPath() + " line: " + line);
 					}
 				}

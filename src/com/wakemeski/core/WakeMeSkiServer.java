@@ -43,7 +43,6 @@ import com.wakemeski.Log;
  * server location
  */
 public class WakeMeSkiServer {
-	private static final String TAG = "WakeMeSkiServer";
 
 	private String mID = null;
 
@@ -172,10 +171,10 @@ public class WakeMeSkiServer {
 			serverInfo.setAlertExpressions(exp.toArray(new String[exp.size()]));
 		}
 		catch ( ClientProtocolException ce ) {
-			Log.i(TAG,"Exception getting server info for server " + serverUrl + ce.getMessage());
+			Log.i("Exception getting server info for server " + serverUrl + ce.getMessage());
 		}
 		catch ( IOException ioe ) {
-			Log.i(TAG,"Exception getting server info for server " + serverUrl + ioe.getMessage());
+			Log.i("Exception getting server info for server " + serverUrl + ioe.getMessage());
 		}
 		return serverInfo;
 
@@ -211,7 +210,7 @@ public class WakeMeSkiServer {
 				}
 			}
 			catch (Exception e) {
-				Log.i(TAG,"Exception getting server info for server " + serverUrl + e.getMessage());
+				Log.i("Exception getting server info for server " + serverUrl + e.getMessage());
 			}
 		}
 		mServerInfo = latestServerInfo;

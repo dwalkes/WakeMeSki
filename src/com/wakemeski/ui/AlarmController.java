@@ -97,7 +97,7 @@ public class AlarmController {
 	}
 
 	public void clearAlarm() {
-		Log.i(TAG, "Clearing alarm");
+		Log.i("Clearing alarm");
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		if (mgr != null) {
@@ -115,7 +115,7 @@ public class AlarmController {
 				prefs.getString(WakeMeSkiPreferences.ALARM_TONE_PREF_KEY,
 						Settings.System.DEFAULT_RINGTONE_URI.toString()));
 
-		Log.i(TAG, "Firing alarm");
+		Log.i("Firing alarm");
 		/* Close dialogs and window shade */
 		Intent i = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 		context.sendBroadcast(i);

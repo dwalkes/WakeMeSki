@@ -137,7 +137,7 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void i(String tag, String message) {
+	public static void i(String message) {
 		getMicrologLogger().info(TAG+ ": " + message);
 	}
 
