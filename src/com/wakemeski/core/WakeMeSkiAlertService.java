@@ -140,7 +140,7 @@ public class WakeMeSkiAlertService extends Service {
 	 */
 	protected void reportLoadStarted()
 	{
-		Log.d(TAG, "Report load started");
+		Log.d("Report load started");
 		/**
 		 * Force a reload of snow settings when the report loading starts
 		 */
@@ -161,7 +161,7 @@ public class WakeMeSkiAlertService extends Service {
 	 */
 	private void reportLoadComplete()
 	{
-		Log.d(TAG, "Report load completed");
+		Log.d("Report load completed");
 		/**
 		 * Done listening now that report load has completed
 		 * Note: missing logic to determine whether the listener was active for at least
@@ -211,7 +211,7 @@ public class WakeMeSkiAlertService extends Service {
 
 	@Override
 	public void onCreate() {
-		Log.d(TAG, "onCreate");
+		Log.d("onCreate");
 		Context c = this.getApplicationContext();
 		// Maintain a lock during the checking of the alarm. This lock may have
 		// already been acquired in AlarmReceiver. If the process was killed,
@@ -224,7 +224,7 @@ public class WakeMeSkiAlertService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Log.d(TAG, "onDestroy");
+		Log.d("onDestroy");
 		/**
 		 * Make sure our listener is removed before destroy.  Should be safe to call
 		 * even if the listener is not currently in the list
@@ -240,7 +240,7 @@ public class WakeMeSkiAlertService extends Service {
 	 * calling reportLoadComplete() when completed
 	 */
 	protected void startReportLoad() {
-		Log.d(TAG, "Start report load");
+		Log.d("Start report load");
 		/**
 		 * Add our listener here - note in the odd case where we've already added a listener
 		 * and have not removed it (two checks in a row occurring before first load completed) it should
@@ -271,9 +271,9 @@ public class WakeMeSkiAlertService extends Service {
 		currentAction = intent.getAction();
 
 		if( currentAction != null ) {
-			Log.d(TAG,"onHandleIntent currentAction " + currentAction );
+			Log.d("onHandleIntent currentAction " + currentAction );
 			if( currentAction.equals(ACTION_ALARM_SCHEDULE) ) {
-				Log.d(TAG, "Checking notify enable to schedule wakeup checks");
+				Log.d("Checking notify enable to schedule wakeup checks");
 				if( WakeMeSkiPreferences.isAlertNotificationEnabled(getSharedPreferences()) ) {
 					AlertPollingController.getInstance(getApplicationContext()).enableAlertPolling();
 				}
@@ -314,7 +314,7 @@ public class WakeMeSkiAlertService extends Service {
 	 */
 	@Override
 	public int onStartCommand(final Intent intent, int flags, final int startId) {
-		Log.d(TAG, "onStartCommand");
+		Log.d("onStartCommand");
 		int startedState;
 		startedState = onHandleIntentReturnStartState(intent,startId);
 		return startedState;
@@ -326,10 +326,7 @@ public class WakeMeSkiAlertService extends Service {
 	 */
 	@Override
 	public void onStart( final Intent intent, final int startId ) {
-		Log.d(TAG, "onStart");
+		Log.d("onStart");
 		onHandleIntentReturnStartState(intent,startId);
 	}
-
-
-
 }

@@ -32,7 +32,6 @@ public class AlertPollingController {
 
 	Context mContext;
 
-	private static final String TAG = "AlertAlarmController";
 	private static AlertPollingController mInstance = null;
 
 	private AlertPollingController(Context c) {
@@ -62,7 +61,7 @@ public class AlertPollingController {
 	 * Enable the periodic wakeup check for alerts
 	 */
 	public void enableAlertPolling() {
-		Log.d(TAG, "Enabling alert polling");
+		Log.d("Enabling alert polling");
 		AlarmManager mgr = (AlarmManager) mContext
 								.getSystemService(Context.ALARM_SERVICE);
 		mgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
@@ -73,7 +72,7 @@ public class AlertPollingController {
 	 * Disable wakeup checks for snow alerts
 	 */
 	public void disableAlertPolling() {
-		Log.d(TAG, "Disabling alert polling");
+		Log.d("Disabling alert polling");
 		AlarmManager mgr = (AlarmManager) mContext
 				.getSystemService(Context.ALARM_SERVICE);
 

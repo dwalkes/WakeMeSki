@@ -170,7 +170,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 					toast.show();
 				}
 			} else {
-				Log.d(TAG, "No days selected");
+				Log.d("No days selected");
 				Toast toast = Toast.makeText(this,
 						R.string.alarm_disabled_no_days_selected,
 						Toast.LENGTH_SHORT);
@@ -178,7 +178,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 				mAlarmController.clearAlarm();
 			}
 		} else {
-			Log.d(TAG, "Alarm is not enabled");
+			Log.d("Alarm is not enabled");
 			Toast toast = Toast.makeText(this, R.string.alarm_disabled,
 					Toast.LENGTH_SHORT);
 			toast.show();
@@ -312,9 +312,9 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 				toast.show();
 			} else {
 				Resort[] resorts =WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager().getResorts();
-				Log.d(TAG, "Configured resorts:");
+				Log.d("Configured resorts:");
 				for( Resort resort : resorts ) {
-					Log.d(TAG, resort + " isWakeupEnabled= " + resort.isWakeupEnabled());
+					Log.d(resort + " isWakeupEnabled= " + resort.isWakeupEnabled());
 				}
 				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			    emailIntent.setType("plain/text");

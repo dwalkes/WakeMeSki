@@ -145,7 +145,7 @@ public class ReportController implements Runnable {
 	 */
 	public void forceLoadReports( boolean isBackground ) {
 		mForceLoadInProgress = true;
-		Log.d(TAG,"Start forceLoadReports isBackground=" +isBackground);
+		Log.d("Start forceLoadReports isBackground=" +isBackground);
 		Action a = new LoadResortsAction(mResortManager.getResorts(),isBackground);
 		mActions.add(a);
 	}
@@ -163,7 +163,7 @@ public class ReportController implements Runnable {
 	 */
 	public void addResort(Resort r) {
 		Action a = new AddResortAction(r);
-		Log.d(TAG,"add resort request");
+		Log.d("add resort request");
 		mActions.add(a);
 	}
 
@@ -172,7 +172,7 @@ public class ReportController implements Runnable {
 	 */
 	public void removeResort(Resort r) {
 		Action a = new RemoveResortAction(r);
-		Log.d(TAG,"remove resort request resort" + r);
+		Log.d("remove resort request resort" + r);
 		mActions.add(a);
 	}
 
@@ -181,7 +181,7 @@ public class ReportController implements Runnable {
 	 * also clears alerts from the alert manager
 	 */
 	public void removeAllReportsAndAlerts() {
-		Log.d(TAG,"remove all reports and alerts");
+		Log.d("remove all reports and alerts");
 		synchronized (mListeners) {
 			mReports.clear();
 			for(ReportListener rl: mListeners) {
@@ -240,7 +240,7 @@ public class ReportController implements Runnable {
 	 */
 	public void addListenerAndUpdateReports(ReportListener listener, boolean isBackground) {
 		synchronized (mListeners) {
-			Log.d(TAG,"addListenerAndUpdateReports isBackground=" + isBackground);
+			Log.d("addListenerAndUpdateReports isBackground=" + isBackground);
 			/*
 			 * Get this listener up to date with the current status of the report load
 			 */
@@ -339,7 +339,7 @@ public class ReportController implements Runnable {
 			am.addAlerts(r, srv);
 			synchronized (mListeners) {
 				mReports.put(resort, r);
-				Log.d(TAG,"AddResortAction added resort " + resort + " notifying listners");
+				Log.d("AddResortAction added resort " + resort + " notifying listners");
 
 				for(ReportListener rl: mListeners) {
 					rl.onAdded(r);
@@ -366,7 +366,7 @@ public class ReportController implements Runnable {
 				am.removeResort(r);
 				am.close();
 
-				Log.d(TAG,"RemoveResortAction removed resort " + r + " notifying listners");
+				Log.d("RemoveResortAction removed resort " + r + " notifying listners");
 				for(ReportListener l: mListeners) {
 					l.onUpdated();
 				}
@@ -390,10 +390,10 @@ public class ReportController implements Runnable {
 			 * issue 20</a>
 			 */
 			if( mIsBackground ) {
-				Log.d(TAG, "Setting thread background priority");
+				Log.d("Setting thread background priority");
 				Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 			} else {
-				Log.d(TAG, "Setting thread default priority");
+				Log.d("Setting thread default priority");
 				Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
 			}
 

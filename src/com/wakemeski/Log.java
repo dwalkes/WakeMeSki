@@ -110,7 +110,7 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void d(String tag, String message) {
+	public static void d(String message) {
 		getMicrologLogger().debug(TAG+ ": " + message);
 	}
 

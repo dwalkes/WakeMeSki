@@ -238,7 +238,7 @@ public class WakeMeSkiDashboard extends Activity {
     					}
     				});
             	} else {
-            		Log.d(TAG,"Not on latest version " + r.getServerInfo().getApLatestVersion() + " but I've already bugged you once...");
+            		Log.d("Not on latest version " + r.getServerInfo().getApLatestVersion() + " but I've already bugged you once...");
             	}
 
 
@@ -309,7 +309,7 @@ public class WakeMeSkiDashboard extends Activity {
                 	 */
                 	editor.putInt(UPDATE_IGNORE_PREF_KEY, mApLatestVersion);
                 	if( editor.commit() ) {
-                		Log.d(TAG,"OK I promise I won't bug you again... until the next version");
+                		Log.d("OK I promise I won't bug you again... until the next version");
                 	} else {
                 		Log.w(TAG, "Ignore pref key commit failed");
                 	}

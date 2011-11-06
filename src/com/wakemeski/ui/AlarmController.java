@@ -75,7 +75,7 @@ public class AlarmController {
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		if (mgr != null) {
-			Log.d(TAG,"Setting alarm for time " + new Date(timeInMilliseconds));
+			Log.d("Setting alarm for time " + new Date(timeInMilliseconds));
 			mgr.set(AlarmManager.RTC_WAKEUP, timeInMilliseconds,
 					getPendingIntent());
 			success = true;

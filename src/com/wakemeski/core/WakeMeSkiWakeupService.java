@@ -68,7 +68,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 	@Override
 	protected boolean shouldStopOnReportLoadComplete() {
 		if( !mAlarmFired ) {
-			Log.d(TAG, "Alarm did not fire, stopping service");
+			Log.d("Alarm did not fire, stopping service");
 			return true;
 		}
 		/**
@@ -127,11 +127,11 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					 */
 				}
 			} else {
-				Log.d(TAG, "Resort " + r.getResort() + " did not meet preference "
+				Log.d("Resort " + r.getResort() + " did not meet preference "
 						+ getSnowSettings());
 			}
 		} else {
-			Log.d(TAG, "Resort " + r.getResort() + " is not wakeup enabled");
+			Log.d("Resort " + r.getResort() + " is not wakeup enabled");
 		}
 
 	}
@@ -167,19 +167,16 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					AlarmCalculator calculator = new AlarmCalculator(repeatDay,
 							timeSettings);
 					nextAlarm = calculator.getNextAlarm();
-					if (nextAlarm == null) {
-						Log
-								.d(TAG,
-										"Alarm caculator returned null, no alarm scheduled");
-					}
+					if (nextAlarm == null)
+						Log.d("Alarm caculator returned null, no alarm scheduled");
 				} else {
-					Log.d(TAG, "No time set, no alarm scheduled");
+					Log.d("No time set, no alarm scheduled");
 				}
 			} else {
-				Log.d(TAG, "No repeat day setting, no alarm scheduled");
+				Log.d("No repeat day setting, no alarm scheduled");
 			}
 		} else {
-			Log.d(TAG, "Alarm is disabled, no alarm scheduled");
+			Log.d("Alarm is disabled, no alarm scheduled");
 		}
 		return nextAlarm;
 	}
@@ -274,7 +271,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 				bcReceiverCalPlus5Minutes.add(Calendar.MINUTE, 5);
 				Calendar now = Calendar.getInstance();
 				isStale = now.after(bcReceiverCalPlus5Minutes);
-				Log.d(TAG, "isStaleIntent " + isStale + " now= " + new Date(now.getTimeInMillis()) +
+				Log.d("isStaleIntent " + isStale + " now= " + new Date(now.getTimeInMillis()) +
 						" bcReceiverCalPlus5Minutes= " + new Date(bcReceiverCalPlus5Minutes.getTimeInMillis()));
 			}
 		}
@@ -306,7 +303,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 			staleIntent = isStaleIntent(intent);
 			if (currentAction.equals(ACTION_WAKE_CHECK)) {
 				if( !staleIntent ) {
-					Log.d(TAG,"Starting new wake check");
+					Log.d("Starting new wake check");
 					checkAlarmAction();
 					/*
 					 * Don't stop the service, we will stop it after resorts are checked
@@ -336,7 +333,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					Log.w(TAG,"Stale intent received with ACTION_SNOOZE, ignoring");
 				}
 			} else {
-				Log.d(TAG,"Unhandled action " + currentAction);
+				Log.d("Unhandled action " + currentAction);
 			}
 
 		}

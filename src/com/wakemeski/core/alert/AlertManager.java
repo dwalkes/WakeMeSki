@@ -54,8 +54,6 @@ public class AlertManager {
 
 	private static final long SIX_HOURS = 6 * 60 * 60;
 
-	private static final String TAG = "AlertManager";
-
 	private final Context mContext;
 	private final SQLiteDatabase mDB;
 
@@ -247,7 +245,7 @@ public class AlertManager {
 	 * Removes all alerts and resorts from the database
 	 */
 	public void removeAll() {
-		Log.d(TAG,"Removing all resorts & alerts");
+		Log.d("Removing all resorts & alerts");
 		SQLiteStatement removeAllAlerts= mDB.compileStatement("DELETE FROM alerts");
 		removeAllAlerts.execute();
 		removeAllAlerts.close();
@@ -265,7 +263,7 @@ public class AlertManager {
 	public void removeResort(Resort r) {
 		Long resId = getExistingResortId(r.getLocation());
 		if( resId != null ) {
-			Log.d(TAG,"Removing resort " + r);
+			Log.d("Removing resort " + r);
 			SQLiteStatement removeResortAlerts = mDB.compileStatement("DELETE FROM alerts WHERE resort=?");
 			removeResortAlerts.bindLong(1, resId);
 			removeResortAlerts.execute();
@@ -274,7 +272,7 @@ public class AlertManager {
 			removeResorts.bindLong(1, resId);
 			removeResorts.execute();
 		} else {
-			Log.d(TAG,"Attempt to remove not present resort " +r);
+			Log.d("Attempt to remove not present resort " +r);
 		}
 	}
 	/**

@@ -36,7 +36,6 @@ public class OnUpgradeReceiver extends BroadcastReceiver {
 	static final String TAG = "com.wakemeski.ui.OnUpgradeReceiver";
 	@Override
 	public void onReceive(Context context, Intent arg1) {
-		// TODO Auto-generated method stub
 		/*
 		 * Note: I couldn't figure out a way to intent filter based on package name.
 		 * I ran into the same issue described here:
@@ -49,7 +48,7 @@ public class OnUpgradeReceiver extends BroadcastReceiver {
 		 * exit if no match.
 		 */
 		if( arg1.getDataString().contains("com.wakemeski")) {
-			Log.d(TAG,"Rescheduling alarm after upgrade" );
+			Log.d("Rescheduling alarm after upgrade" );
 			AlarmAlertWakeLock.acquireCpuWakeLock(context);
 			context.startService(new Intent(WakeMeSkiWakeupService.ACTION_ALARM_SCHEDULE,
 					null, context, WakeMeSkiWakeupService.class));

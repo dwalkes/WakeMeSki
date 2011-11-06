@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Dan Walkes for use with WakeMeSki
  */
 
@@ -33,7 +33,7 @@ class Log {
 			: Config.LOGV;
 
 	static void v(String logMe) {
-		com.wakemeski.Log.d(LOGTAG, logMe);
+		com.wakemeski.Log.d(logMe);
 	}
 
 	static void e(String logMe) {
