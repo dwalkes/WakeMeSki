@@ -31,6 +31,8 @@ import com.google.code.microlog4android.format.PatternFormatter;
  */
 public class Log {
 
+	public final static String TAG = "WakeMeSki";
+
 	static private Log mLogger = null;
 	private final Logger mMicrologLogger;
 	private FileAppender mFileAppender = null;
@@ -109,7 +111,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void d(String tag, String message) {
-		getMicrologLogger().debug(tag+ ": " + message);
+		getMicrologLogger().debug(TAG+ ": " + message);
 	}
 
 	/**
@@ -118,7 +120,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void e(String tag, String message) {
-		getMicrologLogger().error(tag+ ": " + message);
+		getMicrologLogger().error(TAG+ ": " + message);
 	}
 
 	/**
@@ -127,7 +129,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void e(String tag, String message, Throwable t) {
-		getMicrologLogger().error(tag+ ": " + message);
+		getMicrologLogger().error(TAG+ ": " + message);
 	}
 
 	/**
@@ -136,7 +138,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void i(String tag, String message) {
-		getMicrologLogger().info(tag+ ": " + message);
+		getMicrologLogger().info(TAG+ ": " + message);
 	}
 
 	/**
@@ -145,7 +147,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void w(String tag, String message) {
-		getMicrologLogger().warn(tag+ ": " + message);
+		getMicrologLogger().warn(TAG+ ": " + message);
 	}
 
 	/**
@@ -154,6 +156,6 @@ public class Log {
 	 * @param message
 	 */
 	public static void w(String tag, String message, Throwable t) {
-		getMicrologLogger().warn(tag+ ": " + message,t);
+		getMicrologLogger().warn(TAG+ ": " + message,t);
 	}
 }
