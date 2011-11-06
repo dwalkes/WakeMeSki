@@ -7,11 +7,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
+
 import com.wakemeski.Log;
 
 /**
  * A wrapper around setForeground() and startForeground() methods
- * supported by api levels 1-5.  See also 
+ * supported by api levels 1-5.  See also
  * http://developer.android.com/reference/android/app/Service.html
  */
 public class ForegroundServiceCompat {
@@ -21,11 +22,11 @@ public class ForegroundServiceCompat {
 	private static final Class<?>[] mStopForegroundSignature = new Class<?>[] {
 	    boolean.class};
 
-	private NotificationManager mNM;
+	private final NotificationManager mNM;
 	private Method mStartForeground;
 	private Method mStopForeground;
-	private Object[] mStartForegroundArgs = new Object[2];
-	private Object[] mStopForegroundArgs = new Object[1];
+	private final Object[] mStartForegroundArgs = new Object[2];
+	private final Object[] mStopForegroundArgs = new Object[1];
 	private Service mService = null;
 
 	public ForegroundServiceCompat(Service service) {
@@ -41,7 +42,7 @@ public class ForegroundServiceCompat {
 	        mStartForeground = mStopForeground = null;
 	    }
 	}
-	
+
 	/**
 	 * This is a wrapper around the new startForeground method, using the older
 	 * APIs if it is not available.
