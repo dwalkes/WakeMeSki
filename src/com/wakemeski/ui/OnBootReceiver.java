@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -26,9 +26,9 @@ import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 /**
  * This class catches a boot message. We need to reschedule our alarms on boot
  * up, since these don't persist
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class OnBootReceiver extends BroadcastReceiver {
 
@@ -38,5 +38,4 @@ public class OnBootReceiver extends BroadcastReceiver {
 		context.startService(new Intent(WakeMeSkiWakeupService.ACTION_ALARM_SCHEDULE,
 				null, context, WakeMeSkiWakeupService.class));
 	}
-
 }

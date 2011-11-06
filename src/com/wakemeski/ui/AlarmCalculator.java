@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.wakemeski.ui;
@@ -47,7 +47,7 @@ public class AlarmCalculator {
 		nextAlarm.set(Calendar.SECOND, 0);
 		/*
 		 *  never set less than 2 minutes ahead - always go to the next day in
-		 *  this case.  Otherwise it would be possible for the second value to 
+		 *  this case.  Otherwise it would be possible for the second value to
 		 *  roll from 59 to 00 and increment the minute value immediately after
 		 *  we obtained the time, meaning we would set an alarm for a time before
 		 *  the current time. This gives us a in the worst case a full minute
@@ -64,9 +64,9 @@ public class AlarmCalculator {
 				 * If the alarm time specifies the same hour, compare minutes to
 				 * decide if we should set today or another day
 				 */
-				(nextAlarm.get(Calendar.HOUR_OF_DAY) == setHour && 
+				(nextAlarm.get(Calendar.HOUR_OF_DAY) == setHour &&
 						nextAlarm.get(Calendar.MINUTE) < setMinute)
-					
+
 					/*
 					 * If today is one of the days selected for wakeup we might
 					 * leave day of week at current value.
@@ -105,7 +105,7 @@ public class AlarmCalculator {
 		return nextAlarm;
 
 	}
-	
+
 	/**
 	 * @return a calendar object representing the next time the alarm should
 	 *         fire, or null if no day is selected for the next alarm

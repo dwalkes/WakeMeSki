@@ -12,18 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Dan Walkes for use with wakemeski
  */
 
 package com.wakemeski.ui.alarmclock;
 
-import com.wakemeski.R;
-
 import android.graphics.drawable.BitmapDrawable;
-import android.view.View;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
+
+import com.wakemeski.R;
 
 /**
  * Full screen alarm alert: pops visible indicator and plays alarm tone. This
@@ -43,5 +43,4 @@ public class AlarmAlertFullScreen extends AlarmAlert {
 
 		return v;
 	}
-
 }

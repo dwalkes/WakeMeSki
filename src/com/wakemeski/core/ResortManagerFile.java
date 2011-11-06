@@ -25,6 +25,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import android.content.Context;
+
 import com.wakemeski.Log;
 
 /**
@@ -37,7 +38,7 @@ public class ResortManagerFile implements ResortManager {
 
 	private static final String TAG = ResortManagerFile.class.getName();
 	private static final String resortFile = "resorts.txt";
-	private Context context;
+	private final Context context;
 	private static ResortManagerFile instance = null;
 
 	private Resort mResorts[];
@@ -116,6 +117,7 @@ public class ResortManagerFile implements ResortManager {
 	/**
 	 * @return The current resort list from persistent storage
 	 */
+	@Override
 	public Resort[] getResorts() {
 		if( mResorts == null ) {
 			mResorts = new Resort[0];

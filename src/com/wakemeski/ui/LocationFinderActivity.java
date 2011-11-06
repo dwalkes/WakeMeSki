@@ -58,7 +58,7 @@ public class LocationFinderActivity extends ListActivity {
 
 	private String _region = null;
 
-	private Handler _handler = new Handler() {
+	private final Handler _handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			Bundle b = msg.getData();
@@ -196,7 +196,7 @@ public class LocationFinderActivity extends ListActivity {
 
 				WakeMeSkiServer srv = new WakeMeSkiServer(getApplicationContext());
 				LocationFinder finder = new LocationFinder(srv);
-				
+
 				if (_region == null) {
 					String regions[] = finder.getRegions();
 					b.putStringArray("regions", regions);

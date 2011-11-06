@@ -7,7 +7,7 @@ public interface ReportListener {
 	 * for a resort is added or removed)
 	 */
 	void onUpdated();
-	
+
 	/**
 	 * Called when a report is added to the list of reports held by the
 	 * report controller.  Classes which do not need to handle lists of reports
@@ -21,7 +21,7 @@ public interface ReportListener {
 	 * when the loading is completed
 	 */
 	void onLoading(boolean started);
-	
+
 	/**
 	 * Called when the report controller is busy with an action
 	 * or when the busy state clears for the controller

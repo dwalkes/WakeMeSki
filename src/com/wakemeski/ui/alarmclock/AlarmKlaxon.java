@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Dan Walkes for use with WakeMeSki
  */
 
@@ -56,17 +56,18 @@ class AlarmKlaxon {
 	private static final long[] sVibratePattern = new long[] { 500, 500 };
 
 	private int mAlarmId;
-	private String mAlert;
-	private boolean mVibrate;
+	private final String mAlert;
+	private final boolean mVibrate;
 	private boolean mPlaying = false;
-	private Vibrator mVibrator;
+	private final Vibrator mVibrator;
 	private MediaPlayer mMediaPlayer;
 	private KillerCallback mKillerCallback;
 
 	// Internal messages
 	private static final int KILLER = 1000;
 	private static final int PLAY = 1001;
-	private Handler mHandler = new Handler() {
+	private final Handler mHandler = new Handler() {
+		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case KILLER:
@@ -105,6 +106,7 @@ class AlarmKlaxon {
 		// RingtoneManager.
 		mMediaPlayer = new MediaPlayer();
 		mMediaPlayer.setOnErrorListener(new OnErrorListener() {
+			@Override
 			public boolean onError(MediaPlayer mp, int what, int extra) {
 				Log.e("Error occurred while playing audio.");
 				mp.stop();
@@ -207,7 +209,7 @@ class AlarmKlaxon {
 	/**
 	 * Kills alarm audio after ALARM_TIMEOUT_SECONDS, so the alarm won't run all
 	 * day.
-	 * 
+	 *
 	 * This just cancels the audio, but leaves the notification popped, so the
 	 * user will know that the alarm tripped.
 	 */
@@ -219,5 +221,4 @@ class AlarmKlaxon {
 	private void disableKiller() {
 		mHandler.removeMessages(KILLER);
 	}
-
 }

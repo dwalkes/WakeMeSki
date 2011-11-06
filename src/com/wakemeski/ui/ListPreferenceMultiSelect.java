@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -71,6 +71,7 @@ public class ListPreferenceMultiSelect extends ListPreference {
 		restoreCheckedEntries();
 		builder.setMultiChoiceItems(entries, mClickedDialogEntryIndices,
 				new DialogInterface.OnMultiChoiceClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int which,
 							boolean val) {
 						mClickedDialogEntryIndices[which] = val;
@@ -91,7 +92,7 @@ public class ListPreferenceMultiSelect extends ListPreference {
 	/**
 	 * Gets an array representing the list of selected entries as String
 	 * objects.
-	 * 
+	 *
 	 * @return A string object representing the list of selected entries, or
 	 *         null if the list could not be obtained
 	 */

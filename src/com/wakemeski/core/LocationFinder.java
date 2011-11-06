@@ -40,12 +40,12 @@ import com.wakemeski.Log;
  */
 public class LocationFinder {
 	private static final String TAG = "LocationFinder";
-	private WakeMeSkiServer mServer;
+	private final WakeMeSkiServer mServer;
 
 	public LocationFinder(WakeMeSkiServer server) {
 		mServer = server;
 	}
-	
+
 	/**
 	 * Gets the top-level regions to start the search for a location from.
 	 */

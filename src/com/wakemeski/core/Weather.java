@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 
 /**
@@ -30,10 +30,10 @@ import com.wakemeski.pref.SnowSettingsSharedPreference;
  */
 public class Weather implements Parcelable {
 
-	private String mWhen;
-	private long mExact;
-	private String mDesc;
-	private SnowUnits mUnits;
+	private final String mWhen;
+	private final long mExact;
+	private final String mDesc;
+	private final SnowUnits mUnits;
 	private static String TAG = "Weather";
 
 	public Weather(String when, long exact, String desc, SnowUnits units) {

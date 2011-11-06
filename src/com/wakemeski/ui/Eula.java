@@ -66,7 +66,8 @@ class Eula {
             builder.setTitle(R.string.eula_title);
             builder.setCancelable(true);
             builder.setPositiveButton(R.string.eula_accept, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+                @Override
+				public void onClick(DialogInterface dialog, int which) {
                     accept(preferences);
                     if (activity instanceof OnEulaAgreedTo) {
                         ((OnEulaAgreedTo) activity).onEulaAgreedTo();
@@ -74,12 +75,14 @@ class Eula {
                 }
             });
             builder.setNegativeButton(R.string.eula_refuse, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+                @Override
+				public void onClick(DialogInterface dialog, int which) {
                     refuse(activity);
                 }
             });
             builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                public void onCancel(DialogInterface dialog) {
+                @Override
+				public void onCancel(DialogInterface dialog) {
                     refuse(activity);
                 }
             });

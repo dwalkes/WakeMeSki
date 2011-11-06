@@ -23,8 +23,8 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.WakeMeSki;
 import com.wakemeski.pref.RepeatDaySharedPreference;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
@@ -60,7 +60,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 	protected void reportLoadStarted() {
 		mAlarmFired = false;
 	}
-	
+
 	/**
 	 * The service should only stop on report load complete if the alarm did not
 	 * fire.
@@ -70,7 +70,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		if( !mAlarmFired ) {
 			Log.d(TAG, "Alarm did not fire, stopping service");
 			return true;
-		}			
+		}
 		/**
 		 * Else if the alarm fired the Alarm class will shutdown the service when it
 		 * has completed running.  Shutting down here could create a race condition between
@@ -78,7 +78,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		 */
 		return super.shouldStopOnReportLoadComplete();
 	}
-	
+
 	/**
 	 * Gets the wakeup snow settings preference instead of the notification snow
 	 * settings preference for use with the wakeup service
@@ -96,7 +96,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 
 		return mSnowSettings;
 	}
-	
+
 	/**
 	 * Overrides base implementation to check for exceeded preference and fire alarms
 	 * as/if necessary
@@ -119,9 +119,9 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					 */
 					getAlarmController().fireAlarm();
 					mAlarmFired = true;
-					
+
 					/*
-					 * Not safe to stop the service here because the 
+					 * Not safe to stop the service here because the
 					 * alarm activity has not yet started. Will be stopped by the alarm
 					 * activity.
 					 */
@@ -145,10 +145,10 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		}
 		return mAlarmController;
 	}
-	
+
 	/**
 	 * Calculates when the next alarm should occur based on shared prefs
-	 * 
+	 *
 	 * @return a calendar object representing the next alarm to fire, or null if
 	 *         no alarm should be scheduled
 	 */
@@ -190,38 +190,38 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 	 * take care of handling the cases where an alarm action is or is not needed
 	 */
 	private void checkAlarmAction() {
-		
+
 		/**
 		 * I noticed problems shortly after the 2.0 release running in the background.
 		 * In an attempt to resolve I added setForeground() to make it less likely that the
-		 * process will be killed.  I figured out ultimately that the problem was 
+		 * process will be killed.  I figured out ultimately that the problem was
 		 * the process priority in ReportController (THREAD_PRIORITY_BAKGROUND.)  Setting this
 		 * priority on the process when the service was the only thing running in the process
 		 * caused the process to be killed immediately in low memory conditions regardless of
 		 * foreground notifications.
 		 * I had this code implemented by the time I figured it out, so I figured it didn't
-		 * hurt to keep it in.  However if we ever suspect trouble with the foreground 
+		 * hurt to keep it in.  However if we ever suspect trouble with the foreground
 		 * setting or associated notification we should be able to kill this code below.
 		 */
 		Notification notification = new Notification(android.R.drawable.stat_notify_sync_noanim,
 												getString(com.wakemeski.R.string.wakemeski_update),
 												System.currentTimeMillis());
-		
+
 		Intent notificationIntent = new Intent(this,WakeMeSki.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(getApplicationContext(), 
+		notification.setLatestEventInfo(getApplicationContext(),
 									getString(com.wakemeski.R.string.wakemeski_update),
-									getString(com.wakemeski.R.string.checking_notify_text), 
+									getString(com.wakemeski.R.string.checking_notify_text),
 									contentIntent);
-		
+
 		mForegroundService.startForegroundCompat(NOTIFY_CHECK_STATUS_ID, notification);
-		
+
 		startReportLoad();
 
 	}
 
 
-	
+
 	/**
 	 * The next wakup alarm must always be scheduled since this is a RTC wakeup
 	 */
@@ -231,7 +231,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 			getAlarmController().setAlarm(nextAlarm);
 		}
 	}
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -246,7 +246,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		 */
 		mForegroundService.stopForegroundCompat(NOTIFY_CHECK_STATUS_ID);
 	}
-	
+
 	/**
 	 * With API 5 and higher onStartCommand() is used to start the service.
 	 * We have the option to re-deliver an intent (with START_REDELIVER_INTENT) if
@@ -261,14 +261,14 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 	 */
 	private boolean isStaleIntent( Intent intent ) {
 		boolean isStale = false;
-		
+
 		if( intent != null && intent.hasExtra(EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME) ) {
 			long bcReceiverTime = intent.getExtras().getLong(EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME);
 			if( bcReceiverTime != 0 ) {
 				Calendar bcReceiverCalPlus5Minutes = Calendar.getInstance();
 				bcReceiverCalPlus5Minutes.setTimeInMillis(bcReceiverTime);
 				/**
-				 * Consider the intent stale if it's currently 
+				 * Consider the intent stale if it's currently
 				 * greater than 5 minutes after the intent was created
 				 */
 				bcReceiverCalPlus5Minutes.add(Calendar.MINUTE, 5);
@@ -280,7 +280,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		}
 		return isStale;
 	}
-	
+
 	/**
 	 * Handle intents issued for the WakeMeSkiWakeupService
 	 * @param intent
@@ -298,7 +298,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		IntentHandlerResult result = super.onHandleIntent(intent);
 
 		currentAction = intent.getAction();
-		
+
 		if (currentAction == null) {
 			Log.w(TAG, "onHandleIntent with null intent or action");
 		}
@@ -338,14 +338,14 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 			} else {
 				Log.d(TAG,"Unhandled action " + currentAction);
 			}
-		
+
 		}
 		/*
 		 * We always need to schedule the next alarm after a check or snooze event
 		 * Otherwise we won't get a new wakeup on the next configured check day
 		 */
 		scheduleNextAlarm();
-		
+
 		return result;
 	}
 }

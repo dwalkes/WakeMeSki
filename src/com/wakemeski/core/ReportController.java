@@ -28,14 +28,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.Process;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.core.alert.AlertManager;
 
 /**
  * Starts a long running thread that will check for updates to resorts and get
  * their report data on a periodic basis.
- * 
+ *
  * This is similar to the MessagingController class from the Android Email
  * application
  */
@@ -43,11 +43,11 @@ public class ReportController implements Runnable {
 	private final static String TAG = "ReportController";
 
 	private static ReportController inst = null;
-	private Thread mThread;
+	private final Thread mThread;
 
-	private BlockingQueue<Action> mActions = new LinkedBlockingQueue<Action>();
+	private final BlockingQueue<Action> mActions = new LinkedBlockingQueue<Action>();
 
-	private Hashtable<Resort, Report> mReports = new Hashtable<Resort, Report>();
+	private final Hashtable<Resort, Report> mReports = new Hashtable<Resort, Report>();
 
 	/**
 	 * All access to mListeners *must* be synchronized
@@ -55,32 +55,32 @@ public class ReportController implements Runnable {
 	 * in mListeners.  Therefore add and remove may be called multiple times for
 	 * a given listener
 	 */
-	private HashSet<ReportListener> mListeners = new HashSet<ReportListener>();
+	private final HashSet<ReportListener> mListeners = new HashSet<ReportListener>();
 	private boolean mBusy;
-	private Context mContext;
-	private ResortManager mResortManager;
+	private final Context mContext;
+	private final ResortManager mResortManager;
 	private boolean mLoadInProgress=false;
-	
+
 	/*
 	 * Make sure only one thread forces a load to start from listner register
 	 */
-	private Object mSychronizeForceLoad= new Object();
+	private final Object mSychronizeForceLoad= new Object();
 	/*
 	 * The last time we loaded a resort, or 0 if a resort has never been loaded.
 	 * Using object Long to allow synchronization
 	 */
 	private Long   mLastResortLoadTimeMs= new Long(0);
-	
+
 	boolean mForceLoadInProgress = false;
 
 	private ReportController(Context c, ResortManager rm) {
 		mContext = c;
 		mThread = new Thread(this);
 		mThread.start();
-		mResortManager = rm;	
+		mResortManager = rm;
 	}
-	
-	
+
+
 	/**
 	 * @param c context
 	 * @param rm resort manager
@@ -94,7 +94,7 @@ public class ReportController implements Runnable {
 	}
 
 
-	
+
 	@Override
 	public void run() {
 		while (true) {
@@ -103,7 +103,7 @@ public class ReportController implements Runnable {
 
 				mBusy = true;
 				synchronized (mListeners) {
-					for(ReportListener rl: mListeners) {					
+					for(ReportListener rl: mListeners) {
 						rl.onBusy(mBusy);
 					}
 				}
@@ -113,7 +113,7 @@ public class ReportController implements Runnable {
 			}
 			mBusy = false;
 			synchronized (mListeners) {
-				for(ReportListener rl: mListeners) {					
+				for(ReportListener rl: mListeners) {
 					rl.onBusy(mBusy);
 				}
 			}
@@ -125,21 +125,21 @@ public class ReportController implements Runnable {
     }
 
 	/**
-	 * Force Re-Loads all configured reports in the ReportController thread in 
+	 * Force Re-Loads all configured reports in the ReportController thread in
 	 * response to a specific request from a user.  Typically you will want to use
 	 * addListerAndUpdateReports() instead.
-	 * 
+	 *
 	 * Previously the default was to always set the ReportController thread as
-	 * a background thread.  I found out when testing 
+	 * a background thread.  I found out when testing
 	 * (see <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
-	 * issue 20</a>) that this does not work in low memory conditions when 
+	 * issue 20</a>) that this does not work in low memory conditions when
 	 * the service is the only thing running in the process.  Therefore
 	 * the service needs to make sure the ReportController is not a a background
-	 * thread before starting resort loading.  
-	 * 
-	 * Once the UI thread is started it's 
+	 * thread before starting resort loading.
+	 *
+	 * Once the UI thread is started it's
 	 * fine to set isBackground = true to maximize responsiveness.
-	 * 
+	 *
 	 * @param isBackground true when the report controller can be run as a background
 	 * thread.  False when it should be run as the primary thread for the application
 	 */
@@ -184,7 +184,7 @@ public class ReportController implements Runnable {
 		Log.d(TAG,"remove all reports and alerts");
 		synchronized (mListeners) {
 			mReports.clear();
-			for(ReportListener rl: mListeners) {					
+			for(ReportListener rl: mListeners) {
 				rl.onUpdated();
 			}
 		}
@@ -204,7 +204,7 @@ public class ReportController implements Runnable {
 			mListeners.add(listener);
 		}
 	}
-	
+
 	/**
 	 * @return true if the report data currently cached in the controller is stale and
 	 * should be re-loaded.  This could be because a load never completed or because it's been
@@ -218,7 +218,7 @@ public class ReportController implements Runnable {
 				lastLoad = new Date(mLastResortLoadTimeMs);
 			}
 		}
-		
+
 		if(lastLoad != null) {
 			Calendar oneHourAgo =Calendar.getInstance();
 			oneHourAgo.add(Calendar.HOUR,-1);
@@ -256,10 +256,10 @@ public class ReportController implements Runnable {
 					listener.onLoading(false);
 				}
 				listener.onUpdated();
-			} 
+			}
 			mListeners.add(listener);
 		}
-		
+
 		/*
 		 * Make sure only one thread can check for cache invalid and force report load
 		 * at a time, that way we won't ever end up with two threads requesting report
@@ -270,9 +270,9 @@ public class ReportController implements Runnable {
 				forceLoadReports(isBackground);
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Removes a listener if present
 	 * @param listener
@@ -286,7 +286,7 @@ public class ReportController implements Runnable {
 		}
 		return containedElement;
 	}
-	
+
 	/**
 	 * This function represents a query we could return from ReportController as a content
 	 * provider which would return a sorted list of reports
@@ -300,6 +300,7 @@ public class ReportController implements Runnable {
 		//this report was just added, we need to make sure we keep
 		//the list sorted alphabetically
 		Collections.sort(reportList, new Comparator<Report>() {
+			@Override
 			public int compare(Report r1, Report r2) {
 				String n1 = r1.getResort().getResortName();
 				String n2 = r2.getResort().getResortName();
@@ -307,10 +308,10 @@ public class ReportController implements Runnable {
 			}
 		}
 		);
-		
+
 		return reportList;
 	}
-	
+
 
 	abstract class Action {
 		abstract void run();
@@ -325,7 +326,7 @@ public class ReportController implements Runnable {
 		@Override
 		public void run() {
 			Context c = ReportController.this.mContext;
-			ConnectivityManager cm = 
+			ConnectivityManager cm =
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			WakeMeSkiServer srv = new WakeMeSkiServer(mContext);
@@ -340,7 +341,7 @@ public class ReportController implements Runnable {
 				mReports.put(resort, r);
 				Log.d(TAG,"AddResortAction added resort " + resort + " notifying listners");
 
-				for(ReportListener rl: mListeners) {					
+				for(ReportListener rl: mListeners) {
 					rl.onAdded(r);
 					rl.onUpdated();
 				}
@@ -357,14 +358,14 @@ public class ReportController implements Runnable {
 		}
 
 		@Override
-		public void run() {			
+		public void run() {
 			synchronized (mListeners) {
 				mReports.remove(r);
-				
+
 				AlertManager am = new AlertManager(mContext);
 				am.removeResort(r);
 				am.close();
-				
+
 				Log.d(TAG,"RemoveResortAction removed resort " + r + " notifying listners");
 				for(ReportListener l: mListeners) {
 					l.onUpdated();
@@ -383,7 +384,7 @@ public class ReportController implements Runnable {
 		}
 		@Override
 		void run() {
-			
+
 			/**
 			 * See <a href="https://github.com/dwalkes/WakeMeSki/issues/#issue/20">
 			 * issue 20</a>
@@ -393,11 +394,11 @@ public class ReportController implements Runnable {
 				Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 			} else {
 				Log.d(TAG, "Setting thread default priority");
-				Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);	
+				Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
 			}
-			
+
 			Context c = ReportController.this.mContext;
-			ConnectivityManager cm = 
+			ConnectivityManager cm =
 				(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 
@@ -410,7 +411,7 @@ public class ReportController implements Runnable {
 				 * Remove all reports in preparation for reload
 				 */
 				mReports.clear();
-				
+
 				for(ReportListener l: mListeners) {
 					/*
 					 * Send an updated message to show the reports list was cleared
@@ -439,7 +440,7 @@ public class ReportController implements Runnable {
 						l.onAdded(r);
 						l.onUpdated();
 					}
-				}				
+				}
 			}
 			/*
 			 * Update alerts
@@ -458,5 +459,5 @@ public class ReportController implements Runnable {
 			}
 		}
 	}
-	
+
 }

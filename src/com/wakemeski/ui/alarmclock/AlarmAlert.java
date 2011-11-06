@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Dan Walkes for use with wakemeski
  */
 
@@ -53,7 +53,7 @@ public class AlarmAlert extends Activity {
 	private int mState = UNKNOWN;
 
 	private AlarmKlaxon mKlaxon;
-	private int mAlarmId = 0;
+	private final int mAlarmId = 0;
 	private String mLabel;
 
 	public static final String MEDIA_ALERT_SOURCE_STRING_EXTRA = "com.wakemeski.ui.alarmclock.media_alert_source";
@@ -96,6 +96,7 @@ public class AlarmAlert extends Activity {
 		// Alarms.setNextAlert(this);
 
 		mKlaxon.setKillerCallback(new AlarmKlaxon.KillerCallback() {
+			@Override
 			public void onKilled() {
 				if (Log.LOGV)
 					Log.v("onKilled()");
@@ -172,6 +173,7 @@ public class AlarmAlert extends Activity {
 			mSnoozeButton.setEnabled(false);
 		} else {
 			mSnoozeButton.setOnClickListener(new Button.OnClickListener() {
+				@Override
 				public void onClick(View v) {
 					snooze();
 					finish();
@@ -182,6 +184,7 @@ public class AlarmAlert extends Activity {
 		/* dismiss button: close notification */
 		findViewById(R.id.dismiss).setOnClickListener(
 				new Button.OnClickListener() {
+					@Override
 					public void onClick(View v) {
 						dismiss();
 						finish();
@@ -271,6 +274,7 @@ public class AlarmAlert extends Activity {
 
 	}
 
+	@Override
 	protected void onPause() {
 		super.onPause();
 		if (Log.LOGV)

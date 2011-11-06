@@ -36,8 +36,8 @@ import android.os.Parcelable;
  * built from.
  */
 public class Location implements Parcelable, Serializable {
-	private String _label;
-	private String _urlPath;
+	private final String _label;
+	private final String _urlPath;
 
 	private static final long serialVersionUID = 0;
 
@@ -57,7 +57,7 @@ public class Location implements Parcelable, Serializable {
 	};
 
 	/**
-	 * 
+	 *
 	 * @param label A human readable label for this location
 	 * @param urlPath Path+file portion of the URL (does NOT include the server)
 	 */
@@ -98,7 +98,7 @@ public class Location implements Parcelable, Serializable {
 
 	/**
 	 * Determine whether the location objects refer to the same location.
-	 * 
+	 *
 	 * @param loc
 	 *            The location object
 	 * @return True if location refers to the same location
@@ -107,6 +107,7 @@ public class Location implements Parcelable, Serializable {
 		return loc.getLabel().equals(this.getLabel());
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Location) {
 			return equals((Location) obj);

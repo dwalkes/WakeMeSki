@@ -12,15 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.core.WakeMeSkiAlertService;
 import com.wakemeski.core.WakeMeSkiWakeupService;
 import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
@@ -28,9 +28,9 @@ import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 /**
  * This class is invoked when an alarm check needs to occur based on a
  * configured wakeup.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class OnAlarmReceiver extends BroadcastReceiver {
 	public static final String ACTION_WAKE_CHECK = WakeMeSkiWakeupService.ACTION_WAKE_CHECK;
@@ -51,7 +51,7 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 				 */
 				Intent i = new Intent(
 						intent.getAction(), null, context,
-						intent.getAction().equals(ACTION_ALERT_CHECK) ? 
+						intent.getAction().equals(ACTION_ALERT_CHECK) ?
 									WakeMeSkiAlertService.class :
 									WakeMeSkiWakeupService.class
 								);

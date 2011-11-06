@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -27,8 +27,8 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 
 import com.wakemeski.R;
 import com.wakemeski.core.ReportController;
@@ -42,16 +42,16 @@ import com.wakemeski.core.WakeMeSkiFactory;
  * com.wakemeski.core.LocationFinderActivity to select locations, then
  * allows the user to configure whether a wakeup is desired on this particular
  * location.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class ResortListActivity extends ListActivity {
 	private ResortManagerFile mResortManager;
 	private static final int SELECT_LOCATION = 1;
 	private Resort[] mResortList;
 	private static final int ADD_ID = Menu.FIRST;
-	private static final int CLEAR_ID = ADD_ID + 1;	
+	private static final int CLEAR_ID = ADD_ID + 1;
 	private static final int REMOVE_ID = ADD_ID + 2;
 	private WakeupResortListAdapter mListAdapter;
 	private ReportController mReportController;
@@ -93,7 +93,7 @@ public class ResortListActivity extends ListActivity {
 		registerForContextMenu(getListView());
 
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -140,7 +140,7 @@ public class ResortListActivity extends ListActivity {
 		Resort matchingLocation =
 			Resort.getResortWithLocation(r.getLocation(), mResortList);
 		if (matchingLocation != null) {
-			ArrayList<Resort> rl = 
+			ArrayList<Resort> rl =
 				new ArrayList<Resort>(Arrays.asList(mResortList));
 			rl.remove(matchingLocation);
 			mReportController.removeResort(r);
@@ -173,8 +173,8 @@ public class ResortListActivity extends ListActivity {
 			r.setWakeupEnabled(true);
 			addResort(r);
 		} else if (resultCode == RESULT_CANCELED) {
-			/* 
-			 * If the user cancelled out of the location finder, they also want to back out of this 
+			/*
+			 * If the user cancelled out of the location finder, they also want to back out of this
 			 * activity, since it appears to the user as the same activity.
 			 */
 			finish();
@@ -199,7 +199,7 @@ public class ResortListActivity extends ListActivity {
 			}
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -218,6 +218,7 @@ public class ResortListActivity extends ListActivity {
 
 	}
 
+	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Resort resort = (Resort) l.getItemAtPosition(position);
 		if (l.isItemChecked(position)) {
@@ -227,5 +228,4 @@ public class ResortListActivity extends ListActivity {
 		}
 		mResortManager.update(mResortList);
 	}
-
 }

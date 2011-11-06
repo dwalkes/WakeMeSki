@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.wakemeski.ui;
@@ -20,15 +20,15 @@ package com.wakemeski.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.core.WakeMeSkiWakeupService;
 import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
  * Catch an upgrade message for our ap... otherwise our alarm will be removed and never
  * rescheduled.
- * 
+ *
  * @author dan
  *
  */
@@ -42,7 +42,7 @@ public class OnUpgradeReceiver extends BroadcastReceiver {
 		 * I ran into the same issue described here:
 		 *  http://groups.google.com/group/android-developers/browse_thread/thread/14589d5e0761c056?pli=1
 		 * It appears it's not possible to filter based on this data field.
-		 * I was not able to figure out how to do so (path/host filters do not work as 
+		 * I was not able to figure out how to do so (path/host filters do not work as
 		 * as arg1.getData().getPath() or getHost() both return NULL.)  Therefore this receiver
 		 * fires on every install of every application.  Hopefully that won't be
 		 * a problem since we just do a quick check for the application name and
@@ -55,5 +55,4 @@ public class OnUpgradeReceiver extends BroadcastReceiver {
 					null, context, WakeMeSkiWakeupService.class));
 		}
 	}
-
 }

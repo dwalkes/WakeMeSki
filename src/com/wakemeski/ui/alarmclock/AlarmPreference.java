@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Dan Walkes for use with WakeMeSki
  */
 
@@ -50,6 +50,7 @@ public class AlarmPreference extends RingtonePreference {
 		// this.setSummary(summaryString);
 	}
 
+	@Override
 	protected void onSaveRingtone(Uri ringtoneUri) {
 		mPreference.setFromUri(ringtoneUri);
 		updateSummary();
@@ -61,7 +62,7 @@ public class AlarmPreference extends RingtonePreference {
 
 	/**
 	 * This is the first time the persistent value can be read
-	 * 
+	 *
 	 * @param preferenceManager
 	 *            - the manager attached to this hierarchy
 	 */
@@ -75,5 +76,4 @@ public class AlarmPreference extends RingtonePreference {
 	public Uri getTone() {
 		return mPreference.getUri();
 	}
-
 }

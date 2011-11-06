@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -28,9 +28,9 @@ import com.wakemeski.pref.RepeatDaySharedPreference;
  * A preference class to hold a list of days. In this case the list of days is
  * used to select when the user would like to be woken up for good ski
  * conditions.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class RepeatDayPreference extends ListPreferenceMultiSelect {
 
@@ -72,10 +72,11 @@ public class RepeatDayPreference extends ListPreferenceMultiSelect {
 
 	/**
 	 * This is the first time the persistent value can be read
-	 * 
+	 *
 	 * @param preferenceManager
 	 *            - the manager attached to this hierarchy
 	 */
+	@Override
 	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
 		sharedPreference.setFromPersistString(this.getValue());
@@ -84,7 +85,7 @@ public class RepeatDayPreference extends ListPreferenceMultiSelect {
 
 	/**
 	 * public c'tor
-	 * 
+	 *
 	 * @param context
 	 * @param attrs
 	 */
@@ -99,6 +100,7 @@ public class RepeatDayPreference extends ListPreferenceMultiSelect {
 		 */
 		super
 				.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+					@Override
 					public boolean onPreferenceChange(Preference pref,
 							Object newValue) {
 						if (newValue != null) {
@@ -122,7 +124,7 @@ public class RepeatDayPreference extends ListPreferenceMultiSelect {
 	 * c'tor, we need a way for classes to register for an additional change
 	 * listener as necessary This synchronized method calls a registered pref
 	 * listener
-	 * 
+	 *
 	 * @param pref
 	 *            The value to pass to the registered pref listener
 	 * @param newValue
@@ -145,5 +147,4 @@ public class RepeatDayPreference extends ListPreferenceMultiSelect {
 			Preference.OnPreferenceChangeListener listener) {
 		prefListener = listener;
 	}
-
 }

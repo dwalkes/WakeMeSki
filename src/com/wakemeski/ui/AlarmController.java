@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.wakemeski.ui;
@@ -28,8 +28,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.pref.AlarmToneSharedPreference;
 import com.wakemeski.ui.alarmclock.AlarmAlert;
 import com.wakemeski.ui.alarmclock.AlarmAlertFullScreen;
@@ -37,14 +37,14 @@ import com.wakemeski.ui.alarmclock.AlarmAlertFullScreen;
 /**
  * POJO used for alarm related actions such as setting, clearing or firing the
  * alarm
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class AlarmController {
 	public static final String ACTION_FIRE_ALARM = "com.wakemeski.ui.firealarm";
 
-	private Context context;
+	private final Context context;
 	private static final String TAG = "AlarmController";
 
 	public AlarmController(Context theContext) {
@@ -65,7 +65,7 @@ public class AlarmController {
 
 	/**
 	 * Sets the next alarm based on the passed value
-	 * 
+	 *
 	 * @param timeInMilliseconds
 	 *            The next time the alarm should fire
 	 * @return true if the alarm was set successfully
@@ -87,7 +87,7 @@ public class AlarmController {
 
 	/**
 	 * Sets the next alarm based on the passed value
-	 * 
+	 *
 	 * @param nextAlarm
 	 *            An object representing the next time the alarm should fire
 	 * @return true if the alarm was set successfully

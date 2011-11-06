@@ -12,31 +12,30 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.pref;
 
 import java.util.Calendar;
 
-import com.wakemeski.ui.ListPreferenceMultiSelect;
-
 import com.wakemeski.Log;
+import com.wakemeski.ui.ListPreferenceMultiSelect;
 
 /**
  * A POJO used to access repeat day information shared in an android preference.
  * This POJO is shared by the preference activity and the code reading directly
  * from the shared preference datastore.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class RepeatDaySharedPreference {
 	private String[] selectedDays;
-	private String TAG = "RepeatDaySharedPreference";
+	private final String TAG = "RepeatDaySharedPreference";
 
 	/**
 	 * Initializes this shared preference object from a persistent string
-	 * 
+	 *
 	 * @param persistentString
 	 *            The persistent string read from the database.
 	 * @return true if the value was set successfully, false if using defaults

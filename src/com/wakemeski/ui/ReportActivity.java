@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
-import com.wakemeski.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
+import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.core.Report;
 import com.wakemeski.core.Weather;
@@ -68,7 +68,7 @@ public class ReportActivity extends Activity {
 		// Title
 		TextView t = (TextView) findViewById(R.id.report_label);
 		t.setText(r.getResort().getResortName());
-		
+
 		if( r.hasErrors() ) {
 			t = (TextView) findViewById(R.id.report_fresh);
 			if( r.hasServerError() ) {
@@ -87,10 +87,10 @@ public class ReportActivity extends Activity {
 			}
 			return;
 		}
-		
+
 		t = (TextView) findViewById(R.id.report_snow_text);
 		t.setText(getString(R.string.report_snow));
-		
+
 		t = (TextView) findViewById(R.id.report_weather_text);
 		t.setText(getString(R.string.report_weather));
 

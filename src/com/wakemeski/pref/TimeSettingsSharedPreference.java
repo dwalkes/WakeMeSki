@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.pref;
 
@@ -23,9 +23,9 @@ import android.text.format.DateFormat;
  * Read/write the time value from persistent storage. Used by
  * both the dialog preference and by classes accessing the shared preferences
  * datastore.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class TimeSettingsSharedPreference {
 	/*
@@ -97,7 +97,7 @@ public class TimeSettingsSharedPreference {
 
 	/**
 	 * Sets the time in this object based on the persisted string
-	 * 
+	 *
 	 * @param persistedString
 	 *            The string from persistance store
 	 * @return true if the store was parseable and time was changed

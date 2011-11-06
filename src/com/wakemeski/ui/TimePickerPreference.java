@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -28,15 +28,15 @@ import com.wakemeski.pref.TimeSettingsSharedPreference;
 /**
  * Configure a time (in this case the time for wakeup resort checks) and store
  * in persistent storage.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class TimePickerPreference extends DialogPreference {
 	private TimePicker mTimePicker;
-	private Context mContext;
-	private AttributeSet mAttributes;
-	private TimeSettingsSharedPreference mPreference;
+	private final Context mContext;
+	private final AttributeSet mAttributes;
+	private final TimeSettingsSharedPreference mPreference;
 
 	public TimePickerPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -46,6 +46,7 @@ public class TimePickerPreference extends DialogPreference {
 		mPreference = new TimeSettingsSharedPreference(context);
 	}
 
+	@Override
 	protected View onCreateDialogView() {
 		mTimePicker = new TimePicker(mContext, mAttributes);
 		if (mTimePicker != null) {
@@ -66,6 +67,7 @@ public class TimePickerPreference extends DialogPreference {
 		updateSummary();
 	}
 
+	@Override
 	public void onDialogClosed(boolean positiveResult) {
 		if (positiveResult) {
 			if (mTimePicker != null) {
@@ -79,6 +81,7 @@ public class TimePickerPreference extends DialogPreference {
 	/**
 	 * This is our first chance to read persistant data
 	 */
+	@Override
 	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
 		if (mPreference.setTimeFromPersistString(this.getPersistedString(null))) {
@@ -98,7 +101,7 @@ public class TimePickerPreference extends DialogPreference {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The current minute selected 0-59
 	 */
 	public int getCurrentMinute() {

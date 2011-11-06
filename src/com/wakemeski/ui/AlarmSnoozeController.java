@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -21,9 +21,9 @@ import android.content.Context;
 
 /**
  * Alarm controller for snooze actions
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class AlarmSnoozeController extends AlarmController {
 
@@ -31,8 +31,8 @@ public class AlarmSnoozeController extends AlarmController {
 		super(context);
 	}
 
+	@Override
 	protected PendingIntent getPendingIntent() {
 		return super.getPendingIntent(OnAlarmReceiver.ACTION_SNOOZE);
 	}
-
 }

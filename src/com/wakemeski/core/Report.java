@@ -37,8 +37,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 
@@ -64,7 +64,7 @@ public class Report implements Parcelable {
 
 	private String _weatherUrl = "";
 	private String _weatherIcon = "";
-	private ArrayList<Weather> _weather = new ArrayList<Weather>();
+	private final ArrayList<Weather> _weather = new ArrayList<Weather>();
 
 	private String _latitude = "";
 	private String _longitude = "";
@@ -83,10 +83,10 @@ public class Report implements Parcelable {
 
 	// Used to display an error if one occurred
 	private String _errMsgLocalized = "";
-	
+
 	// The error message from the server, will not be localized
 	private String _errMsgServer = "";
-	
+
 	private static final String TAG = "com.wakemeski.core.Report";
 
 	public static final Parcelable.Creator<Report> CREATOR = new Parcelable.Creator<Report>() {
@@ -182,7 +182,7 @@ public class Report implements Parcelable {
 			s = _trailsOpen + "/" + _trailsTotal;
 		else if( _trailsOpen > 0 )
 			s = String.valueOf(_trailsOpen);
-		else if( _trailsPercentOpen.length() != 0 ) 
+		else if( _trailsPercentOpen.length() != 0 )
 			s = _trailsPercentOpen;
 
 		return s;
@@ -320,14 +320,14 @@ public class Report implements Parcelable {
 	public String getLocalizedError() {
 		return _errMsgLocalized;
 	}
-	
+
 	/**
 	 * @return any localized error message + any message obtained from the server
 	 */
 	public String getNonLocalizedError() {
 		return _errMsgLocalized + _errMsgServer;
 	}
-	
+
 	/**
 	 * @return true if an error condition was found on the server.  In this
 	 * case the error message will not be localized.  It basically means we
@@ -337,21 +337,21 @@ public class Report implements Parcelable {
 	public boolean hasServerError() {
 		return _errMsgServer.length() != 0;
 	}
-	
+
 	/**
 	 * @return true if hasServerError() or has a localized error available
 	 * with getLocalizedError()
 	 */
 	public boolean hasErrors() {
 		return ( (_errMsgLocalized.length() != 0 ) ||
-				 (_errMsgServer.length() != 0 	 ) 
+				 (_errMsgServer.length() != 0 	 )
 				 );
 	}
 
 	public WakeMeSkiServerInfo getServerInfo() {
 		return _serverInfo;
 	}
-	
+
 	/**
 	 * Returns true if the report include latitude and longitude coordinates
 	 */
@@ -361,7 +361,7 @@ public class Report implements Parcelable {
 			return true;
 		return false;
 	}
-	
+
 	public Uri getGeo() {
 		return Uri.parse("geo:" + _latitude + "," + _longitude);
 	}
@@ -402,14 +402,14 @@ public class Report implements Parcelable {
 	public String getFreshSourceURL() {
 		return _freshSourceUrl;
 	}
-	
+
 	/**
 	 * @return The string URL requested of a wakemeski server to build this report
 	 */
 	public String getRequestURL() {
 		return _requestUrl;
 	}
-	
+
 	public String getWeatherURL() {
 		return _weatherUrl;
 	}
@@ -523,7 +523,7 @@ public class Report implements Parcelable {
 	{
 		return loadReportWithAppendUrl(c,cm,resort,server,"");
 	}
-	
+
 	/**
 	 * Loads a report from the given location without caching
 	 */
@@ -532,7 +532,7 @@ public class Report implements Parcelable {
 	{
 		return loadReportWithAppendUrl(c,cm,resort,server,"&nocache=1");
 	}
-	
+
 
 	/**
 	 * Loads a report.  Allows specifying custom append values to the URL request
@@ -541,7 +541,7 @@ public class Report implements Parcelable {
 	 */
 	private static Report loadReportWithAppendUrl(Context c, ConnectivityManager cm,
 			Resort resort, WakeMeSkiServer server, String appendUrl) {
-		
+
 		// A report will be in the format:
 		// location = OSOALP
 		// date = 12-6-2008
@@ -563,7 +563,7 @@ public class Report implements Parcelable {
 
 		String lines[] = new String[0];
 
-		String url = "/" + l.getReportUrlPath() 
+		String url = "/" + l.getReportUrlPath()
 						+ appendUrl;
 		r._requestUrl = server.getFetchUrl(url);
 		try {
@@ -762,7 +762,7 @@ public class Report implements Parcelable {
 
 		// mix = snow and rain
 		_icons.put("mix", new Integer(R.drawable.mix));
-		
+
 		_icons.put("nwind", new Integer(R.drawable.night_wind));
 		_icons.put("wind", new Integer(R.drawable.wind));
 
