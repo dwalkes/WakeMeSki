@@ -27,26 +27,26 @@ import com.google.code.microlog4android.format.PatternFormatter;
 
 /**
  * Logger class for WakeMeSki.  Wrapper around microlog4android
- * which provides logging both to file on sdcard and 
+ * which provides logging both to file on sdcard and
  */
 public class Log {
-	
+
 	static private Log mLogger = null;
-	private Logger mMicrologLogger;
+	private final Logger mMicrologLogger;
 	private FileAppender mFileAppender = null;
-	
+
 	private Log() {
 		mMicrologLogger = LoggerFactory.getLogger();
 
 		/*
-		 * Only write prints to logcat if this is a 
+		 * Only write prints to logcat if this is a
 		 * debug build
 		 */
 		if( WakeMeSki.DEBUG ) {
 			mMicrologLogger.addAppender(new LogCatAppender());
 		}
 	}
-	
+
 	/**
 	 * Sets the context for the logger which will add support for
 	 * logging to file
@@ -78,7 +78,7 @@ public class Log {
 			mMicrologLogger.addAppender(mFileAppender);
 		}
 	}
-	
+
 	public File getLogFile() {
 		File logFile=null;
 		if( mFileAppender != null ) {
@@ -91,18 +91,18 @@ public class Log {
 		}
 		return logFile;
 	}
-	
+
 	static public synchronized Log getInstance() {
 		if( mLogger == null ) {
 			mLogger = new Log();
 		}
 		return mLogger;
 	}
-	
+
 	static private Logger getMicrologLogger() {
 		return getInstance().mMicrologLogger;
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.d but uses microlog
 	 * @param tag
@@ -111,7 +111,7 @@ public class Log {
 	public static void d(String tag, String message) {
 		getMicrologLogger().debug(tag+ ": " + message);
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.e but uses microlog
 	 * @param tag
@@ -120,7 +120,7 @@ public class Log {
 	public static void e(String tag, String message) {
 		getMicrologLogger().error(tag+ ": " + message);
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.e but uses microlog
 	 * @param tag
@@ -147,7 +147,7 @@ public class Log {
 	public static void w(String tag, String message) {
 		getMicrologLogger().warn(tag+ ": " + message);
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.w but uses microlog
 	 * @param tag
@@ -156,5 +156,4 @@ public class Log {
 	public static void w(String tag, String message, Throwable t) {
 		getMicrologLogger().warn(tag+ ": " + message,t);
 	}
-	
 }
