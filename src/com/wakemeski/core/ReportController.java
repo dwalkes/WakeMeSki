@@ -40,8 +40,6 @@ import com.wakemeski.core.alert.AlertManager;
  * application
  */
 public class ReportController implements Runnable {
-	private final static String TAG = "ReportController";
-
 	private static ReportController inst = null;
 	private final Thread mThread;
 
@@ -109,7 +107,7 @@ public class ReportController implements Runnable {
 				}
 				a.run();
 			} catch (Exception e) {
-				Log.e(TAG, "error performing action", e);
+				Log.e("error performing action", e);
 			}
 			mBusy = false;
 			synchronized (mListeners) {

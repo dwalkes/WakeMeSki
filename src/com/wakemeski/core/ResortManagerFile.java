@@ -75,7 +75,7 @@ public class ResortManagerFile implements ResortManager {
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(mResorts);
 		} catch (Exception e) {
-			Log.e(TAG, "Exception " + e + " writing " + resortFile);
+			Log.e("Exception " + e + " writing " + resortFile);
 		} finally {
 			if (oos != null) {
 				try {
@@ -102,7 +102,7 @@ public class ResortManagerFile implements ResortManager {
 					+ " not found setting selected resorts");
 			// leave selected resorts list empty
 		} catch (Exception e) {
-			Log.e(TAG, "Exception " + e + " reading " + resortFile);
+			Log.e("Exception " + e + " reading " + resortFile);
 		} finally {
 			if (ois != null) {
 				try {

@@ -508,7 +508,7 @@ public class Report implements Parcelable {
 			try {
 				v = Integer.parseInt(val);
 			} catch (Throwable t) {
-				Log.e(TAG, "Unable to parse value to int: " + val);
+				Log.e("Unable to parse value to int: " + val);
 			}
 		}
 
@@ -669,7 +669,7 @@ public class Report implements Parcelable {
 					}
 				}
 			} else {
-				Log.e(TAG, "Error invalid line from report URL("
+				Log.e("Error invalid line from report URL("
 						+ l.getReportUrlPath() + " line: " + line);
 			}
 		}

@@ -37,10 +37,10 @@ class Log {
 	}
 
 	static void e(String logMe) {
-		com.wakemeski.Log.e(LOGTAG, logMe);
+		com.wakemeski.Log.e(logMe);
 	}
 
 	static void e(String logMe, Exception ex) {
-		com.wakemeski.Log.e(LOGTAG, logMe, ex);
+		com.wakemeski.Log.e(logMe, ex);
 	}
 }

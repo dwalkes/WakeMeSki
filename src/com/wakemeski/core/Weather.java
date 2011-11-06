@@ -34,7 +34,6 @@ public class Weather implements Parcelable {
 	private final long mExact;
 	private final String mDesc;
 	private final SnowUnits mUnits;
-	private static String TAG = "Weather";
 
 	public Weather(String when, long exact, String desc, SnowUnits units) {
 		mWhen = when;
@@ -53,7 +52,7 @@ public class Weather implements Parcelable {
 			try {
 				snowTotal = Integer.parseInt(snowTotalString);
 			} catch (Throwable t) {
-				Log.e(TAG, "Unable to parse snow total to int: " + snowTotalString);
+				Log.e("Unable to parse snow total to int: " + snowTotalString);
 			}
 		}
 		return pref.meetsPreference(snowTotal, mUnits);

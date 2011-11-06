@@ -134,7 +134,7 @@ public class WakeMeSkiServer {
 		try {
 			v = Integer.parseInt(val);
 		} catch (Throwable t) {
-			Log.e(TAG, "Unable to parse value to int: " + val);
+			Log.e("Unable to parse value to int: " + val);
 		}
 
 		return v;

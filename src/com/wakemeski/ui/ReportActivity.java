@@ -40,8 +40,6 @@ import com.wakemeski.core.Weather;
 
 public class ReportActivity extends Activity {
 
-	private final static String TAG = "ReportActivity";
-
 	private static final int WEATHER_ID  = Menu.FIRST;
 	private static final int DETAILS_ID  = WEATHER_ID + 1;
 	private static final int LOCATION_ID = DETAILS_ID + 1;
@@ -187,7 +185,7 @@ public class ReportActivity extends Activity {
 				startActivity(new Intent(Intent.ACTION_VIEW, mReport.getGeo()));
 			}
 			catch(Exception e){
-				Log.e(TAG, "Error launching map for: " + mReport.getResort().getResortName(), e);
+				Log.e("Error launching map for: " + mReport.getResort().getResortName(), e);
 			}
 		}
 		return super.onOptionsItemSelected(item);
@@ -198,7 +196,7 @@ public class ReportActivity extends Activity {
 			try {
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
 			} catch (Exception e) {
-				Log.e(TAG, "Error launching url: " + url, e);
+				Log.e("Error launching url: " + url, e);
 			}
 		}
 	}

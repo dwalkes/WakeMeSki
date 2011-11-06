@@ -85,9 +85,8 @@ public class WakeMeSkiDashboard extends Activity {
 		{
 			mApVersion = getApplicationContext().getPackageManager().
 					getPackageInfo(getPackageName(),PackageManager.GET_ACTIVITIES).versionCode;
-		} catch (NameNotFoundException e)
-		{
-			Log.e(TAG,"Caught NameNotFoundException quering my package!" + e.getLocalizedMessage() );
+		} catch (NameNotFoundException e) {
+			Log.e("Caught NameNotFoundException quering my package!" + e.getLocalizedMessage() );
 		}
 
 		mReportsList = (ListView)findViewById(R.id.dashboard_list);

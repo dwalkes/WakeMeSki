@@ -39,7 +39,6 @@ import com.wakemeski.Log;
  * get the ski report.
  */
 public class LocationFinder {
-	private static final String TAG = "LocationFinder";
 	private final WakeMeSkiServer mServer;
 
 	public LocationFinder(WakeMeSkiServer server) {
@@ -71,8 +70,7 @@ public class LocationFinder {
 				Location l = new Location(vals[0].trim(), vals[1].trim());
 				locations.add(l);
 			} else {
-				Log.e(TAG, "Bad location line for region [" + region + "]: ["
-						+ row + "]");
+				Log.e("Bad location line for region [" + region + "]: ["+ row + "]");
 			}
 		}
 		return locations.toArray(new Location[locations.size()]);

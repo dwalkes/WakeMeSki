@@ -89,9 +89,8 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		if( mSnowSettings == null ) {
 			mSnowSettings = SnowSettingsSharedPreference.getWakeupPreference();
 			// update snow settings based on current preferences
-			if( !mSnowSettings.setFromPreferences(getSharedPreferences()) ) {
-				Log.e(TAG, "snow settings not found");
-			}
+			if( !mSnowSettings.setFromPreferences(getSharedPreferences()) )
+				Log.e("snow settings not found");
 		}
 
 		return mSnowSettings;

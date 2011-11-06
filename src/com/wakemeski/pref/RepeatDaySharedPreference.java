@@ -31,7 +31,6 @@ import com.wakemeski.ui.ListPreferenceMultiSelect;
  */
 public class RepeatDaySharedPreference {
 	private String[] selectedDays;
-	private final String TAG = "RepeatDaySharedPreference";
 
 	/**
 	 * Initializes this shared preference object from a persistent string
@@ -76,7 +75,7 @@ public class RepeatDaySharedPreference {
 			selectedString = "Saturday";
 			break;
 		default:
-			Log.e(TAG, "Unknown day of week" + dayOfWeek);
+			Log.e("Unknown day of week" + dayOfWeek);
 			break;
 		}
 		if (selectedDays != null && selectedString != null) {

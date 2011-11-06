@@ -119,7 +119,7 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void e(String tag, String message) {
+	public static void e(String message) {
 		getMicrologLogger().error(TAG+ ": " + message);
 	}
 
@@ -128,7 +128,7 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void e(String tag, String message, Throwable t) {
+	public static void e(String message, Throwable t) {
 		getMicrologLogger().error(TAG+ ": " + message);
 	}
 
