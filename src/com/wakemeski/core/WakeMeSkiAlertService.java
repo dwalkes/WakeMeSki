@@ -39,8 +39,6 @@ import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
  */
 public class WakeMeSkiAlertService extends Service {
 
-	private static final String TAG = "WakeMeSkiAlertService";
-
 	private SnowSettingsSharedPreference	mSnowSettings = null;
 	private SharedPreferences			 	mSharedPreferences = null;
 	private ReportController				mReportController;
@@ -284,7 +282,7 @@ public class WakeMeSkiAlertService extends Service {
 				result.setStopService(false);
 			}
 		} else {
-			Log.w(TAG, "onHandleIntent with null intent or action");
+			Log.w("onHandleIntent with null intent or action");
 		}
 
 		return result;

@@ -146,7 +146,7 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void w(String tag, String message) {
+	public static void w(String message) {
 		getMicrologLogger().warn(TAG+ ": " + message);
 	}
 
@@ -155,7 +155,7 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void w(String tag, String message, Throwable t) {
+	public static void w(String message, Throwable t) {
 		getMicrologLogger().warn(TAG+ ": " + message,t);
 	}
 }

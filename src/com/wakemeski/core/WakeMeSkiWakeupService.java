@@ -44,7 +44,6 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 
 	private	SnowSettingsSharedPreference mSnowSettings;
 	private boolean mAlarmFired;
-	private static final String TAG = "WakeMeSkiWakeupService";
 	private AlarmController				 	mAlarmController=null;
 	private ForegroundServiceCompat			mForegroundService;
 	private static final int				NOTIFY_CHECK_STATUS_ID=1;
@@ -295,7 +294,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 		currentAction = intent.getAction();
 
 		if (currentAction == null) {
-			Log.w(TAG, "onHandleIntent with null intent or action");
+			Log.w("onHandleIntent with null intent or action");
 		}
 		else {
 			staleIntent = isStaleIntent(intent);
@@ -314,7 +313,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					 */
 					result.setStartState(START_REDELIVER_INTENT);
 				} else {
-					Log.w(TAG,"Stale intent received with ACTION_WAKE_CHECK, ignoring");
+					Log.w("Stale intent received with ACTION_WAKE_CHECK, ignoring");
 				}
 			} else if (currentAction.equals(ACTION_ALARM_SCHEDULE)) {
 				// alarm will be scheduled below, even on stale intents
@@ -328,7 +327,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					 * there's no background processing happening it shouldn't be an issue.
 					 */
 				} else {
-					Log.w(TAG,"Stale intent received with ACTION_SNOOZE, ignoring");
+					Log.w("Stale intent received with ACTION_SNOOZE, ignoring");
 				}
 			} else {
 				Log.d("Unhandled action " + currentAction);

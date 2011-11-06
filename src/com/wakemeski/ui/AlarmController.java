@@ -45,7 +45,6 @@ public class AlarmController {
 	public static final String ACTION_FIRE_ALARM = "com.wakemeski.ui.firealarm";
 
 	private final Context context;
-	private static final String TAG = "AlarmController";
 
 	public AlarmController(Context theContext) {
 		context = theContext;
@@ -80,7 +79,7 @@ public class AlarmController {
 					getPendingIntent());
 			success = true;
 		} else {
-			Log.w(TAG, "Alarm manager could not be obtained");
+			Log.w("Alarm manager could not be obtained");
 		}
 		return success;
 	}
@@ -103,7 +102,7 @@ public class AlarmController {
 		if (mgr != null) {
 			mgr.cancel(getPendingIntent());
 		} else {
-			Log.w(TAG, "Alarm manager could not be obtained");
+			Log.w("Alarm manager could not be obtained");
 		}
 	}
 

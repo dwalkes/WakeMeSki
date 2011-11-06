@@ -35,8 +35,6 @@ import com.wakemeski.Log;
  *
  */
 public class ResortManagerFile implements ResortManager {
-
-	private static final String TAG = ResortManagerFile.class.getName();
 	private static final String resortFile = "resorts.txt";
 	private final Context context;
 	private static ResortManagerFile instance = null;
@@ -81,8 +79,7 @@ public class ResortManagerFile implements ResortManager {
 				try {
 					oos.close();
 				} catch (IOException ioe) {
-					Log.w(TAG, "IO exception " + ioe + " closing output file "
-							+ resortFile);
+					Log.w("IO exception " + ioe + " closing output file " + resortFile);
 				}
 			}
 		}
@@ -98,8 +95,7 @@ public class ResortManagerFile implements ResortManager {
 			mResorts = (Resort[]) ois.readObject();
 			Arrays.sort(mResorts);
 		} catch (FileNotFoundException fnf) {
-			Log.w(TAG, "File " + resortFile
-					+ " not found setting selected resorts");
+			Log.w("File " + resortFile + " not found setting selected resorts");
 			// leave selected resorts list empty
 		} catch (Exception e) {
 			Log.e("Exception " + e + " reading " + resortFile);
@@ -108,7 +104,7 @@ public class ResortManagerFile implements ResortManager {
 				try {
 					ois.close();
 				} catch (IOException ioe) {
-					Log.w(TAG, "IO exception closing input file " + resortFile);
+					Log.w("IO exception closing input file " + resortFile, ioe);
 				}
 			}
 		}

@@ -56,10 +56,10 @@ public class ForegroundServiceCompat {
 	            mStartForeground.invoke(this, mStartForegroundArgs);
 	        } catch (InvocationTargetException e) {
 	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke startForeground", e);
+	            Log.w("Unable to invoke startForeground", e);
 	        } catch (IllegalAccessException e) {
 	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke startForeground", e);
+	            Log.w("Unable to invoke startForeground", e);
 	        }
 	        return;
 	    }
@@ -81,10 +81,10 @@ public class ForegroundServiceCompat {
 	            mStopForeground.invoke(this, mStopForegroundArgs);
 	        } catch (InvocationTargetException e) {
 	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke stopForeground", e);
+	            Log.w("Unable to invoke stopForeground", e);
 	        } catch (IllegalAccessException e) {
 	            // Should not happen.
-	            Log.w("ApiDemos", "Unable to invoke stopForeground", e);
+	            Log.w("Unable to invoke stopForeground", e);
 	        }
 	        return;
 	    }

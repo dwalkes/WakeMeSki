@@ -36,7 +36,6 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 	public static final String ACTION_WAKE_CHECK = WakeMeSkiWakeupService.ACTION_WAKE_CHECK;
 	public static final String ACTION_ALERT_CHECK = WakeMeSkiWakeupService.ACTION_ALERT_CHECK;
 	public static final String ACTION_SNOOZE = AlarmController.ACTION_FIRE_ALARM;
-	private static final String TAG = "OnAlarmReceiver";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -59,10 +58,10 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 						System.currentTimeMillis());
 				context.startService(i);
 			} else {
-				Log.w(TAG, "Unknown wake action " + intent.getAction());
+				Log.w("Unknown wake action " + intent.getAction());
 			}
 		} else {
-			Log.w(TAG, "Null wake action");
+			Log.w("Null wake action");
 		}
 	}
 

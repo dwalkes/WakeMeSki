@@ -59,7 +59,6 @@ public class WakeMeSkiDashboard extends Activity {
 	private static final int PREFERENCES_ID = Menu.FIRST;
 	private static final int REFRESH_ID     = Menu.FIRST + 1;
 	private static final int ALERTS_ID     = Menu.FIRST + 2;
-	private static final String TAG = "WakeMeSkiDashboard";
 	private int mApVersion = 0;
 	private int mApLatestVersion = 0;
 	private ReportController mReportController;
@@ -310,7 +309,7 @@ public class WakeMeSkiDashboard extends Activity {
                 	if( editor.commit() ) {
                 		Log.d("OK I promise I won't bug you again... until the next version");
                 	} else {
-                		Log.w(TAG, "Ignore pref key commit failed");
+                		Log.w("Ignore pref key commit failed");
                 	}
 
                 }
