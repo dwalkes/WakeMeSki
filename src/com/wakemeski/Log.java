@@ -18,12 +18,14 @@ package com.wakemeski;
 import java.io.File;
 
 import android.content.Context;
+import android.util.Config;
 
 import com.google.code.microlog4android.Logger;
 import com.google.code.microlog4android.LoggerFactory;
 import com.google.code.microlog4android.appender.FileAppender;
 import com.google.code.microlog4android.appender.LogCatAppender;
 import com.google.code.microlog4android.format.PatternFormatter;
+import com.wakemeski.ui.WakeMeSkiPreferences;
 
 /**
  * Logger class for WakeMeSki.  Wrapper around microlog4android
@@ -32,6 +34,8 @@ import com.google.code.microlog4android.format.PatternFormatter;
 public class Log {
 
 	public final static String TAG = "WakeMeSki";
+
+	public static final boolean LOGV = WakeMeSkiPreferences.DEBUG ? Config.LOGD : Config.LOGV;
 
 	static private Log mLogger = null;
 	private final Logger mMicrologLogger;

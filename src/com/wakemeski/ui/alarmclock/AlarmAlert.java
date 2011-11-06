@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.core.WakeMeSkiWakeupService;
 import com.wakemeski.ui.AlarmSnoozeController;
@@ -77,7 +78,7 @@ public class AlarmAlert extends Activity {
 		 * FIXME Intentionally verbose: always log this until we've fully
 		 * debugged the app failing to start up
 		 */
-		Log.v("AlarmAlert.onCreate()");
+		Log.d("AlarmAlert.onCreate()");
 
 		Intent i = getIntent();
 		// mAlarmId = i.getIntExtra(Alarms.ID, -1);
@@ -99,7 +100,7 @@ public class AlarmAlert extends Activity {
 			@Override
 			public void onKilled() {
 				if (Log.LOGV)
-					Log.v("onKilled()");
+					Log.d("onKilled()");
 				updateSilencedText();
 
 				/* don't allow snooze */
@@ -219,7 +220,7 @@ public class AlarmAlert extends Activity {
 		mState = SNOOZE;
 		// }
 		// Intentionally log the snooze time for debugging.
-		Log.v(displayTime);
+		Log.d(displayTime);
 		// Display the snooze minutes in a toast.
 		Toast.makeText(AlarmAlert.this, displayTime, Toast.LENGTH_LONG).show();
 		mKlaxon.stop(this, mState == SNOOZE);
@@ -267,7 +268,7 @@ public class AlarmAlert extends Activity {
 	protected void onResume() {
 		super.onResume();
 		if (Log.LOGV)
-			Log.v("AlarmAlert.onResume()");
+			Log.d("AlarmAlert.onResume()");
 		// Acquire a separate lock for the screen to stay on. This is necessary
 		// to avoid flashing the keyguard when the screen is locked.
 		AlarmAlertWakeLock.acquireScreenWakeLock(this);
@@ -278,14 +279,14 @@ public class AlarmAlert extends Activity {
 	protected void onPause() {
 		super.onPause();
 		if (Log.LOGV)
-			Log.v("AlarmAlert.onPause()");
+			Log.d("AlarmAlert.onPause()");
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
 		if (Log.LOGV)
-			Log.v("AlarmAlert.onStop()");
+			Log.d("AlarmAlert.onStop()");
 		// As a last resort, try to snooze if this activity is stopped.
 		snooze();
 		// We might have been killed by the KillerCallback so always release

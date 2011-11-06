@@ -22,6 +22,8 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.os.PowerManager;
 
+import com.wakemeski.Log;
+
 /**
  * Hold a wakelock that can be acquired in the AlarmReceiver and released in the
  * AlarmAlert activity
@@ -33,7 +35,7 @@ public class AlarmAlertWakeLock {
 	private static KeyguardManager.KeyguardLock mKeyguardLock = null;
 
 	public static void acquireCpuWakeLock(Context context) {
-		Log.v("Acquiring cpu wake lock");
+		Log.d("Acquiring cpu wake lock");
 		if (sCpuWakeLock != null) {
 			return;
 		}
@@ -43,12 +45,12 @@ public class AlarmAlertWakeLock {
 
 		sCpuWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
 				| PowerManager.ACQUIRE_CAUSES_WAKEUP
-				| PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
+				| PowerManager.ON_AFTER_RELEASE, Log.TAG);
 		sCpuWakeLock.acquire();
 	}
 
 	public static void acquireScreenWakeLock(Context context) {
-		Log.v("Acquiring screen wake lock");
+		Log.d("Acquiring screen wake lock");
 		if (sScreenWakeLock != null) {
 			return;
 		}
@@ -58,7 +60,7 @@ public class AlarmAlertWakeLock {
 
 		sScreenWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
 				| PowerManager.ACQUIRE_CAUSES_WAKEUP
-				| PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
+				| PowerManager.ON_AFTER_RELEASE, Log.TAG);
 		sScreenWakeLock.acquire();
 
 		/*
@@ -75,18 +77,18 @@ public class AlarmAlertWakeLock {
 			mKeyguardLock = keyMgr.newKeyguardLock("com.dwalkes.wakemeski");
 			if (mKeyguardLock != null) {
 				if (Log.LOGV)
-					Log.v("keyguardLock Created");
+					Log.d("keyguardLock Created");
 			}
 		}
 		if (mKeyguardLock != null) {
 			if (Log.LOGV)
-				Log.v("disabling keyguard");
+				Log.d("disabling keyguard");
 			mKeyguardLock.disableKeyguard();
 		}
 	}
 
 	public static void release() {
-		Log.v("Releasing wake lock");
+		Log.d("Releasing wake lock");
 		if (sCpuWakeLock != null) {
 			sCpuWakeLock.release();
 			sCpuWakeLock = null;
@@ -97,7 +99,7 @@ public class AlarmAlertWakeLock {
 		}
 		if (mKeyguardLock != null) {
 			if (Log.LOGV)
-				Log.v("re-enabling keyguard");
+				Log.d("re-enabling keyguard");
 			mKeyguardLock.reenableKeyguard();
 			mKeyguardLock = null;
 		}

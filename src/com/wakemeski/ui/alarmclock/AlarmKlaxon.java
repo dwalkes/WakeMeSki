@@ -30,6 +30,7 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 
+import com.wakemeski.Log;
 import com.wakemeski.R;
 
 /**
@@ -71,9 +72,9 @@ class AlarmKlaxon {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case KILLER:
-				if (Log.LOGV) {
-					Log.v("*********** Alarm killer triggered ***********");
-				}
+				if (Log.LOGV)
+					Log.d("*********** Alarm killer triggered ***********");
+
 				if (mKillerCallback != null) {
 					mKillerCallback.onKilled();
 				}
@@ -100,7 +101,7 @@ class AlarmKlaxon {
 		mAlarmId = alarmId;
 
 		if (Log.LOGV)
-			Log.v("AlarmKlaxon.play() " + mAlarmId + " alert " + mAlert);
+			Log.d("AlarmKlaxon.play() " + mAlarmId + " alert " + mAlert);
 
 		// TODO: Reuse mMediaPlayer instead of creating a new one and/or use
 		// RingtoneManager.
@@ -122,7 +123,7 @@ class AlarmKlaxon {
 			// Check if we are in a call. If we are, use the in-call alarm
 			// resource at a low volume to not disrupt the call.
 			if (tm.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
-				Log.v("Using the in-call alarm");
+				Log.d("Using the in-call alarm");
 				mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
 				setDataSourceFromResource(context.getResources(), mMediaPlayer,
 						R.raw.in_call_alarm);
@@ -181,7 +182,7 @@ class AlarmKlaxon {
 	 */
 	public void stop(Context context, boolean snoozed) {
 		if (Log.LOGV)
-			Log.v("AlarmKlaxon.stop() " + mAlarmId);
+			Log.d("AlarmKlaxon.stop() " + mAlarmId);
 		if (mPlaying) {
 			mPlaying = false;
 
