@@ -17,21 +17,11 @@
 	    android:title="@string/snow_settings"
 	    android:summary="@string/snow_wakeup_settings_detail"
 	    android:dialogLayout="@layout/snow_settings"/>
-	    <com.wakemeski.ui.TimePickerPreference android:key="alarm_wakeup_time" 
-	        android:title="@string/wakeup_time"
-	        android:enabled="false"/>
-	    <com.wakemeski.ui.RepeatDayPreference 
-	        android:key="alarm_repeat_days" 
-	        android:title="@string/alarm_repeat"
-	        android:entries="@array/days_of_week"
-	        android:entryValues="@array/days_of_week"
-	        android:enabled="false"/>
-	   <com.wakemeski.ui.alarmclock.AlarmPreference
-	        android:key="alarm_tone" 
-	        android:title="@string/alert"
-	        android:ringtoneType="alarm"
-	        android:showDefault="false"
-	        android:showSilent="false" />
+	     <PreferenceScreen 
+   		android:key="alarm_settings"
+		android:title="@string/alarm_settings_title"
+		android:summary="@string/alarm_settings_summary"
+		/>	
    </PreferenceScreen>
    	<PreferenceScreen 
 	android:title="@string/alert_settings"

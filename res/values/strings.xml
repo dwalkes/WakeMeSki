@@ -10,7 +10,8 @@
 	<string name="wake_me_up_when">When me up when at least 1 selected resort reports greater than</string>
 	<string name="past_24_hours">of snow in the past 24 hours</string>
 	<string name="alarm_summary">Configure your wake-up settings</string>
-	<string name="alarm_repeat">Wake-up Days</string>
+	<string name="alarm_settings_title">Alarm Settings</string>
+	<string name="alarm_settings_summary">Configure alarm settings</string>
 	<string name="enable">Enable</string>
 	<string name="enabled">Enabled</string>
 	<string name="enable_wakeup">Enable wake-up</string>

@@ -19,20 +19,17 @@ package com.wakemeski.core;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import com.wakemeski.Log;
 
+import com.dwalkes.generic_deskclock.Alarms;
+import com.wakemeski.Log;
 import com.wakemeski.WakeMeSki;
-import com.wakemeski.pref.RepeatDaySharedPreference;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
-import com.wakemeski.pref.TimeSettingsSharedPreference;
-import com.wakemeski.ui.AlarmCalculator;
-import com.wakemeski.ui.AlarmController;
-import com.wakemeski.ui.OnAlarmReceiver;
-import com.wakemeski.ui.WakeMeSkiPreferences;
 
 /**
  * Extends WakeMeSkiAlertService to provide wakeup related service functionality
@@ -45,13 +42,12 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 	private	SnowSettingsSharedPreference mSnowSettings;
 	private boolean mAlarmFired;
 	private static final String TAG = "WakeMeSkiWakeupService";
-	private AlarmController				 	mAlarmController=null;
 	private ForegroundServiceCompat			mForegroundService;
 	private static final int				NOTIFY_CHECK_STATUS_ID=1;
 	public static final String ACTION_WAKE_CHECK = "com.wakemeski.core.ACTION_WAKE_CHECK";
 	public static final String ACTION_SHUTDOWN = "com.wakemeski.core.ACTION_SHUTDOWN";
 	public static final String EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME ="com.wakemeski.core.BCAST_RECEIVER_TIME_EXTRA";
-
+	Intent	mPendingAlarmIntent=null;
 
 	/**
 	 * Clear mAlarmFired when the report load starts
@@ -96,7 +92,17 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 
 		return mSnowSettings;
 	}
-	
+
+	private class OnAlarmAlertReceiverComplete extends BroadcastReceiver {
+		public void onReceive(Context context, Intent intent) {
+			/*
+			 * Done with the service now that we've started the alarm.
+			 */
+			stopService(new Intent(getApplicationContext(),
+					WakeMeSkiWakeupService.class));
+		}
+	}
+
 	/**
 	 * Overrides base implementation to check for exceeded preference and fire alarms
 	 * as/if necessary
@@ -113,84 +119,56 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 				 * Done listening now that we've fired the alarm
 				 */
 				if( mAlarmFired == false ) {
+					
+					if( mPendingAlarmIntent != null ) {
+						/*
+						 * Change the pending intent to be an alarm alert and actually fire the alarm
+						 * Set a receiver to call when the alert has been fired to allow shutdown of the service
+						 * It's not safe to shut down the service until the alert wake lock is held by the
+						 * alert broadcast receiver
+						 */
+						mPendingAlarmIntent.setAction(Alarms.ALARM_ALERT_ACTION);
+						sendOrderedBroadcast(mPendingAlarmIntent,
+												null, // no permission
+												new OnAlarmAlertReceiverComplete(),
+												null, // no custom handler
+												Activity.RESULT_OK,
+												null, // no initial data
+												null  // no initial extras
+												);
+					} else {
+						Log.w(TAG, "Pending alarm intent null when alarm should be fired");
+						stopService(new Intent(getApplicationContext(),
+								WakeMeSkiWakeupService.class));
+					}
+
 					/**
 					 * Only fire the alarm once
 					 * Don't release the wake lock, we will do that when the alarm activity starts
 					 */
-					getAlarmController().fireAlarm();
+
 					mAlarmFired = true;
-					
-					/*
-					 * Not safe to stop the service here because the 
-					 * alarm activity has not yet started. Will be stopped by the alarm
-					 * activity.
-					 */
 				}
+
 			} else {
 				Log.d(TAG, "Resort " + r.getResort() + " did not meet preference "
-						+ getSnowSettings());
+							+ getSnowSettings());
 			}
 		} else {
 			Log.d(TAG, "Resort " + r.getResort() + " is not wakeup enabled");
 		}
 
 	}
-	/**
-	 * @return An alarm controller instance used by the service
-	 */
-	private AlarmController getAlarmController() {
-		if( mAlarmController == null ) {
-			mAlarmController = new AlarmController(this
-				.getApplicationContext());
-		}
-		return mAlarmController;
-	}
 	
-	/**
-	 * Calculates when the next alarm should occur based on shared prefs
-	 * 
-	 * @return a calendar object representing the next alarm to fire, or null if
-	 *         no alarm should be scheduled
-	 */
-	private Calendar getNextAlarm() {
-		Calendar nextAlarm = null;
-		SharedPreferences prefs =getSharedPreferences();
-
-		if (prefs.getBoolean(WakeMeSkiPreferences.ALARM_ENABLE_PREF_KEY, false)) {
-
-			RepeatDaySharedPreference repeatDay = new RepeatDaySharedPreference();
-			if (repeatDay.setFromPersistString(prefs.getString(
-					WakeMeSkiPreferences.REPEAT_DAYS_PREF_KEY, null))) {
-				TimeSettingsSharedPreference timeSettings = new TimeSettingsSharedPreference(this.getApplicationContext());
-				if (timeSettings.setTimeFromPersistString(prefs.getString(
-						WakeMeSkiPreferences.ALARM_WAKEUP_TIME_PREF_KEY, null))) {
-					AlarmCalculator calculator = new AlarmCalculator(repeatDay,
-							timeSettings);
-					nextAlarm = calculator.getNextAlarm();
-					if (nextAlarm == null) {
-						Log
-								.d(TAG,
-										"Alarm caculator returned null, no alarm scheduled");
-					}
-				} else {
-					Log.d(TAG, "No time set, no alarm scheduled");
-				}
-			} else {
-				Log.d(TAG, "No repeat day setting, no alarm scheduled");
-			}
-		} else {
-			Log.d(TAG, "Alarm is disabled, no alarm scheduled");
-		}
-		return nextAlarm;
-	}
 
 	/**
 	 * Checks whether an alarm action needs to occur based on stored preferences.
 	 * Kicks off report load using ReportController.  onReportAdded() and onReportLoading() will
 	 * take care of handling the cases where an alarm action is or is not needed
 	 */
-	private void checkAlarmAction() {
+	private void checkAlarmAction(Intent pendingAlarm) {
 		
+		mPendingAlarmIntent = pendingAlarm;
 		/**
 		 * I noticed problems shortly after the 2.0 release running in the background.
 		 * In an attempt to resolve I added setForeground() to make it less likely that the
@@ -223,13 +201,10 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 
 	
 	/**
-	 * The next wakup alarm must always be scheduled since this is a RTC wakeup
+	 * The next wakeup alarm must always be scheduled since this is a RTC wakeup
 	 */
 	private void scheduleNextAlarm() {
-		Calendar nextAlarm = getNextAlarm();
-		if (nextAlarm != null) {
-			getAlarmController().setAlarm(nextAlarm);
-		}
+		Alarms.setNextAlert(this);
 	}
 	
 	@Override
@@ -307,7 +282,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 			if (currentAction.equals(ACTION_WAKE_CHECK)) {
 				if( !staleIntent ) {
 					Log.d(TAG,"Starting new wake check");
-					checkAlarmAction();
+					checkAlarmAction(intent);
 					/*
 					 * Don't stop the service, we will stop it after resorts are checked
 					 */
@@ -323,25 +298,13 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 				}
 			} else if (currentAction.equals(ACTION_ALARM_SCHEDULE)) {
 				// alarm will be scheduled below, even on stale intents
-			} else if (currentAction.equals(OnAlarmReceiver.ACTION_SNOOZE)) {
-				if( !staleIntent ) {
-					getAlarmController().fireAlarm();
-					// we will release wake lock in the alarm controller
-					result.setStopService(false);
-					/*
-					 * Don't bother with redeliver intent in this case.  Since
-					 * there's no background processing happening it shouldn't be an issue.
-					 */
-				} else {
-					Log.w(TAG,"Stale intent received with ACTION_SNOOZE, ignoring");
-				}
 			} else {
 				Log.d(TAG,"Unhandled action " + currentAction);
 			}
 		
 		}
 		/*
-		 * We always need to schedule the next alarm after a check or snooze event
+		 * We always need to schedule the next alarm after any check
 		 * Otherwise we won't get a new wakeup on the next configured check day
 		 */
 		scheduleNextAlarm();

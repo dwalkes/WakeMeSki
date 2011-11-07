@@ -17,9 +17,12 @@ package com.wakemeski;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.preference.PreferenceManager;
 
+import com.dwalkes.generic_deskclock.GenericDeskClockCustomization;
 import com.wakemeski.core.WakeMeSkiFactory;
+import com.wakemeski.core.WakeMeSkiWakeupService;
 import com.wakemeski.core.alert.AlertPollingController;
 import com.wakemeski.ui.WakeMeSkiPreferences;
 
@@ -30,10 +33,34 @@ public class WakeMeSki extends Application {
 	 */
 	public static final boolean DEBUG = false;
 	
+	static private class WakeMeSkiAlarmCustomization extends GenericDeskClockCustomization {
+		public Intent getAlarmFireIntent() {
+			return new Intent(WakeMeSkiWakeupService.ACTION_WAKE_CHECK);
+		}
+		
+		/**
+		 * Content URI authority.  Must match the value specified in the application manifest
+		 * @return
+		 */
+		public String getContentURIAuthority() {
+			return new String("com.wakemeski");
+		}
+	}
+	
+	static {
+		GenericDeskClockCustomization.setInstance(new WakeMeSki.WakeMeSkiAlarmCustomization());
+	}
+	
+
+	
+
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+		/*
+		 * Modify the desk clock alarm shared library code to use application specific settings 
+		 */
 		WakeMeSkiFactory.getInstance(this);
 		Context c = getApplicationContext();
 		/**
