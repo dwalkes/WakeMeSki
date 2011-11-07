@@ -16,32 +16,32 @@
  */
 package com.wakemeski.ui;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 import com.wakemeski.Log;
 import com.wakemeski.core.WakeMeSkiAlertService;
 import com.wakemeski.core.WakeMeSkiWakeupService;
-import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
+import com.wakemeski.generic_deskclock.AlarmAlertWakeLock;
+import com.wakemeski.generic_deskclock.AlarmReceiver;
+import com.wakemeski.generic_deskclock.GenericDeskClockCustomization;
 
 /**
  * This class is invoked when an alarm check needs to occur based on a
- * configured wakeup.
- *
+ * configured wakeup or when we need to check for new snow alerts.
+ * 
  * @author dan
  *
  */
-public class OnAlarmReceiver extends BroadcastReceiver {
+
+public class OnAlarmReceiver extends AlarmReceiver {
 	public static final String ACTION_WAKE_CHECK = WakeMeSkiWakeupService.ACTION_WAKE_CHECK;
 	public static final String ACTION_ALERT_CHECK = WakeMeSkiWakeupService.ACTION_ALERT_CHECK;
-	public static final String ACTION_SNOOZE = AlarmController.ACTION_FIRE_ALARM;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction() != null) {
-			if (intent.getAction().equals(ACTION_SNOOZE) ||
-						intent.getAction().equals(ACTION_WAKE_CHECK) ||
+			if ( intent.getAction().equals(ACTION_WAKE_CHECK) ||
 						intent.getAction().equals(ACTION_ALERT_CHECK)) {
 				AlarmAlertWakeLock.acquireCpuWakeLock(context);
 				/*
@@ -50,12 +50,22 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 				 */
 				Intent i = new Intent(
 						intent.getAction(), null, context,
-						intent.getAction().equals(ACTION_ALERT_CHECK) ?
+						intent.getAction().equals(ACTION_ALERT_CHECK) ? 
 									WakeMeSkiAlertService.class :
 									WakeMeSkiWakeupService.class
 								);
 				i.putExtra(WakeMeSkiWakeupService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
 						System.currentTimeMillis());
+				if( intent.getAction().equals(ACTION_WAKE_CHECK) ) {
+					/*
+					 * Add an extra with the intent that will actually fire the alarm, by removing the class and
+					 * setting alarm alert action as the action
+					 */
+					Intent alarmFireIntent = GenericDeskClockCustomization.getInstance().getShowAlertIntent(context);
+					alarmFireIntent.putExtras(intent);
+					i.putExtra(WakeMeSkiWakeupService.EXTRA_PENDING_ALARM_INTENT,
+							alarmFireIntent);
+				}
 				context.startService(i);
 			} else {
 				Log.w("Unknown wake action " + intent.getAction());

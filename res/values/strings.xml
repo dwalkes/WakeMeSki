@@ -10,7 +10,8 @@
 	<string name="wake_me_up_when">When me up when at least 1 selected resort reports greater than</string>
 	<string name="past_24_hours">of snow in the past 24 hours</string>
 	<string name="alarm_summary">Configure your wake-up settings</string>
-	<string name="alarm_repeat">Wake-up Days</string>
+	<string name="alarm_settings_title">Alarm Settings</string>
+	<string name="count_alarms_enabled"><xliff:g id="count">%d</xliff:g> alarms enabled</string>
 	<string name="enable">Enable</string>
 	<string name="enabled">Enabled</string>
 	<string name="enable_wakeup">Enable wake-up</string>
@@ -48,8 +49,8 @@
 	<string name="show_report_summary">Check status for selected resorts</string>
 	<string name="please_wait_for_service">Please wait while snow status is obtained for selected resorts.</string>
 	<string name="alarm_updated">WakeMeSki alarm successfully updated</string>
-	<string name="alarm_disabled">WakeMeSki alarm is currently disabled</string>
-	<string name="alarm_disabled_no_days_selected">Please select at least one Wake-up day to enable the alarm.</string>
+	<string name="wakeup_disabled">WakeMeSki wake-up is currently disabled</string>
+	<string name="alarm_not_set">Please configure alarm to enable wakeup</string>
 	<string name="resort_list_title">WakeMeSki Selected Resorts</string>
 	<string name="wakeup">Wake Up</string>
 	<string name="resort_title">Resort</string>
@@ -99,6 +100,7 @@
     <string name="eula_refuse">Don\'t Accept</string>
     <!-- Alarm dialog strings -->
     <string name="ski_wake_up">WakeMeSki Wake Up!</string>
+    <string name="alarm_screen_title">WakeMeSki Alarms</string>
     <!-- Service notification strings -->
     <string name="wakemeski_update">WakeMeSki update</string>
     <string name="checking_notify_text">Checking snow totals</string>

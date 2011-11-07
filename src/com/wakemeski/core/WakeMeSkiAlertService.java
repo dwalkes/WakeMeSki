@@ -26,9 +26,9 @@ import android.preference.PreferenceManager;
 
 import com.wakemeski.Log;
 import com.wakemeski.core.alert.AlertPollingController;
+import com.wakemeski.generic_deskclock.AlarmAlertWakeLock;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.ui.WakeMeSkiPreferences;
-import com.wakemeski.ui.alarmclock.AlarmAlertWakeLock;
 
 /**
  * A service to manage alert notifications.  This service checks snow
@@ -227,7 +227,7 @@ public class WakeMeSkiAlertService extends Service {
 		 * even if the listener is not currently in the list
 		 */
 		mReportController.removeListener(mReportListener);
-		AlarmAlertWakeLock.release();
+		AlarmAlertWakeLock.releaseCpuLock();
 
 		super.onDestroy();
 	}

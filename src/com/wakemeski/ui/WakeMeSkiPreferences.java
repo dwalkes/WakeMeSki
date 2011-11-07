@@ -17,11 +17,9 @@
 package com.wakemeski.ui;
 
 import java.io.File;
-import java.util.Calendar;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -39,10 +37,8 @@ import com.wakemeski.core.Resort;
 import com.wakemeski.core.ResortManager;
 import com.wakemeski.core.WakeMeSkiFactory;
 import com.wakemeski.core.alert.AlertPollingController;
-import com.wakemeski.pref.RepeatDaySharedPreference;
-import com.wakemeski.pref.TimeSettingsSharedPreference;
-import com.wakemeski.ui.alarmclock.AlarmPreference;
-import com.wakemeski.ui.alarmclock.AlarmPreference.IRingtoneChangedListener;
+import com.wakemeski.deskclock_custom.WakeMeSkiAlarmCustomization;
+import com.wakemeski.generic_deskclock.Alarms;
 
 /**
  * The main preferences activity, used to show wakemeski application
@@ -52,23 +48,16 @@ import com.wakemeski.ui.alarmclock.AlarmPreference.IRingtoneChangedListener;
  *
  */
 public class WakeMeSkiPreferences extends PreferenceActivity implements
-		IRingtoneChangedListener,
 		SharedPreferences.OnSharedPreferenceChangeListener {
 
-	private RepeatDayPreference mDayPreference;
-	private TimePickerPreference mWakeUpTimePreference;
 	private CheckBoxPreference mAlarmEnablePreference;
-	private AlarmPreference mAlarmTonePreference;
 	private PreferenceScreen mDashboardPreference;
 	private PreferenceScreen mResortsPreference;
 	private PreferenceScreen mSendLogsPreference;
 	private SnowSettingsPreference mWakeupSnowSettings;
-	private AlarmController mAlarmController;
+	private PreferenceScreen mAlarmSettingsPreference;
 	private ResortManager	mResortManager;
 	public static final String ALARM_ENABLE_PREF_KEY = "alarm_enable";
-	public static final String ALARM_TONE_PREF_KEY = "alarm_tone";
-	public static final String REPEAT_DAYS_PREF_KEY = "alarm_repeat_days";
-	public static final String ALARM_WAKEUP_TIME_PREF_KEY = "alarm_wakeup_time";
 	public static final String SELECTED_RESORTS_PREF_KEY = "selected_resorts";
 	/*
 	 * Note: this was the name used before notifications were used.  Don't change it now
@@ -87,112 +76,47 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	 */
 	public static final String EXTRA_START_PREF_SCREEN_WITH_KEY = "start_pref_with_key";
 	public static final String NOTIFY_PREFS_SCREEN_KEY = "notification_prefs";
+	// Spawned activity id's
+	private final static int ALARM_CONFIGURE = 2;
 
-	private void updateToneSummary(Uri ringtoneUri) {
-		// this code doesn't work for some reason - I can't get the real name of
-		// the ringtone
-		// RingtoneManager ringtoneManager = new RingtoneManager(this);
-		// int ringtonePosition =
-		// ringtoneManager.getRingtonePosition(ringtoneUri);
-		// if( ringtonePosition >= 0 ) {
-		// Ringtone ringtone = ringtoneManager.getRingtone(ringtonePosition);
-		// if(ringtone != null ) {
-		// mAlarmTonePreference.setSummary(ringtone.getTitle(WakeMeSkiPreferences.this));
-		// }
-		// }
-	}
-
-	@Override
-	public void onRingtoneChanged(Uri ringtoneUri) {
-		updateToneSummary(ringtoneUri);
-	}
-
-	private void alarmSchedulingPreferenceUpdated(SharedPreferences sharedPreferences,
-			String key) {
-		boolean alarmEnabled = mAlarmEnablePreference.isChecked();
-		/**
-		 * If the enable key was the key changed, get the latest value
-		 * from the passed object.
-		 */
-		if( key.equals(ALARM_ENABLE_PREF_KEY) ) {
-			alarmEnabled = sharedPreferences.getBoolean(key, false);
-		}
-
-		if ( alarmEnabled ) {
-
-			RepeatDaySharedPreference dayPref = mDayPreference
-													.getSharedPreference();
-			TimeSettingsSharedPreference timePref=	mWakeUpTimePreference
-													.getSharedPreference();
-
-			/**
-			 * I've found through testing that onSharedPreference() is fired multiple
-			 * times when preferences change and unfortunately in some cases at least
-			 * the second time the preferences value returned by .getSharedPreference()
-			 * returns a preference containing the previous values.
-			 * To work around this, check for keys with value REPEAT_DAYS_PREF_KEY or
-			 * ALARM_WAKEUP_TIME_PREF_KEY.  If we find this key, create a new
-			 * preferences object with the value of the shared preference and use this
-			 * instead of the member.getSharedPreference() value.
-			 */
-			if(key.equals(REPEAT_DAYS_PREF_KEY) ||
-					key.equals(ALARM_WAKEUP_TIME_PREF_KEY)) {
-				String value = sharedPreferences.getString(key, "");
-				if(value.length() > 0) {
-					if (key.equals(REPEAT_DAYS_PREF_KEY)) {
-						dayPref = new RepeatDaySharedPreference();
-						dayPref.setFromPersistString(value);
-					} else if (key.equals(ALARM_WAKEUP_TIME_PREF_KEY)) {
-						timePref = new TimeSettingsSharedPreference(this.getApplicationContext());
-						timePref.setTimeFromPersistString(value);
+	/**
+	 * Based on change in alarm scheduling related preferences, pop up a toast message
+	 * telling the user if the alarm is ready to go or not
+	 * @param wakeupEnabled true if the "enable wake-up" box is checked
+	 */
+	private void alarmSchedulingPreferenceUpdated(boolean wakeupEnabled) {
+	
+		if ( wakeupEnabled ) {
+			
+			if( Alarms.getEnabledAlarmsQuery(getContentResolver()).getCount() != 0 ) {
+				int wakeupEnabledResorts = 0;
+				for( Resort r: mResortManager.getResorts()) {
+					if( r.isWakeupEnabled() ) {
+						wakeupEnabledResorts ++;
 					}
 				}
-			}
-			AlarmCalculator calculator = new AlarmCalculator(dayPref,timePref);
-			Calendar nextAlarm = calculator.getNextAlarm();
-			if (nextAlarm != null) {
-				if (mAlarmController.setAlarm(nextAlarm)) {
-					int wakeupEnabledResorts = 0;
-					for( Resort r: mResortManager.getResorts()) {
-						if( r.isWakeupEnabled() ) {
-							wakeupEnabledResorts ++;
-						}
-					}
-					Toast toast ;
-					if( wakeupEnabledResorts != 0 ) {
-						toast = Toast.makeText(this, R.string.alarm_updated,
-								Toast.LENGTH_SHORT);
-					} else {
-						toast = Toast.makeText(this, R.string.please_enable_wakeup_on_resort,
-								Toast.LENGTH_SHORT);
-					}
-					toast.show();
+				Toast toast ;
+				if( wakeupEnabledResorts != 0 ) {
+					toast = Toast.makeText(this, R.string.alarm_updated,
+							Toast.LENGTH_SHORT);
+				} else {
+					toast = Toast.makeText(this, R.string.please_enable_wakeup_on_resort,
+							Toast.LENGTH_SHORT);
 				}
+				toast.show();
 			} else {
-				Log.d("No days selected");
+				Log.d("No alarm configured");
 				Toast toast = Toast.makeText(this,
-						R.string.alarm_disabled_no_days_selected,
+						R.string.alarm_not_set,
 						Toast.LENGTH_SHORT);
 				toast.show();
-				mAlarmController.clearAlarm();
 			}
 		} else {
 			Log.d("Alarm is not enabled");
-			Toast toast = Toast.makeText(this, R.string.alarm_disabled,
+			Toast toast = Toast.makeText(this, R.string.wakeup_disabled,
 					Toast.LENGTH_SHORT);
 			toast.show();
-			mAlarmController.clearAlarm();
 		}
-	}
-
-	/**
-	 * @param key
-	 * @return true if this key value is a preference which relates to alarm scheduling.
-	 */
-	private boolean isAlarmSchedulingRelatedPreferenceKey(String key) {
-		return key.equals(ALARM_ENABLE_PREF_KEY) ||
-				key.equals(REPEAT_DAYS_PREF_KEY) ||
-				key.equals(ALARM_WAKEUP_TIME_PREF_KEY);
 	}
 
 	/**
@@ -208,8 +132,9 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 
-		if( isAlarmSchedulingRelatedPreferenceKey(key) ) {
-			alarmSchedulingPreferenceUpdated(sharedPreferences,key);
+		if( key.equals(ALARM_ENABLE_PREF_KEY) ) {
+			boolean enabled = sharedPreferences.getBoolean(key, false);
+			alarmSchedulingPreferenceUpdated(enabled);
 		} else if (key.equals(NOTIFY_ENABLE_PREF_KEY)) {
 			/*
 			 * Turn on/off alert wakeup service funtionality based on the new
@@ -226,26 +151,14 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mAlarmController = new AlarmController(this.getApplicationContext());
 		addPreferencesFromResource(R.xml.preferences);
-		mDayPreference = (RepeatDayPreference) findPreference(REPEAT_DAYS_PREF_KEY);
-		mWakeUpTimePreference = (TimePickerPreference) findPreference(ALARM_WAKEUP_TIME_PREF_KEY);
 		mAlarmEnablePreference = (CheckBoxPreference) findPreference(ALARM_ENABLE_PREF_KEY);
-		mAlarmTonePreference = (AlarmPreference) findPreference(ALARM_TONE_PREF_KEY);
 		mDashboardPreference = (PreferenceScreen) findPreference("dashboard");
 		mResortsPreference = (PreferenceScreen) findPreference("selected_resorts");
 		mWakeupSnowSettings = (SnowSettingsPreference) findPreference(SNOW_WAKEUP_SETTINGS_KEY);
 		mSendLogsPreference = (PreferenceScreen) findPreference("send_logs");
 		mResortManager = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager();
-		mAlarmTonePreference.setRingtoneChangedListener(this);
-
-		Uri defaultAlarm = getDefaultAlarm();
-		if (defaultAlarm != null) {
-			Log.i("Setting default alarm tone " + defaultAlarm);
-			mAlarmTonePreference.setDefaultValue(defaultAlarm);
-		}
-		updateToneSummary(defaultAlarm);
-
+		mAlarmSettingsPreference = (PreferenceScreen) findPreference("alarm_settings");
 		updateAlarmPreferences();
 
 		getPreferenceScreen().getSharedPreferences()
@@ -271,31 +184,36 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	}
 
 	/**
-	 * picks the first alarm available
-	 */
-	private Uri getDefaultAlarm() {
-		RingtoneManager ringtoneManager = new RingtoneManager(this);
-		ringtoneManager.setType(RingtoneManager.TYPE_ALARM);
-		return ringtoneManager.getRingtoneUri(0);
-	}
-
-	/**
 	 * Syncs the enabled state of alarm related settings to the enable checkbox
 	 */
 	private void updateAlarmPreferences() {
 		boolean enabled = mAlarmEnablePreference.isChecked();
-		mWakeUpTimePreference.setEnabled(enabled);
-		mDayPreference.setEnabled(enabled);
-		mAlarmTonePreference.setEnabled(enabled);
 		mWakeupSnowSettings.setEnabled(enabled);
+		String alarmSettingsSummary = getString(R.string.count_alarms_enabled ,
+				Alarms.getEnabledAlarmsQuery(getContentResolver()).getCount());
+		/**
+		 * Set the number of currently enabled alarms in the alarm preferences dialog
+		 */
+		mAlarmSettingsPreference.setSummary(alarmSettingsSummary);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == ALARM_CONFIGURE) {
+			alarmSchedulingPreferenceUpdated(mAlarmEnablePreference.isChecked());
+			updateAlarmPreferences();
+		}
 	}
 
 	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
 			Preference preference) {
+		if (preference == mAlarmSettingsPreference ) {
+			startActivityForResult(new Intent(this, WakeMeSkiAlarmCustomization.getInstance().getAlarmClock()),ALARM_CONFIGURE);
+		}
 		if (preference == mAlarmEnablePreference) {
 			updateAlarmPreferences();
-			updateToneSummary(mAlarmTonePreference.getTone());
 		} else if (preference == mDashboardPreference) {
 			startActivity(new Intent(Intent.ACTION_MAIN, null, this,
 					WakeMeSkiDashboard.class));
@@ -338,6 +256,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	 * @return true if handled
 	 */
 	private boolean applyMenuChoice(MenuItem item) {
+		/*
 		if (WakeMeSkiPreferences.DEBUG) {
 			switch (item.getItemId()) {
 			case TEST_SERVICE_FIRE_ID:
@@ -359,6 +278,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 
 			}
 		}
+		*/
 		return false;
 	}
 

@@ -21,10 +21,15 @@ import android.preference.PreferenceManager;
 
 import com.wakemeski.core.WakeMeSkiFactory;
 import com.wakemeski.core.alert.AlertPollingController;
+import com.wakemeski.deskclock_custom.WakeMeSkiAlarmCustomization;
+import com.wakemeski.generic_deskclock.GenericDeskClockCustomization;
 import com.wakemeski.ui.WakeMeSkiPreferences;
 
 public class WakeMeSki extends Application {
 
+	static {
+		GenericDeskClockCustomization.setInstance(new WakeMeSkiAlarmCustomization());
+	}
 	/**
 	 * Global control of all debug applications including logging to logcat
 	 */
