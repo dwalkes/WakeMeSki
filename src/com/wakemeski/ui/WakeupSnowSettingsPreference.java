@@ -14,7 +14,7 @@ public class WakeupSnowSettingsPreference extends SnowSettingsPreference {
 	public WakeupSnowSettingsPreference(Context context, AttributeSet attrs) {
 		super(context,attrs,SnowSettingsSharedPreference.getWakeupPreference());
 	}
-	
+
 	@Override
 	protected String getUpdateSummaryPrefix() {
 		// TODO Auto-generated method stub
@@ -26,5 +26,4 @@ public class WakeupSnowSettingsPreference extends SnowSettingsPreference {
 		// TODO Auto-generated method stub
 		return getContext().getString(R.string.wake_overnight);
 	}
-
 }

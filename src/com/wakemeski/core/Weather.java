@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 
 /**
@@ -30,11 +30,10 @@ import com.wakemeski.pref.SnowSettingsSharedPreference;
  */
 public class Weather implements Parcelable {
 
-	private String mWhen;
-	private long mExact;
-	private String mDesc;
-	private SnowUnits mUnits;
-	private static String TAG = "Weather";
+	private final String mWhen;
+	private final long mExact;
+	private final String mDesc;
+	private final SnowUnits mUnits;
 
 	public Weather(String when, long exact, String desc, SnowUnits units) {
 		mWhen = when;
@@ -53,7 +52,7 @@ public class Weather implements Parcelable {
 			try {
 				snowTotal = Integer.parseInt(snowTotalString);
 			} catch (Throwable t) {
-				Log.e(TAG, "Unable to parse snow total to int: " + snowTotalString);
+				Log.e("Unable to parse snow total to int: " + snowTotalString);
 			}
 		}
 		return pref.meetsPreference(snowTotal, mUnits);

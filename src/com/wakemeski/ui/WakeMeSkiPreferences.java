@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.dwalkes.generic_deskclock.AlarmClock;
+
 import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.WakeMeSki;
@@ -42,9 +43,9 @@ import com.wakemeski.core.alert.AlertPollingController;
 /**
  * The main preferences activity, used to show wakemeski application
  * preferences.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class WakeMeSkiPreferences extends PreferenceActivity implements
 		SharedPreferences.OnSharedPreferenceChangeListener {
@@ -55,7 +56,6 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private PreferenceScreen mSendLogsPreference;
 	private SnowSettingsPreference mWakeupSnowSettings;
 	private PreferenceScreen mAlarmSettingsPreference;
-	private String TAG = "WakeMeSkiPreferences";
 	private ResortManager	mResortManager;
 	public static final String ALARM_ENABLE_PREF_KEY = "alarm_enable";
 	public static final String SELECTED_RESORTS_PREF_KEY = "selected_resorts";
@@ -105,19 +105,20 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 				}
 				toast.show();
 			} else {
-				Log.d(TAG, "No days selected");
-				Toast toast = Toast.makeText(this, 
+				Log.d("No days selected");
+				Toast toast = Toast.makeText(this,
 						R.string.alarm_disabled_no_days_selected,
 						Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		} else {
-			Log.d(TAG, "Alarm is not enabled");
+			Log.d("Alarm is not enabled");
 			Toast toast = Toast.makeText(this, R.string.alarm_disabled,
 					Toast.LENGTH_SHORT);
 			toast.show();
 		}
 	}
+
 
 	/**
 	 * @param sharedPreferences the preferences object containing shared preferences
@@ -127,7 +128,8 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	public static boolean isAlertNotificationEnabled(SharedPreferences sharedPreferences) {
 		return sharedPreferences.getBoolean(NOTIFY_ENABLE_PREF_KEY, false);
 	}
-	
+
+	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
@@ -165,14 +167,15 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 
 
 
-		
+
 	}
 
-	public void onResume() { 
+	@Override
+	public void onResume() {
 		super.onResume();
 		Intent i = getIntent();
 		/**
-		 * If we specified starting at a specific preference screen, 
+		 * If we specified starting at a specific preference screen,
 		 * start it based on the value in the intent extra.
 		 */
 		if( i != null && i.hasExtra(EXTRA_START_PREF_SCREEN_WITH_KEY) ) {
@@ -180,7 +183,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 			setPreferenceScreen((PreferenceScreen) findPreference(startPrefScreen));
 		}
 	}
-	
+
 	/**
 	 * Syncs the enabled state of alarm related settings to the enable checkbox
 	 */
@@ -220,18 +223,18 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 				toast.show();
 			} else {
 				Resort[] resorts =WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager().getResorts();
-				Log.d(TAG, "Configured resorts:");
+				Log.d("Configured resorts:");
 				for( Resort resort : resorts ) {
-					Log.d(TAG, resort + " isWakeupEnabled= " + resort.isWakeupEnabled());
+					Log.d(resort + " isWakeupEnabled= " + resort.isWakeupEnabled());
 				}
-				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND); 
+				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			    emailIntent.setType("plain/text");
-			    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] 
-			    {"wakemeski@ddubtech.com"}); 
-			    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, 
-			    "WakeMeSki debug log"); 
-			    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, 
-			    "Description of problem:"); 
+			    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]
+			    {"wakemeski@ddubtech.com"});
+			    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+			    "WakeMeSki debug log");
+			    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+			    "Description of problem:");
 			    emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+ logFile.getAbsolutePath()));
 			    startActivity(Intent.createChooser(emailIntent,this.getString(R.string.send_mail)));
 			}
@@ -241,7 +244,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 
 	/**
 	 * Handles menu items invoked from the menu
-	 * 
+	 *
 	 * @param item
 	 *            the item invoked
 	 * @return true if handled
@@ -287,5 +290,4 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 		}
 		return super.onCreateOptionsMenu(menu);
 	}
-
 }

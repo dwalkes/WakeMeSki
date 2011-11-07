@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.core;
 
@@ -20,9 +20,9 @@ package com.wakemeski.core;
  * An enumeration describing the units of measure for snow totals. Different
  * resorts may use different display measurements, and the user may want to
  * configure thresholds in terms of different display measurements.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public enum SnowUnits {
 	INCHES("inches"), CENTIMETERS("cm");

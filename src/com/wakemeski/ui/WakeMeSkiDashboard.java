@@ -28,16 +28,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import com.wakemeski.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 
+import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.core.Report;
 import com.wakemeski.core.ReportController;
@@ -59,7 +59,6 @@ public class WakeMeSkiDashboard extends Activity {
 	private static final int PREFERENCES_ID = Menu.FIRST;
 	private static final int REFRESH_ID     = Menu.FIRST + 1;
 	private static final int ALERTS_ID     = Menu.FIRST + 2;
-	private static final String TAG = "WakeMeSkiDashboard";
 	private int mApVersion = 0;
 	private int mApLatestVersion = 0;
 	private ReportController mReportController;
@@ -74,28 +73,27 @@ public class WakeMeSkiDashboard extends Activity {
 		super.onCreate(icicle);
 
 		Eula.show(this);
-		
+
 		mReportController = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getReportController();
 		mResortManager = WakeMeSkiFactory.getInstance(this.getApplicationContext()).getRestortManager();
-		
+
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.dashboard);
 
-		try 
+		try
 		{
 			mApVersion = getApplicationContext().getPackageManager().
 					getPackageInfo(getPackageName(),PackageManager.GET_ACTIVITIES).versionCode;
-		} catch (NameNotFoundException e)
-		{
-			Log.e(TAG,"Caught NameNotFoundException quering my package!" + e.getLocalizedMessage() );
+		} catch (NameNotFoundException e) {
+			Log.e("Caught NameNotFoundException quering my package!" + e.getLocalizedMessage() );
 		}
-		
+
 		mReportsList = (ListView)findViewById(R.id.dashboard_list);
 		mAddResortsButton = (Button)findViewById(R.id.add_resort_button_dashboard);
-		
+
 		/*
 		 * If the user hasn't configured a resort we will turn this button on with
-		 * setVisibility() to allow them to select a resort.  
+		 * setVisibility() to allow them to select a resort.
 		 * By default it will be invisible
 		 */
 		mAddResortsButton.setOnClickListener(new Button.OnClickListener() {
@@ -105,7 +103,7 @@ public class WakeMeSkiDashboard extends Activity {
 						ResortListActivity.class));
 			}
 		});
-		
+
 		mListAdapter = new ReportListAdapter(getApplicationContext());
 		mReportsList.setAdapter(mListAdapter);
 
@@ -114,14 +112,14 @@ public class WakeMeSkiDashboard extends Activity {
 
 	@Override
 	protected void onResume() {
-		super.onResume();		
+		super.onResume();
 
 		/*
-		 * Update visibility of the add resorts button based on number of 
+		 * Update visibility of the add resorts button based on number of
 		 * configured resorts
 		 */
 		updateAddResortsButton();
-		
+
 		mReportController.addListener(mReportListener);
 		if( mReportController.isBusy() ) {
 			setProgressBarIndeterminateVisibility(true);
@@ -134,9 +132,9 @@ public class WakeMeSkiDashboard extends Activity {
 
 		mReportController.removeListener(mReportListener);
 	}
-	
+
 	/**
-	 * Update visibility of the mAddResortsButton button based on number 
+	 * Update visibility of the mAddResortsButton button based on number
 	 * of configured resorts.  When resorts are configured, remove from the view.
 	 */
 	private void updateAddResortsButton() {
@@ -146,7 +144,7 @@ public class WakeMeSkiDashboard extends Activity {
 			mAddResortsButton.setVisibility(View.VISIBLE);
 		}
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean result = super.onPrepareOptionsMenu(menu);
@@ -171,7 +169,7 @@ public class WakeMeSkiDashboard extends Activity {
 		item.setIcon(R.drawable.ic_menu_notifications);
 
 		item = menu.add(0, PREFERENCES_ID, 0, R.string.set_preferences);
-		item.setIcon(android.R.drawable.ic_menu_preferences);		
+		item.setIcon(android.R.drawable.ic_menu_preferences);
 
 		return result;
 	}
@@ -197,13 +195,14 @@ public class WakeMeSkiDashboard extends Activity {
 	}
 
 
-	
-	private ReportListener mReportListener = new ReportListener() {
+
+	private final ReportListener mReportListener = new ReportListener() {
 		Handler h = new Handler();
 
 		@Override
 		public void onUpdated() {
 			h.post(new Runnable() {
+				@Override
 				public void run() {
 					updateAddResortsButton();
 				}
@@ -213,6 +212,7 @@ public class WakeMeSkiDashboard extends Activity {
 		public void onAdded(Report r) {
 			if( r.getServerInfo().getApMinSupportedVersion() > mApVersion ) {
 				h.post(new Runnable() {
+					@Override
 					public void run() {
 						showDialog(DIALOG_ID_LESS_THAN_MIN_VERSION);
 					}
@@ -227,15 +227,16 @@ public class WakeMeSkiDashboard extends Activity {
 				mApLatestVersion = r.getServerInfo().getApLatestVersion();
 
             	if( !prefs.contains(UPDATE_IGNORE_PREF_KEY) ||
-            			prefs.getInt(UPDATE_IGNORE_PREF_KEY,0) 
+            			prefs.getInt(UPDATE_IGNORE_PREF_KEY,0)
             				< r.getServerInfo().getApLatestVersion() ) {
     				h.post(new Runnable() {
-    					public void run() {
+    					@Override
+						public void run() {
     						showDialog(DIALOG_ID_LESS_THAN_LATEST_VERSION);
     					}
-    				});				
+    				});
             	} else {
-            		Log.d(TAG,"Not on latest version " + r.getServerInfo().getApLatestVersion() + " but I've already bugged you once...");
+            		Log.d("Not on latest version " + r.getServerInfo().getApLatestVersion() + " but I've already bugged you once...");
             	}
 
 
@@ -245,31 +246,36 @@ public class WakeMeSkiDashboard extends Activity {
 		@Override
 		public void onLoading(final boolean started) {
 		}
-		
+
+		@Override
 		public void onBusy(final boolean isBusy) {
 			h.post(new Runnable() {
+				@Override
 				public void run() {
 					setProgressBarIndeterminateVisibility(isBusy);
 				}
-			});	
+			});
 		}
 	};
 
-	
-    protected Dialog onCreateDialog(int id) {
+
+    @Override
+	protected Dialog onCreateDialog(int id) {
         if( id == DIALOG_ID_LESS_THAN_MIN_VERSION) {
 	        return new AlertDialog.Builder(this)
 	            .setTitle(R.string.please_upgrade)
 	            .setMessage(R.string.no_longer_supported)
 	            .setPositiveButton(R.string.update_button, new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int which) {
+	                @Override
+					public void onClick(DialogInterface dialog, int which) {
 	                    Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
 	                        "http://market.android.com/details?id=" + getPackageName()));
 	                    startActivity(marketIntent);
 	                }
 	            })
 	            .setNegativeButton(R.string.quit_button, new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int which) {
+	                @Override
+					public void onClick(DialogInterface dialog, int which) {
 	                    finish();
 	                }
 	            })
@@ -279,14 +285,16 @@ public class WakeMeSkiDashboard extends Activity {
             .setTitle(R.string.please_upgrade)
             .setMessage(R.string.out_of_date_dialog_body)
             .setPositiveButton(R.string.update_button, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+                @Override
+				public void onClick(DialogInterface dialog, int which) {
                     Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
                         "http://market.android.com/details?id=" + getPackageName()));
                     startActivity(marketIntent);
                 }
             })
             .setNegativeButton(R.string.ignore_button, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
+                @Override
+				public void onClick(DialogInterface dialog, int which) {
 					/*
 					 * If the user selected ignore and this isn't a mandatory
 					 * update don't bother them until the next update.
@@ -299,11 +307,11 @@ public class WakeMeSkiDashboard extends Activity {
                 	 */
                 	editor.putInt(UPDATE_IGNORE_PREF_KEY, mApLatestVersion);
                 	if( editor.commit() ) {
-                		Log.d(TAG,"OK I promise I won't bug you again... until the next version");
+                		Log.d("OK I promise I won't bug you again... until the next version");
                 	} else {
-                		Log.w(TAG, "Ignore pref key commit failed");
+                		Log.w("Ignore pref key commit failed");
                 	}
-                	
+
                 }
             })
             .create();
@@ -311,9 +319,10 @@ public class WakeMeSkiDashboard extends Activity {
         	return super.onCreateDialog(id);
         }
     }
-        
 
-	private OnItemClickListener mClickListener = new OnItemClickListener() {
+
+	private final OnItemClickListener mClickListener = new OnItemClickListener() {
+		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int pos, long id)
 		{
 			Report r = (Report)mListAdapter.getItem(pos);

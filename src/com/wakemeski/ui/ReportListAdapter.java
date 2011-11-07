@@ -40,11 +40,11 @@ public class ReportListAdapter implements ListAdapter {
 
 	private ArrayList<Report> mReports = new ArrayList<Report>();
 
-	private DataSetObservable mDataSetObservable = new DataSetObservable();
+	private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
-	private LayoutInflater mInflater;
-	
-	private ReportController mReportController;
+	private final LayoutInflater mInflater;
+
+	private final ReportController mReportController;
 
 	public ReportListAdapter(Context c) {
 		mInflater = (LayoutInflater) c
@@ -85,7 +85,7 @@ public class ReportListAdapter implements ListAdapter {
 		}
 		return atPosition;
 	}
-	
+
 	@Override
 	public synchronized Object getItem(int position) {
 		return getReportAtPosition(position);
@@ -151,7 +151,7 @@ public class ReportListAdapter implements ListAdapter {
 
 	ReportListener mListener = new ReportListener() {
 		/**
-		 * This method represents the content observer handler 
+		 * This method represents the content observer handler
 		 * we would use on notify changed
 		 * from the report controller if it were a content provider.
 		 */
@@ -166,6 +166,7 @@ public class ReportListAdapter implements ListAdapter {
 				mReports = mReportController.getSortedReportList();
 			}
 			mHandler.post(new Runnable() {
+				@Override
 				public void run() {
 					mDataSetObservable.notifyChanged();
 				}
@@ -179,10 +180,10 @@ public class ReportListAdapter implements ListAdapter {
 		@Override
 		public void onAdded(Report r) {
 		}
-		
+
 		@Override
 		public void onBusy( boolean busy ) {
-			
+
 		}
 	};
 }

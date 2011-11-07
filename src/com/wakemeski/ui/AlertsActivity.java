@@ -23,23 +23,23 @@ public class AlertsActivity extends ExpandableListActivity {
 	private static final int SHARE_ID = Menu.FIRST;
 
 	private AlertManager mAlerts;
-	
+
 	private static final int PREFERENCES_ID = Menu.FIRST;
 	private static final int REPORT_ID     = Menu.FIRST+1;
 	private Button mConfigureNotifyButton;
-	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.alert_list_activity);
-		
+
 		mConfigureNotifyButton = (Button)findViewById(R.id.btn_alert_configure_notify);
-		
+
 		/**
 		 * If the user hasn't configured a resort we will turn this button on with
-		 * setVisibility() to allow them to select a resort.  
+		 * setVisibility() to allow them to select a resort.
 		 * By default it will be invisible
 		 */
 		mConfigureNotifyButton.setOnClickListener(new Button.OnClickListener() {
@@ -47,17 +47,17 @@ public class AlertsActivity extends ExpandableListActivity {
 			public void onClick(View v) {
 				/**
 				 * Start the prefernces application at the notify preferences
-				 * PreferenceScreen when AlertsActivity#mConfigureNotifyButton 
+				 * PreferenceScreen when AlertsActivity#mConfigureNotifyButton
 				 * is clicked
 				 */
 				Intent i = new Intent(AlertsActivity.this,
 						WakeMeSkiPreferences.class);
-				i.putExtra(WakeMeSkiPreferences.EXTRA_START_PREF_SCREEN_WITH_KEY, 
+				i.putExtra(WakeMeSkiPreferences.EXTRA_START_PREF_SCREEN_WITH_KEY,
 						WakeMeSkiPreferences.NOTIFY_PREFS_SCREEN_KEY);
 				startActivity(i);
 			}
 		});
-		
+
 		mAlerts = new AlertManager(getApplication());
 		mAlerts.removeOld();
 		Cursor c = mAlerts.getAlertResorts();
@@ -163,7 +163,7 @@ public class AlertsActivity extends ExpandableListActivity {
 			return c;
 		}
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
@@ -172,7 +172,7 @@ public class AlertsActivity extends ExpandableListActivity {
 		item.setIcon(R.drawable.ic_menu_home);
 
 		item = menu.add(0, PREFERENCES_ID, 0, R.string.set_preferences);
-		item.setIcon(android.R.drawable.ic_menu_preferences);		
+		item.setIcon(android.R.drawable.ic_menu_preferences);
 
 		return result;
 	}

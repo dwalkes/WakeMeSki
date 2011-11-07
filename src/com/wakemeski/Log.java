@@ -18,35 +18,41 @@ package com.wakemeski;
 import java.io.File;
 
 import android.content.Context;
+import android.util.Config;
 
 import com.google.code.microlog4android.Logger;
 import com.google.code.microlog4android.LoggerFactory;
 import com.google.code.microlog4android.appender.FileAppender;
 import com.google.code.microlog4android.appender.LogCatAppender;
 import com.google.code.microlog4android.format.PatternFormatter;
+import com.wakemeski.ui.WakeMeSkiPreferences;
 
 /**
  * Logger class for WakeMeSki.  Wrapper around microlog4android
- * which provides logging both to file on sdcard and 
+ * which provides logging both to file on sdcard and
  */
 public class Log {
-	
+
+	public final static String TAG = "WakeMeSki";
+
+	public static final boolean LOGV = WakeMeSkiPreferences.DEBUG ? Config.LOGD : Config.LOGV;
+
 	static private Log mLogger = null;
-	private Logger mMicrologLogger;
+	private final Logger mMicrologLogger;
 	private FileAppender mFileAppender = null;
-	
+
 	private Log() {
 		mMicrologLogger = LoggerFactory.getLogger();
 
 		/*
-		 * Only write prints to logcat if this is a 
+		 * Only write prints to logcat if this is a
 		 * debug build
 		 */
 		if( WakeMeSki.DEBUG ) {
 			mMicrologLogger.addAppender(new LogCatAppender());
 		}
 	}
-	
+
 	/**
 	 * Sets the context for the logger which will add support for
 	 * logging to file
@@ -78,7 +84,7 @@ public class Log {
 			mMicrologLogger.addAppender(mFileAppender);
 		}
 	}
-	
+
 	public File getLogFile() {
 		File logFile=null;
 		if( mFileAppender != null ) {
@@ -91,43 +97,43 @@ public class Log {
 		}
 		return logFile;
 	}
-	
+
 	static public synchronized Log getInstance() {
 		if( mLogger == null ) {
 			mLogger = new Log();
 		}
 		return mLogger;
 	}
-	
+
 	static private Logger getMicrologLogger() {
 		return getInstance().mMicrologLogger;
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.d but uses microlog
 	 * @param tag
 	 * @param message
 	 */
-	public static void d(String tag, String message) {
-		getMicrologLogger().debug(tag+ ": " + message);
+	public static void d(String message) {
+		getMicrologLogger().debug(TAG+ ": " + message);
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.e but uses microlog
 	 * @param tag
 	 * @param message
 	 */
-	public static void e(String tag, String message) {
-		getMicrologLogger().error(tag+ ": " + message);
+	public static void e(String message) {
+		getMicrologLogger().error(TAG+ ": " + message);
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.e but uses microlog
 	 * @param tag
 	 * @param message
 	 */
-	public static void e(String tag, String message, Throwable t) {
-		getMicrologLogger().error(tag+ ": " + message);
+	public static void e(String message, Throwable t) {
+		getMicrologLogger().error(TAG+ ": " + message);
 	}
 
 	/**
@@ -135,8 +141,8 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void i(String tag, String message) {
-		getMicrologLogger().info(tag+ ": " + message);
+	public static void i(String message) {
+		getMicrologLogger().info(TAG+ ": " + message);
 	}
 
 	/**
@@ -144,17 +150,16 @@ public class Log {
 	 * @param tag
 	 * @param message
 	 */
-	public static void w(String tag, String message) {
-		getMicrologLogger().warn(tag+ ": " + message);
+	public static void w(String message) {
+		getMicrologLogger().warn(TAG+ ": " + message);
 	}
-	
+
 	/**
 	 * Mimics android.util.Log.w but uses microlog
 	 * @param tag
 	 * @param message
 	 */
-	public static void w(String tag, String message, Throwable t) {
-		getMicrologLogger().warn(tag+ ": " + message,t);
+	public static void w(String message, Throwable t) {
+		getMicrologLogger().warn(TAG+ ": " + message,t);
 	}
-	
 }

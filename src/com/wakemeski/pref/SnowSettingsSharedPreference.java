@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.pref;
 
@@ -25,21 +25,21 @@ import com.wakemeski.ui.WakeMeSkiPreferences;
  * A POJO used to access snow settings from a shared preference. Shared by the
  * preference dialog class and any class reading snow settings directly out of
  * the shared preferences datastore.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class SnowSettingsSharedPreference {
 	private int snowDepth = 1; // the default
 	private SnowUnits measurementUnits = SnowUnits.INCHES;
-	private String mPrefKey;
-	
+	private final String mPrefKey;
+
 	/**
 	 * A singleton reference to the snow settings shared preference
 	 * for wakeup snow threshold
 	 */
 	private static SnowSettingsSharedPreference mWakeupPreference = null;
-	
+
 	/**
 	 * A singleton reference to the snow settings shared preference for
 	 * notify snow threshold
@@ -49,7 +49,7 @@ public class SnowSettingsSharedPreference {
 	private SnowSettingsSharedPreference(String prefKey) {
 		mPrefKey = prefKey;
 	}
-	
+
 	public int getSnowDepth() {
 		return snowDepth;
 	}
@@ -65,7 +65,7 @@ public class SnowSettingsSharedPreference {
 	public void setMeasurementUnits(SnowUnits measurementUnits) {
 		this.measurementUnits = measurementUnits;
 	}
-	
+
 	/**
 	 * @return The key used to store this shared preference in persistent storage
 	 */
@@ -80,7 +80,7 @@ public class SnowSettingsSharedPreference {
 
 	/**
 	 * Converts from a persisted string to
-	 * 
+	 *
 	 * @param persistedString
 	 * @return true if set, false if using defaults
 	 */
@@ -112,10 +112,11 @@ public class SnowSettingsSharedPreference {
 		return snowSet;
 	}
 
+	@Override
 	public String toString() {
 		return snowDepth + " " + measurementUnits.getAbbreviation();
 	}
-	
+
 	/**
 	 * @return reference to the snow settings preference holding the value of the snow wakeup
 	 * preference key
@@ -134,7 +135,7 @@ public class SnowSettingsSharedPreference {
 	public static synchronized SnowSettingsSharedPreference getNotifyPreference() {
 		if( mNotifyPreference == null ) {
 			mNotifyPreference = new SnowSettingsSharedPreference(WakeMeSkiPreferences.SNOW_ALERT_SETTINGS_KEY);
-		} 
+		}
 		return mNotifyPreference;
 	}
 

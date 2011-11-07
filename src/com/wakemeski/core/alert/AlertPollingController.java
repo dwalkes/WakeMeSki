@@ -12,17 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.core.alert;
-
-import com.wakemeski.ui.OnAlarmReceiver;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+
 import com.wakemeski.Log;
+import com.wakemeski.ui.OnAlarmReceiver;
 
 /**
  * A class to control the turn on/off of polling for snow alerts using
@@ -31,14 +31,13 @@ import com.wakemeski.Log;
 public class AlertPollingController {
 
 	Context mContext;
-	
-	private static final String TAG = "AlertAlarmController";
+
 	private static AlertPollingController mInstance = null;
-	
+
 	private AlertPollingController(Context c) {
 		mContext = c;
 	}
-	
+
 	public static synchronized AlertPollingController getInstance(Context c) {
 		if( mInstance == null ) {
 			mInstance = new AlertPollingController(c);
@@ -62,21 +61,21 @@ public class AlertPollingController {
 	 * Enable the periodic wakeup check for alerts
 	 */
 	public void enableAlertPolling() {
-		Log.d(TAG, "Enabling alert polling");
+		Log.d("Enabling alert polling");
 		AlarmManager mgr = (AlarmManager) mContext
 								.getSystemService(Context.ALARM_SERVICE);
-		mgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 
+		mgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
 								0, AlarmManager.INTERVAL_HOUR, getPendingIntent());
 	}
-	
+
 	/**
 	 * Disable wakeup checks for snow alerts
 	 */
 	public void disableAlertPolling() {
-		Log.d(TAG, "Disabling alert polling");
+		Log.d("Disabling alert polling");
 		AlarmManager mgr = (AlarmManager) mContext
 				.getSystemService(Context.ALARM_SERVICE);
-		
+
 		mgr.cancel(getPendingIntent());
 	}
 }

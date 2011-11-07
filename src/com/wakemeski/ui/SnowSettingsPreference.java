@@ -12,13 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
-
-import com.wakemeski.R;
-import com.wakemeski.core.SnowUnits;
-import com.wakemeski.pref.SnowSettingsSharedPreference;
 
 import android.content.Context;
 import android.preference.DialogPreference;
@@ -27,12 +23,16 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Spinner;
 
+import com.wakemeski.R;
+import com.wakemeski.core.SnowUnits;
+import com.wakemeski.pref.SnowSettingsSharedPreference;
+
 /**
  * A preference class that shows a dialog for selecting how much snow a
  * configured resort must receive before enabling a wakeup call.
- * 
+ *
  * @author dan
- * 
+ *
  */
 abstract class SnowSettingsPreference extends DialogPreference {
 
@@ -61,6 +61,7 @@ abstract class SnowSettingsPreference extends DialogPreference {
 	/**
 	 * Sets custom properties on the dialog
 	 */
+	@Override
 	protected void onBindDialogView(View view) {
 		super.onBindDialogView(view);
 		if (view != null) {
@@ -99,6 +100,7 @@ abstract class SnowSettingsPreference extends DialogPreference {
 	 * Called when the dialog is closed through OK or cancel buttons. Saves
 	 * settings back to persistent storage.
 	 */
+	@Override
 	public void onDialogClosed(boolean positiveResult) {
 		if (positiveResult) {
 			if (mDepthSpinner != null) {
@@ -126,15 +128,15 @@ abstract class SnowSettingsPreference extends DialogPreference {
 	 * @return a string to place before the value of the snow setting
 	 */
 	protected abstract String getUpdateSummaryPrefix();
-	
+
 	/**
 	 * Abstract method used to obtain a suffix string displayed in the summary
 	 * bar of the preference.  Describes the use of this snow settings preference object
 	 * @return a string to place after the value of the snow setting
 	 */
 	protected abstract String getUpdateSummarySuffix();
-	
-	
+
+
 	/**
 	 * Updates the summary text of this preference with the status stored in
 	 * this class
@@ -160,6 +162,7 @@ abstract class SnowSettingsPreference extends DialogPreference {
 	/**
 	 * This is our first chance to read persistent data
 	 */
+	@Override
 	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
 		if (!mPreference.setFromPersistedString(this.getPersistedString(null))) {
@@ -169,5 +172,4 @@ abstract class SnowSettingsPreference extends DialogPreference {
 		updateSummary();
 
 	}
-
 }

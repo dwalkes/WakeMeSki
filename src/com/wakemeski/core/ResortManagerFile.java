@@ -25,6 +25,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import android.content.Context;
+
 import com.wakemeski.Log;
 
 /**
@@ -34,10 +35,8 @@ import com.wakemeski.Log;
  *
  */
 public class ResortManagerFile implements ResortManager {
-
-	private static final String TAG = ResortManagerFile.class.getName();
 	private static final String resortFile = "resorts.txt";
-	private Context context;
+	private final Context context;
 	private static ResortManagerFile instance = null;
 
 	private Resort mResorts[];
@@ -74,14 +73,13 @@ public class ResortManagerFile implements ResortManager {
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(mResorts);
 		} catch (Exception e) {
-			Log.e(TAG, "Exception " + e + " writing " + resortFile);
+			Log.e("Exception " + e + " writing " + resortFile);
 		} finally {
 			if (oos != null) {
 				try {
 					oos.close();
 				} catch (IOException ioe) {
-					Log.w(TAG, "IO exception " + ioe + " closing output file "
-							+ resortFile);
+					Log.w("IO exception " + ioe + " closing output file " + resortFile);
 				}
 			}
 		}
@@ -97,17 +95,16 @@ public class ResortManagerFile implements ResortManager {
 			mResorts = (Resort[]) ois.readObject();
 			Arrays.sort(mResorts);
 		} catch (FileNotFoundException fnf) {
-			Log.w(TAG, "File " + resortFile
-					+ " not found setting selected resorts");
+			Log.w("File " + resortFile + " not found setting selected resorts");
 			// leave selected resorts list empty
 		} catch (Exception e) {
-			Log.e(TAG, "Exception " + e + " reading " + resortFile);
+			Log.e("Exception " + e + " reading " + resortFile);
 		} finally {
 			if (ois != null) {
 				try {
 					ois.close();
 				} catch (IOException ioe) {
-					Log.w(TAG, "IO exception closing input file " + resortFile);
+					Log.w("IO exception closing input file " + resortFile, ioe);
 				}
 			}
 		}
@@ -116,6 +113,7 @@ public class ResortManagerFile implements ResortManager {
 	/**
 	 * @return The current resort list from persistent storage
 	 */
+	@Override
 	public Resort[] getResorts() {
 		if( mResorts == null ) {
 			mResorts = new Resort[0];

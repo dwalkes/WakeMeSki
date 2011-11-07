@@ -31,8 +31,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import com.wakemeski.Log;
 
+import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.core.Location;
 import com.wakemeski.core.Report;
@@ -53,11 +53,9 @@ public class AlertManager {
 	public static final int NOTIFICATION_ID = R.drawable.snow;
 
 	private static final long SIX_HOURS = 6 * 60 * 60;
-	
-	private static final String TAG = "AlertManager";
 
-	private Context mContext;
-	private SQLiteDatabase mDB;
+	private final Context mContext;
+	private final SQLiteDatabase mDB;
 
 	private SnowSettingsSharedPreference mNotifySnowSettings = null;
 
@@ -95,7 +93,7 @@ public class AlertManager {
 		mDB = h.getWritableDatabase();
 
 	}
-	
+
 	public void close() {
 		mDB.close();
 	}
@@ -137,7 +135,7 @@ public class AlertManager {
 		c.close();
 		return resortId;
 	}
-	
+
 	/**
 	 * Returns the resort ID or creates a entry
 	 */
@@ -148,12 +146,12 @@ public class AlertManager {
 		if( id == null ) {
 			SQLiteStatement insertResort = mDB
 						.compileStatement("INSERT INTO resorts (label,url) values (?, ?)");
-			
+
 			insertResort.bindString(1, l.getLabel());
 			insertResort.bindString(2, l.getReportUrlPath());
 			id = insertResort.executeInsert();
 			insertResort.close();
-		} 
+		}
 		return id;
 	}
 
@@ -179,7 +177,7 @@ public class AlertManager {
 		SQLiteStatement insertAlert = mDB
 			.compileStatement("INSERT INTO alerts (time,desc,acked,resort) values (?, ?, ?, ?)");
 
-		
+
 		insertAlert.bindLong(1, w.getExact());
 		insertAlert.bindString(2, w.getDesc());
 		insertAlert.bindLong(3, 0);
@@ -221,7 +219,7 @@ public class AlertManager {
 	public void acknowledgeAlerts() {
 		SQLiteStatement ackAll = mDB
 		.compileStatement("UPDATE alerts SET acked=1 WHERE acked=0");
-		
+
 		ackAll.execute();
 		ackAll.close();
 
@@ -247,17 +245,17 @@ public class AlertManager {
 	 * Removes all alerts and resorts from the database
 	 */
 	public void removeAll() {
-		Log.d(TAG,"Removing all resorts & alerts");
+		Log.d("Removing all resorts & alerts");
 		SQLiteStatement removeAllAlerts= mDB.compileStatement("DELETE FROM alerts");
 		removeAllAlerts.execute();
 		removeAllAlerts.close();
-		
+
 		SQLiteStatement removeAllResorts= mDB.compileStatement("DELETE FROM resorts");
 		removeAllResorts.execute();
 		removeAllResorts.close();
-		
+
 	}
-	
+
 	/**
 	 * Removes all resorts for a particular resort from the database
 	 * @param r
@@ -265,7 +263,7 @@ public class AlertManager {
 	public void removeResort(Resort r) {
 		Long resId = getExistingResortId(r.getLocation());
 		if( resId != null ) {
-			Log.d(TAG,"Removing resort " + r);
+			Log.d("Removing resort " + r);
 			SQLiteStatement removeResortAlerts = mDB.compileStatement("DELETE FROM alerts WHERE resort=?");
 			removeResortAlerts.bindLong(1, resId);
 			removeResortAlerts.execute();
@@ -274,7 +272,7 @@ public class AlertManager {
 			removeResorts.bindLong(1, resId);
 			removeResorts.execute();
 		} else {
-			Log.d(TAG,"Attempt to remove not present resort " +r);
+			Log.d("Attempt to remove not present resort " +r);
 		}
 	}
 	/**

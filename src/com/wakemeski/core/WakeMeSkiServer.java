@@ -1,4 +1,4 @@
- /* 
+ /*
  * Copyright (c) 2010 Dan Walkes, Andy Doan
  * All rights reserved.
  *
@@ -35,21 +35,21 @@ import org.apache.http.client.ClientProtocolException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.Settings;
+
 import com.wakemeski.Log;
 
 /**
- * Wrapper around HttpUtils.getLocationServer() that allows caching a 
+ * Wrapper around HttpUtils.getLocationServer() that allows caching a
  * server location
  */
 public class WakeMeSkiServer {
-	private static final String TAG = "WakeMeSkiServer";
-	
+
 	private String mID = null;
-	
+
 	private String mServerUrl=null;
-	
+
 	private WakeMeSkiServerInfo mServerInfo=null;
-	
+
 	/**
 	 * list of supported servers
 	 */
@@ -57,14 +57,14 @@ public class WakeMeSkiServer {
 		"http://bettykrocks.com/skireport",
 		"http://wakemeski.com/skireport"
 	};
-	
+
 	public WakeMeSkiServer(Context c) {
 		mServerInfo = null;
-		initID(c.getContentResolver());	
+		initID(c.getContentResolver());
 	}
-	
+
 	protected WakeMeSkiServer(Context c, String serverUrl) {
-		initID(c.getContentResolver());	
+		initID(c.getContentResolver());
 		mServerUrl = serverUrl;
 	}
 
@@ -75,7 +75,7 @@ public class WakeMeSkiServer {
 	}
 
 	/**
-	 * @return The server URL as obtained from HttpUtils as necessary or 
+	 * @return The server URL as obtained from HttpUtils as necessary or
 	 * cached version from previous request
 	 */
 	private synchronized String getServerUrl() {
@@ -84,7 +84,7 @@ public class WakeMeSkiServer {
 		}
 		return mServerUrl;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getServerUrl();
@@ -98,7 +98,7 @@ public class WakeMeSkiServer {
 	public String getFetchUrl( String url ) {
 		return getServerUrl() + url;
 	}
-	
+
 	/**
 	 * Fetch the URL from the server by prefixing url with
 	 * the server URL
@@ -115,7 +115,7 @@ public class WakeMeSkiServer {
 	public String getId() {
 		return mID;
 	}
-	
+
 	/**
 	 * Same as the fetchURL but adds the phone's unique ID to the query
 	 * string so the server can track usage patterns
@@ -124,7 +124,7 @@ public class WakeMeSkiServer {
 		throws ClientProtocolException, IOException {
 		return fetchUrl(url + "&id=" + getId());
 	}
-	
+
 	/**
 	 * Simple wrapper to Integer.parseInt that will catch format errors
 	 */
@@ -133,12 +133,12 @@ public class WakeMeSkiServer {
 		try {
 			v = Integer.parseInt(val);
 		} catch (Throwable t) {
-			Log.e(TAG, "Unable to parse value to int: " + val);
+			Log.e("Unable to parse value to int: " + val);
 		}
 
 		return v;
 	}
-	
+
 	/**
 	 * Get the server info for the given server URL
 	 * @param serverUrl Server to query for server info
@@ -171,10 +171,10 @@ public class WakeMeSkiServer {
 			serverInfo.setAlertExpressions(exp.toArray(new String[exp.size()]));
 		}
 		catch ( ClientProtocolException ce ) {
-			Log.i(TAG,"Exception getting server info for server " + serverUrl + ce.getMessage());
-		} 
+			Log.i("Exception getting server info for server " + serverUrl + ce.getMessage());
+		}
 		catch ( IOException ioe ) {
-			Log.i(TAG,"Exception getting server info for server " + serverUrl + ioe.getMessage());
+			Log.i("Exception getting server info for server " + serverUrl + ioe.getMessage());
 		}
 		return serverInfo;
 
@@ -190,9 +190,9 @@ public class WakeMeSkiServer {
 		}
 		return mServerInfo;
 	}
-	
+
 	/**
-	 * Looks for the latest of the two servers in the server list, or defaults to 
+	 * Looks for the latest of the two servers in the server list, or defaults to
 	 * using the first server in the list if both are at the same version or both
 	 * are unreachable.
 	 * @return A string with the URL which should be used with this server
@@ -210,12 +210,12 @@ public class WakeMeSkiServer {
 				}
 			}
 			catch (Exception e) {
-				Log.i(TAG,"Exception getting server info for server " + serverUrl + e.getMessage());
+				Log.i("Exception getting server info for server " + serverUrl + e.getMessage());
 			}
 		}
 		mServerInfo = latestServerInfo;
 		return latestServerUrl;
 	}
-	
-	
+
+
 }

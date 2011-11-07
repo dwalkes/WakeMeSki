@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.core;
 
@@ -24,14 +24,14 @@ import java.util.Set;
 /**
  * A class containing resort information destined for persistent storage Uses
  * com.wakemeski.core.location as the base location detail.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class Resort implements Serializable, Comparable<Resort> {
 
 	boolean wakeupEnabled = false;
-	private Location mLocation;
+	private final Location mLocation;
 
 	/**
 	 * @return True when the user has configured a wakeup check on this resort
@@ -67,6 +67,7 @@ public class Resort implements Serializable, Comparable<Resort> {
 		return mLocation;
 	}
 
+	@Override
 	public String toString() {
 		return mLocation.toString();
 	}
@@ -78,7 +79,7 @@ public class Resort implements Serializable, Comparable<Resort> {
 
 	/**
 	 * Finds a resort in the list with matching location
-	 * 
+	 *
 	 * @param location
 	 *            The location to search for
 	 * @param resortList
@@ -104,7 +105,7 @@ public class Resort implements Serializable, Comparable<Resort> {
 		}
 		return locationSet.toArray(new Location[locationSet.size()]);
 	}
-	
+
 	public static Resort[] fromLocationList(Location[] locationList) {
 		Set<Resort> resortSet = new HashSet<Resort>();
 		for (Location location : locationList) {

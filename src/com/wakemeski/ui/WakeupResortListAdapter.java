@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 package com.wakemeski.ui;
 
@@ -23,17 +23,13 @@ import com.wakemeski.core.Resort;
 
 /**
  * A list adapter for the list of configured resorts.
- * 
+ *
  * @author dan
- * 
+ *
  */
 public class WakeupResortListAdapter extends ArrayAdapter<Resort> {
-
-	
 
 	public WakeupResortListAdapter(Context c, Resort[] items) {
 		super(c, android.R.layout.simple_list_item_multiple_choice, items);
 	}
-	
-
 }

@@ -46,7 +46,7 @@ public class HttpUtils {
 	/**
 	 * Returns the contents of the given URL as an array of strings
 	 */
-	public static String[] fetchUrl(String url) 
+	public static String[] fetchUrl(String url)
 		throws ClientProtocolException, IOException {
 		ArrayList<String> lines = new ArrayList<String>();
 
@@ -70,8 +70,8 @@ public class HttpUtils {
 	}
 
 
-	
 
-	
+
+
 
 }
