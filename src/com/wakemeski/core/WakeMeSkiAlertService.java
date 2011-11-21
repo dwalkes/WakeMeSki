@@ -24,9 +24,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
-import com.dwalkes.generic_deskclock.AlarmAlertWakeLock;
 import com.wakemeski.Log;
 import com.wakemeski.core.alert.AlertPollingController;
+import com.wakemeski.generic_deskclock.AlarmAlertWakeLock;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 import com.wakemeski.ui.WakeMeSkiPreferences;
 

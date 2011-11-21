@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.wakemeski.R;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -39,7 +40,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wakemeski.Log;
-import com.wakemeski.R;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 
 public class Report implements Parcelable {

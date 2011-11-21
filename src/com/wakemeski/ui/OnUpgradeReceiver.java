@@ -21,9 +21,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.dwalkes.generic_deskclock.AlarmAlertWakeLock;
 import com.wakemeski.Log;
 import com.wakemeski.core.WakeMeSkiWakeupService;
+import com.wakemeski.generic_deskclock.AlarmAlertWakeLock;
 
 /**
  * Catch an upgrade message for our ap... otherwise our alarm will be removed and never

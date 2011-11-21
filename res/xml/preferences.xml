@@ -20,7 +20,6 @@
 	     <PreferenceScreen 
    		android:key="alarm_settings"
 		android:title="@string/alarm_settings_title"
-		android:summary="@string/alarm_settings_summary"
 		/>	
    </PreferenceScreen>
    	<PreferenceScreen 

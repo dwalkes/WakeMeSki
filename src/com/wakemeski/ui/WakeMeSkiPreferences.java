@@ -30,8 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.dwalkes.generic_deskclock.AlarmClock;
-
 import com.wakemeski.Log;
 import com.wakemeski.R;
 import com.wakemeski.WakeMeSki;
@@ -39,6 +37,8 @@ import com.wakemeski.core.Resort;
 import com.wakemeski.core.ResortManager;
 import com.wakemeski.core.WakeMeSkiFactory;
 import com.wakemeski.core.alert.AlertPollingController;
+import com.wakemeski.deskclock_custom.WakeMeSkiAlarmCustomization;
+import com.wakemeski.generic_deskclock.Alarms;
 
 /**
  * The main preferences activity, used to show wakemeski application
@@ -82,13 +82,13 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	/**
 	 * Based on change in alarm scheduling related preferences, pop up a toast message
 	 * telling the user if the alarm is ready to go or not
-	 * @param alarmEnabled true if the alarm is enabled.
+	 * @param wakeupEnabled true if the "enable wake-up" box is checked
 	 */
-	private void alarmSchedulingPreferenceUpdated(boolean alarmEnabled) {
+	private void alarmSchedulingPreferenceUpdated(boolean wakeupEnabled) {
 	
-		if ( alarmEnabled ) {
+		if ( wakeupEnabled ) {
 			
-			if( false ) {
+			if( Alarms.getEnabledAlarmsQuery(getContentResolver()).getCount() != 0 ) {
 				int wakeupEnabledResorts = 0;
 				for( Resort r: mResortManager.getResorts()) {
 					if( r.isWakeupEnabled() ) {
@@ -105,15 +105,15 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 				}
 				toast.show();
 			} else {
-				Log.d("No days selected");
+				Log.d("No alarm configured");
 				Toast toast = Toast.makeText(this,
-						R.string.alarm_disabled_no_days_selected,
+						R.string.alarm_not_set,
 						Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		} else {
 			Log.d("Alarm is not enabled");
-			Toast toast = Toast.makeText(this, R.string.alarm_disabled,
+			Toast toast = Toast.makeText(this, R.string.wakeup_disabled,
 					Toast.LENGTH_SHORT);
 			toast.show();
 		}
@@ -190,13 +190,20 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	private void updateAlarmPreferences() {
 		boolean enabled = mAlarmEnablePreference.isChecked();
 		mWakeupSnowSettings.setEnabled(enabled);
+		String alarmSettingsSummary = getString(R.string.count_alarms_enabled ,
+				Alarms.getEnabledAlarmsQuery(getContentResolver()).getCount());
+		/**
+		 * Set the number of currently enabled alarms in the alarm preferences dialog
+		 */
+		mAlarmSettingsPreference.setSummary(alarmSettingsSummary);
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == ALARM_CONFIGURE && resultCode == RESULT_OK) {
+		if (requestCode == ALARM_CONFIGURE) {
 			alarmSchedulingPreferenceUpdated(mAlarmEnablePreference.isChecked());
+			updateAlarmPreferences();
 		}
 	}
 
@@ -204,7 +211,7 @@ public class WakeMeSkiPreferences extends PreferenceActivity implements
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
 			Preference preference) {
 		if (preference == mAlarmSettingsPreference ) {
-			startActivityForResult(new Intent(this, AlarmClock.class),ALARM_CONFIGURE);
+			startActivityForResult(new Intent(this, WakeMeSkiAlarmCustomization.getInstance().getAlarmClock()),ALARM_CONFIGURE);
 		}
 		if (preference == mAlarmEnablePreference) {
 			updateAlarmPreferences();

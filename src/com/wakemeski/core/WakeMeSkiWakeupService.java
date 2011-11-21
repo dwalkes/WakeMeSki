@@ -26,9 +26,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.dwalkes.generic_deskclock.Alarms;
 import com.wakemeski.Log;
 import com.wakemeski.WakeMeSki;
+import com.wakemeski.generic_deskclock.Alarms;
 import com.wakemeski.pref.SnowSettingsSharedPreference;
 
 /**
@@ -46,6 +46,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 	public static final String ACTION_WAKE_CHECK = "com.wakemeski.core.ACTION_WAKE_CHECK";
 	public static final String ACTION_SHUTDOWN = "com.wakemeski.core.ACTION_SHUTDOWN";
 	public static final String EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME ="com.wakemeski.core.BCAST_RECEIVER_TIME_EXTRA";
+	public static final String EXTRA_PENDING_ALARM_INTENT ="com.wakemeski.core.PENDING_ALARM_INTENT";
 	Intent	mPendingAlarmIntent=null;
 
 	/**
@@ -119,12 +120,11 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 					
 					if( mPendingAlarmIntent != null ) {
 						/*
-						 * Change the pending intent to be an alarm alert and actually fire the alarm
+						 * Actually fire the alarm using the pending alarm intent 
 						 * Set a receiver to call when the alert has been fired to allow shutdown of the service
 						 * It's not safe to shut down the service until the alert wake lock is held by the
 						 * alert broadcast receiver
 						 */
-						mPendingAlarmIntent.setAction(Alarms.ALARM_ALERT_ACTION);
 						sendOrderedBroadcast(mPendingAlarmIntent,
 												null, // no permission
 												new OnAlarmAlertReceiverComplete(),
@@ -282,6 +282,7 @@ public class WakeMeSkiWakeupService extends WakeMeSkiAlertService {
 			if (currentAction.equals(ACTION_WAKE_CHECK)) {
 				if( !staleIntent ) {
 					Log.d("Starting new wake check");
+					mPendingAlarmIntent = (Intent)intent.getExtras().get(EXTRA_PENDING_ALARM_INTENT);
 					checkAlarmAction();
 					/*
 					 * Don't stop the service, we will stop it after resorts are checked

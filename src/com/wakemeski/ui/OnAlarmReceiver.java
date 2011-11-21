@@ -19,11 +19,12 @@ package com.wakemeski.ui;
 import android.content.Context;
 import android.content.Intent;
 
-import com.dwalkes.generic_deskclock.AlarmAlertWakeLock;
-import com.dwalkes.generic_deskclock.AlarmReceiver;
 import com.wakemeski.Log;
 import com.wakemeski.core.WakeMeSkiAlertService;
 import com.wakemeski.core.WakeMeSkiWakeupService;
+import com.wakemeski.generic_deskclock.AlarmAlertWakeLock;
+import com.wakemeski.generic_deskclock.AlarmReceiver;
+import com.wakemeski.generic_deskclock.GenericDeskClockCustomization;
 
 /**
  * This class is invoked when an alarm check needs to occur based on a
@@ -49,12 +50,22 @@ public class OnAlarmReceiver extends AlarmReceiver {
 				 */
 				Intent i = new Intent(
 						intent.getAction(), null, context,
-						intent.getAction().equals(ACTION_ALERT_CHECK) ?
+						intent.getAction().equals(ACTION_ALERT_CHECK) ? 
 									WakeMeSkiAlertService.class :
 									WakeMeSkiWakeupService.class
 								);
 				i.putExtra(WakeMeSkiWakeupService.EXTRA_ALARM_INTENT_BROADCAST_RECEIVER_TIME,
 						System.currentTimeMillis());
+				if( intent.getAction().equals(ACTION_WAKE_CHECK) ) {
+					/*
+					 * Add an extra with the intent that will actually fire the alarm, by removing the class and
+					 * setting alarm alert action as the action
+					 */
+					Intent alarmFireIntent = GenericDeskClockCustomization.getInstance().getShowAlertIntent(context);
+					alarmFireIntent.putExtras(intent);
+					i.putExtra(WakeMeSkiWakeupService.EXTRA_PENDING_ALARM_INTENT,
+							alarmFireIntent);
+				}
 				context.startService(i);
 			} else {
 				Log.w("Unknown wake action " + intent.getAction());
